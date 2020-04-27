@@ -134,13 +134,12 @@ echo install pytorch
 conda install -y pytorch torchvision
 
 echo copy MPICH libs to local area
-cp /opt/cray/pe/mpt/7.7.0/gni/mpich-gnu-abi/5.1/lib/libmpi* ./lib/
-# cp /opt/cray/pe/mpt/default/gni/mpich-intel-abi/16.0/lib/libmpi*  ./lib/
+cp /opt/cray/pe/mpt/default/gni/mpich-gnu-abi/8.2/lib/libmpi* ./lib/
 
 echo install mpi4py
 conda install -y mpi4py
 
 # install keras and horovod
-echo install horovod
-pip install horovod
+#echo install horovod
+#pip install horovod
 

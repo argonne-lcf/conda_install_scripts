@@ -1,10 +1,12 @@
 #!/bin/bash
 
-CONDAVER=3
-VERSION=4.4.10
-BASE_DIR=$PWD/miniconda$CONDAVER
+PYTHON_VERSION=2
+CONDA_VERSION=latest
+BASE_DIR=$PWD/miniconda$PYTHON_VERSION
+PREFIX_PATH=$BASE_DIR/$CONDA_VERSION
+DOWNLOAD_PATH=$BASE_DIR/DOWNLOADS
 
-echo Installing into $BASE_DIR
+echo Installing into $PREFIX_PATH
 read -p "Are you sure? " -n 1 -r
 echo  
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -14,22 +16,27 @@ else
    exit -1
 fi
 
-#BASE_DIR=/tmp/conda/miniconda$CONDAVER
-PREFIX_PATH=$BASE_DIR/$VERSION
-DOWNLOAD_PATH=$BASE_DIR/DOWNLOADS
+# change umask to remove group write
+umask 0022
 
 mkdir -p $PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 
-echo "Downloading miniconda installer from  https://repo.continuum.io/miniconda/Miniconda$CONDAVER-$VERSION-Linux-x86_64.sh"
-wget https://repo.continuum.io/miniconda/Miniconda$CONDAVER-$VERSION-Linux-x86_64.sh -P $DOWNLOAD_PATH
+MINICONDA_INSTALL_FILE=Miniconda$PYTHON_VERSION-$CONDA_VERSION-Linux-x86_64.sh
 
-chmod +x $DOWNLOAD_PATH/Miniconda$CONDAVER-$VERSION-Linux-x86_64.sh
+if [ ! -f $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE ]; then
+   echo Downloading miniconda installer
+   wget https://repo.continuum.io/miniconda/$MINICONDA_INSTALL_FILE -P $DOWNLOAD_PATH
+   
+   chmod +x $DOWNLOAD_PATH/Miniconda$PYTHON_VERSION-$CONDA_VERSION-Linux-x86_64.sh
+fi
 
-echo "Installing Miniconda: ./$DOWNLOAD_PATH/Miniconda$CONDAVER-$VERSION-Linux-x86_64.sh -b -p $PREFIX_PATH -u"
-$DOWNLOAD_PATH/Miniconda$CONDAVER-$VERSION-Linux-x86_64.sh -b -p $PREFIX_PATH -u
+echo Installing Miniconda
+$DOWNLOAD_PATH/Miniconda$PYTHON_VERSION-$CONDA_VERSION-Linux-x86_64.sh -b -p $PREFIX_PATH -u
 
+echo moving into $PREFIX_PATH
 cd $PREFIX_PATH
+
 
 PYTHON_VER=$(ls -d lib/python?.? | tail -c4)
 echo PYTHON_VER=$PYTHON_VER
@@ -37,10 +44,7 @@ echo PYTHON_VER=$PYTHON_VER
 # create a setup file
 cat > setup.sh << EOF
 DIR=\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )
-export LD_LIBRARY_PATH=\$DIR/lib:\$LD_LIBRARY_PATH
-export PATH=\$DIR/bin:\$PATH
-export PYTHONPATH=\$DIR/lib/python3.6/site-packages:\$PYTHONPATH
-export PYTHONSTARTUP=\$PWD/etc/pythonstart
+eval "\$(\$DIR/bin/conda shell.bash hook)"
 EOF
 
 # create custom pythonstart in local area to deal with python readlines error
@@ -82,27 +86,26 @@ EOF
 
 cat > modulefile << EOF
 #%Module2.0
-## miniconda3 modulefile
+## miniconda$PYTHON_VERSION modulefile
 ##
 proc ModulesHelp { } {
    global CONDA_LEVEL PYTHON_LEVEL MINICONDA_LEVEL
    puts stderr "This module will add Miniconda \$MINICONDA_LEVEL to your environment with conda version \$CONDA_LEVEL and python version \$PYTHON_LEVEL"
 }
 
-set _module_nme   [module-info name]
+set _module_name  [module-info name]
 set is_module_rm  [module-info mode remove]
 set sys           [uname sysname]
 set os            [uname release]
 
 set PYTHON_LEVEL                 $PYTHON_VER
-set CONDA_LEVEL                  $VERSION
-set MINICONDA_LEVEL              $CONDAVER
-set MINICONDA_INSTALL_PATH       $PREFIX_PATH
-setenv PYTHONSTARTUP             \$MINICONDA_INSTALL_PATH/etc/pythonstart
-
-prepend-path   PATH              \$MINICONDA_INSTALL_PATH/bin
-prepend-path   LD_LIBRARY_PATH   \$MINICONDA_INSTALL_PATH/lib
-prepend-path   PYTHONPATH        \$MINICONDA_INSTALL_PATH/lib/python$PYTHON_VER/site-packages
+set CONDA_LEVEL                  $CONDA_VERSION
+set MINICONDA_LEVEL              $PYTHON_VERSION
+set CONDA_PREFIX                 $PREFIX_PATH
+setenv CONDA_PREFIX              \$CONDA_PREFIX
+setenv ENV_NAME                  miniconda\${MINICONDA_LEVEL}/${CONDA_LEVEL}
+setenv PYTHONSTARTUP             \$CONDA_PREFIX/etc/pythonstart
+puts stdout "source \$CONDA_PREFIX/setup.sh"
 
 module-whatis  "miniconda installation"
 EOF
@@ -110,6 +113,7 @@ EOF
 # setup area
 echo setting up conda environment
 module load $(pwd)/modulefile
+conda config --remove channels intel
 
 echo CONDA BINARY: $(which conda)
 echo CONDA VERSION: $(conda --version)
@@ -119,21 +123,24 @@ echo CONDA VERSION: $(conda --version)
 echo install tensorflow dependencies and other things
 
 # install tensorflow depenedencies
-conda install -y gflags glog numpy mkl-dnn scipy pandas h5py virtualenv protobuf grpcio funcsigs pbr mock html5lib bleach werkzeug markdown tensorboard=1.6.0 gast absl-py backports.weakref termcolor astor scikit-learn mpi4py
+conda install -y tensorflow 
 
-echo copy MPICH libs to local area
-cp /opt/cray/pe/mpt/default/gni/mpich-intel-abi/16.0/lib/libmpi*  ./lib/
-
-# install tensorflow
-echo installing tensorflow for python version $PYTHON_VER
-if [ "$PYTHON_VER" = "3.6" ]; then
-   pip install https://anaconda.org/intel/tensorflow/1.6.0/download/tensorflow-1.6.0-cp36-cp36m-linux_x86_64.whl
-elif [ "$PYTHON_VER" = "2.7" ]; then
-   pip install https://anaconda.org/intel/tensorflow/1.6.0/download/tensorflow-1.6.0-cp27-cp27mu-linux_x86_64.whl
-else
-   echo no tensorflow for this python version
+if [ "$PYTHON_VER" == "2.7" ]; then
+   conda install -y enum34
 fi
 
+# install pytorch
+echo install pytorch
+conda install -y pytorch torchvision
+
+echo copy MPICH libs to local area
+cp /opt/cray/pe/mpt/7.7.0/gni/mpich-gnu-abi/5.1/lib/libmpi* ./lib/
+# cp /opt/cray/pe/mpt/default/gni/mpich-intel-abi/16.0/lib/libmpi*  ./lib/
+
+echo install mpi4py
+conda install -y mpi4py
+
 # install keras and horovod
-pip install keras horovod
+echo install horovod
+pip install horovod
 

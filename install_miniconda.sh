@@ -1,10 +1,16 @@
 #!/bin/bash
 
-PYTHON_VERSION=2
+PYTHON_VERSION=3
 CONDA_VERSION=latest
 BASE_DIR=$PWD/miniconda$PYTHON_VERSION
-PREFIX_PATH=$BASE_DIR/$CONDA_VERSION
 DOWNLOAD_PATH=$BASE_DIR/DOWNLOADS
+
+if [ $# -eq 0 ]
+then
+   PREFIX_PATH=$BASE_DIR/$CONDA_VERSION
+else
+   PREFIX_PATH=$1
+fi 
 
 echo Installing into $PREFIX_PATH
 read -p "Are you sure? " -n 1 -r
@@ -103,11 +109,17 @@ set CONDA_LEVEL                  $CONDA_VERSION
 set MINICONDA_LEVEL              $PYTHON_VERSION
 set CONDA_PREFIX                 $PREFIX_PATH
 setenv CONDA_PREFIX              \$CONDA_PREFIX
-setenv ENV_NAME                  miniconda\${MINICONDA_LEVEL}/${CONDA_LEVEL}
+setenv ENV_NAME                  \$_module_name
 setenv PYTHONSTARTUP             \$CONDA_PREFIX/etc/pythonstart
 puts stdout "source \$CONDA_PREFIX/setup.sh"
 
 module-whatis  "miniconda installation"
+EOF
+
+cat > .condarc << EOF
+env_prompt: "(\$ENV_NAME/\$CONDA_DEFAULT_ENV) "
+pkgs_dirs:
+   - \$CONDA_PREFIX/pkgs
 EOF
 
 # setup area
@@ -120,26 +132,19 @@ echo CONDA VERSION: $(conda --version)
 
 
 
-echo install tensorflow dependencies and other things
+echo install tensorflow 
 
 # install tensorflow depenedencies
 conda install -y tensorflow 
-
-if [ "$PYTHON_VER" == "2.7" ]; then
-   conda install -y enum34
-fi
 
 # install pytorch
 echo install pytorch
 conda install -y pytorch torchvision
 
-echo copy MPICH libs to local area
-cp /opt/cray/pe/mpt/default/gni/mpich-gnu-abi/8.2/lib/libmpi* ./lib/
+echo install other tools
+conda install -y scikit-learn scikit-image pandas matplotlib h5py  
 
-echo install mpi4py
-conda install -y mpi4py
+echo install horovod
+conda install -y -c alcf-theta horovod
 
-# install keras and horovod
-#echo install horovod
-#pip install horovod
 

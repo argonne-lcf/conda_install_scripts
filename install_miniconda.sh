@@ -50,7 +50,8 @@ echo PYTHON_VER=$PYTHON_VER
 # create a setup file
 cat > setup.sh << EOF
 DIR=\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )
-eval "\$(\$DIR/bin/conda shell.bash hook)"
+preferred_shell=\$(basename \$SHELL)
+eval "\$(\$DIR/bin/conda shell.\${preferred_shell} hook)"
 EOF
 
 # create custom pythonstart in local area to deal with python readlines error
@@ -103,12 +104,14 @@ set _module_name  [module-info name]
 set is_module_rm  [module-info mode remove]
 set sys           [uname sysname]
 set os            [uname release]
+set HOME          $::env(HOME)
 
 set PYTHON_LEVEL                 $PYTHON_VER
 set CONDA_LEVEL                  $CONDA_VERSION
 set MINICONDA_LEVEL              $PYTHON_VERSION
 set CONDA_PREFIX                 $PREFIX_PATH
 setenv CONDA_PREFIX              \$CONDA_PREFIX
+setenv PYTHONUSERBASE            \$HOME/.local/\$_module_name
 setenv ENV_NAME                  \$_module_name
 setenv PYTHONSTARTUP             \$CONDA_PREFIX/etc/pythonstart
 puts stdout "source \$CONDA_PREFIX/setup.sh"

@@ -3,9 +3,6 @@
 CONDAVER=3
 VERSION=4.4.10
 BASE_DIR=$PWD/miniconda$CONDAVER
-
-
-
 #BASE_DIR=/tmp/conda/miniconda$CONDAVER
 PREFIX_PATH=$BASE_DIR/$VERSION-intel
 DOWNLOAD_PATH=$BASE_DIR/DOWNLOADS
@@ -24,7 +21,6 @@ mkdir -p $PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 
 MINICONDA_INSTALL_FILE=Miniconda$CONDAVER-$VERSION-Linux-x86_64.sh
-
 if [ ! -f $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE ]; then
    echo Downloading miniconda installer
    wget https://repo.continuum.io/miniconda/$MINICONDA_INSTALL_FILE -P $DOWNLOAD_PATH

@@ -1,9 +1,8 @@
 #!/bin/bash
 
-CONDAVER=3
-VERSION=4.4.10
+CONDAVER=2
+VERSION=4.5.4
 BASE_DIR=$PWD/miniconda$CONDAVER
-#BASE_DIR=/tmp/conda/miniconda$CONDAVER
 PREFIX_PATH=$BASE_DIR/$VERSION-login
 DOWNLOAD_PATH=$BASE_DIR/DOWNLOADS
 
@@ -17,6 +16,7 @@ else
    exit -1
 fi
 
+umask 0022
 
 mkdir -p $PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
@@ -122,6 +122,10 @@ echo CONDA VERSION: $(conda --version)
 
 
 echo install tensorflow dependencies and other things
+
+conda install -y pytorch gflags glog numpy scipy pandas h5py virtualenv protobuf grpcio funcsigs pbr mock html5lib bleach werkzeug markdown gast absl-py backports.weakref termcolor astor scikit-learn mpi4py 
+conda install -y -c conda-forge mpich
 # install keras and horovod
-pip install keras horovod tensorflow mpi4py
+pip install --no-deps tensorflow tensorboard
+pip install keras horovod
 

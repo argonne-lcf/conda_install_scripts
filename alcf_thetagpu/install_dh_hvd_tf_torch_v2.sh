@@ -19,6 +19,8 @@ TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 DH_REPO_URL=https://github.com/deephyper/deephyper
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 
+# where to install relative to current path
+DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
 
 # MPI source on ThetaGPU
 MPI=/lus/theta-fs0/software/thetagpu/openmpi-4.0.5
@@ -110,8 +112,8 @@ fi
 set -e
 
 # set Conda installation folder and where downloaded content will stay
-CONDA_PREFIX_PATH=$INSTALL_BASE_DIR/mconda3
-DOWNLOAD_PATH=$INSTALL_BASE_DIR/DOWNLOADS
+CONDA_PREFIX_PATH=$DH_INSTALL_BASE_DIR/mconda3
+DOWNLOAD_PATH=$DH_INSTALL_BASE_DIR/DOWNLOADS
 
 mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
@@ -283,7 +285,7 @@ cd $DH_INSTALL_BASE_DIR
 echo Install Tensorflow Dependencies
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
-pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
+pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 

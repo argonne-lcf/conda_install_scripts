@@ -13,7 +13,7 @@ DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 #TF_REPO_TAG="v2.4.2" # requires NumPy 1.19.x
 #PT_REPO_TAG="v1.9.0"
-HOROVOD_REPO_TAG="v0.21.3"
+HOROVOD_REPO_TAG="v0.22.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
@@ -295,11 +295,20 @@ pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
 echo Configure TensorFlow
+
+# KGF: avoid problem when building post 2.5.0 master (762790710496e04801ec17dd7f012fd9aa37a1df)
+# ERROR: /lus/theta-fs0/software/thetagpu/conda/deephyper/latest/tensorflow/tensorflow/core/kernels/mlir_generated/BUILD:910:23: compile tensorflow/core/kernels/mlir_generated/bitwise_xor_gpu_i32_i32_kernel_generator_kernel.o failed (Exit 1): tf_to_kernel failed: error executing command bazel-out/k8-opt/bin/tensorflow/compiler/mlir/tools/kernel_gen/tf_to_kernel '--tile_sizes=1024' '--max-supported-rank=5' '--arch=compute_80' ... (remaining 4 argument(s) skipped)
+# 2021-06-21 21:49:28.967640: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:210] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+# 2021-06-21 21:49:29.052480: W tensorflow/compiler/mlir/tools/kernel_gen/kernel_creator.cc:385] There should be exactly one GPU Module, but got 8. Currently we leak memory if there is more than one module, see https://bugs.llvm.org/show_bug.cgi?id=48385
+export CUDA_VISIBLE_DEVICES=0
+
+
 cd tensorflow
 export PYTHON_BIN_PATH=$(which python)
 export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0])')
 # Auto-Configuration Warning: 'TMP' environment variable is not set, using 'C:\Windows\Temp' as default
 export TMP=/tmp
+
 ./configure
 echo Bazel Build TensorFlow
 HOME=$DOWNLOAD_PATH bazel build --config=cuda //tensorflow/tools/pip_package:build_pip_package

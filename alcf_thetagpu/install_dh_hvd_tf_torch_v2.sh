@@ -91,7 +91,7 @@ DH_INSTALL_BASE_DIR=$THISDIR/$DH_INSTALL_SUBDIR
 WHEEL_DIR=$DH_INSTALL_BASE_DIR/wheels
 
 # confirm install path
-echo Installing tensorflow into $DH_INSTALL_BASE_DIR
+echo Installing module into $DH_INSTALL_BASE_DIR
 #read -p "Are you sure? " -n 1 -r
 #echo
 #if [[ $REPLY =~ ^[Yy]$ ]]
@@ -102,16 +102,16 @@ echo Installing tensorflow into $DH_INSTALL_BASE_DIR
 #fi
 
 
-# needed for outside communication on ThetaGPU
-wget -q --spider http://google.com
+# Check for outside communication on ThetaGPU
+# (be sure not to inherit these vars from dotfiles)
+unset https_proxy
+unset http_proxy
+
+wget -q --spider -T 10 http://google.com
 if [ $? -eq 0 ]; then
-    # interactive allocation without --attrs=pubnet on ThetaGPU
     echo "Network Online"
-    # be sure not to inherit these vars from dotfiles
-    unset https_proxy
-    unset http_proxy
 else
-    # noninteractive job without --attrs=pubnet on ThetaGPU
+    # non-/interactive full-node job without --attrs=pubnet on ThetaGPU
     echo "Network Offline, setting proxy envs"
     export https_proxy=http://proxy.tmi.alcf.anl.gov:3128
     export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
@@ -152,7 +152,7 @@ fi
 eval "\$(\$DIR/bin/conda shell.\${preferred_shell} hook)"
 
 # test network
-wget -q --spider http://google.com
+wget -q --spider -T 10 http://google.com
 if [ \$? -eq 0 ]; then
     echo "Network Online"
 else
@@ -302,7 +302,6 @@ echo Install TensorFlow Dependencies
 pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
-0D
 
 echo Configure TensorFlow
 cd tensorflow

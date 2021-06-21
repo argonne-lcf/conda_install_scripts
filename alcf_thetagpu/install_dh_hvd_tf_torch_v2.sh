@@ -14,7 +14,7 @@ DH_REPO_URL=https://github.com/deephyper/deephyper.git
 # KGF: add switch for "latest" --> master
 
 TF_REPO_TAG="v2.4.2"
-TORCH_TAG="v1.9.0"
+PT_REPO_TAG="v1.9.0"
 HOROVOD_REPO_TAG="v0.21.3"
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git

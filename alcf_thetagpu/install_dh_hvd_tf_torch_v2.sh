@@ -13,7 +13,7 @@ DH_REPO_TAG="0.2.5"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 # KGF: add switch for "latest" --> master
 
-TF_REPO_TAG="v2.4.2"
+TF_REPO_TAG="v2.4.2" # requires NumPy 1.19.x
 PT_REPO_TAG="v1.9.0"
 HOROVOD_REPO_TAG="v0.21.3"
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
@@ -290,7 +290,7 @@ cd $DH_INSTALL_BASE_DIR
 echo Install Tensorflow Dependencies
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
-pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker
+pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
@@ -368,7 +368,7 @@ HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
 echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall $HVD_WHEEL
 
-echo Install Tensorboard profiler plugin
+echo Install TensorBoard profiler plugin
 pip install tensorboard_plugin_profile tensorflow_addons
 echo Install other packages
 pip install pandas h5py matplotlib scikit-learn scipy
@@ -381,6 +381,8 @@ pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November
 export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
 pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 
+# random inconsistencies that pop up with the specific "pip installs" from earlier
+pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/

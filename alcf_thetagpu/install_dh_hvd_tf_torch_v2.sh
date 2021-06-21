@@ -152,6 +152,8 @@ fi
 eval "\$(\$DIR/bin/conda shell.\${preferred_shell} hook)"
 
 # test network
+unset https_proxy
+unset http_proxy
 wget -q --spider -T 10 http://google.com
 if [ \$? -eq 0 ]; then
     echo "Network Online"
@@ -217,7 +219,12 @@ source $CONDA_PREFIX_PATH/setup.sh
 
 set +e
 # needed for outside communication on ThetaGPU
-wget -q --spider http://google.com
+# unset https_proxy
+# unset http_proxy
+echo Testing network for the third time
+echo $http_proxy
+echo $https_proxy
+wget -q --spider -T 10 http://google.com
 if [ $? -eq 0 ]; then
     echo "Network Online"
 else

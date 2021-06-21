@@ -220,24 +220,8 @@ cd $DH_INSTALL_BASE_DIR
 # setup conda environment
 source $CONDA_PREFIX_PATH/setup.sh
 
-set +e
-# needed for outside communication on ThetaGPU
-# unset https_proxy
-# unset http_proxy
-echo Testing network for the third time
-echo $http_proxy
-echo $https_proxy
-wget -q --spider -T 10 http://google.com
-if [ $? -eq 0 ]; then
-    echo "Network Online"
-else
-   echo "Network Offline, setting proxy envs"
-   export https_proxy=http://proxy.tmi.alcf.anl.gov:3128
-   export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
-fi
-
-set -e
-
+# KGF: probably dont need a third (removed) network check--- proxy env vars inherited from either sourced setup.sh
+# and/or first network check
 
 echo CONDA BINARY: $(which conda)
 echo CONDA VERSION: $(conda --version)

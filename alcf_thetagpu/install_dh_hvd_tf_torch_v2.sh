@@ -141,7 +141,7 @@ cd $CONDA_PREFIX_PATH
 
 # create a setup file
 cat > setup.sh << EOF
-preferred_shell=$(basename $SHELL)
+preferred_shell=\$(basename \$SHELL)
 
 if [ -n "\$ZSH_EVAL_CONTEXT" ]; then
     DIR=\$( cd "\$( dirname "\$0" )" && pwd )

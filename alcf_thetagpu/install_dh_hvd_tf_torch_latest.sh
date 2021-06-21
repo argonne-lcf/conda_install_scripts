@@ -117,7 +117,7 @@ else
     export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
 fi
 
-set -e
+##### set -e
 
 # set Conda installation folder and where downloaded content will stay
 CONDA_PREFIX_PATH=$DH_INSTALL_BASE_DIR/mconda3
@@ -152,8 +152,8 @@ fi
 eval "\$(\$DIR/bin/conda shell.\${preferred_shell} hook)"
 
 # test network
-# unset https_proxy
-# unset http_proxy
+unset https_proxy
+unset http_proxy
 wget -q --spider -T 10 http://google.com
 if [ \$? -eq 0 ]; then
     echo "Network Online"
@@ -210,10 +210,6 @@ pkgs_dirs:
    - \$HOME/.conda/pkgs
 EOF
 
-# KGF: uncommenting the 2x unset commands in the above setup.sh causes the following
-# source command to return a nonzero error code and tripping the above "set -e" to exit
-# Why?
-
 # move to base install directory
 cd $DH_INSTALL_BASE_DIR
 
@@ -221,7 +217,8 @@ cd $DH_INSTALL_BASE_DIR
 source $CONDA_PREFIX_PATH/setup.sh
 
 # KGF: probably dont need a third (removed) network check--- proxy env vars inherited from either sourced setup.sh
-# and/or first network check
+# and/or first network check. Make sure "set+e" during above sourced setup.sh since the network check "wget" might
+# return nonzero code if network is offline
 
 echo CONDA BINARY: $(which conda)
 echo CONDA VERSION: $(conda --version)

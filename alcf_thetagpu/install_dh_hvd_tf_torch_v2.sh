@@ -10,14 +10,15 @@
 # where to install relative to current path
 
 DH_REPO_TAG="0.2.5"
+DH_REPO_URL=https://github.com/deephyper/deephyper.git
+# KGF: add switch for "latest" --> master
 
-# unused; for reference
 TF_REPO_TAG="v2.4.2"
 TORCH_TAG="v1.9.0"
 HOROVOD_REPO_TAG="v0.21.3"
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
-DH_REPO_URL=https://github.com/deephyper/deephyper
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
+PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # where to install relative to current path
 DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
@@ -102,7 +103,11 @@ echo Installing tensorflow into $DH_INSTALL_BASE_DIR
 # needed for outside communication on ThetaGPU
 wget -q --spider http://google.com
 if [ $? -eq 0 ]; then
+    # allocation without --attrs=pubnet on ThetaGPU
     echo "Network Online"
+    # be sure not to inherit these vars from dotfiles
+    unset https_proxy
+    unset http_proxy
 else
    echo "Network Offline, setting proxy envs"
    export https_proxy=http://proxy.tmi.alcf.anl.gov:3128
@@ -316,7 +321,7 @@ echo Clone PyTorch
 
 git clone --recursive $PT_REPO_URL
 cd pytorch
-echo Checkout Tensorflow tag $PT_REPO_TAG
+echo Checkout PyTorch tag $PT_REPO_TAG
 git checkout $PT_REPO_TAG
 
 echo Install PyTorch
@@ -343,6 +348,8 @@ pip install $(basename $PT_WHEEL)
 ########
 ### Install Horovod
 ########
+
+cd $DH_INSTALL_BASE_DIR
 
 echo Clone Horovod $HOROVOD_REPO_TAG git repo
 

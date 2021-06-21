@@ -7,8 +7,7 @@
 # 3 - script installs everything down in $PWD/deephyper/...
 # 4 - wait for it to complete
 
-# where to install relative to current path
-
+# unset *_TAG variables to build latest master
 DH_REPO_TAG="0.2.5"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 # KGF: add switch for "latest" --> master
@@ -21,7 +20,11 @@ HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # where to install relative to current path
-DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
+if [[ -z "$DH_REPO_TAG" ]]; then
+    DH_INSTALL_SUBDIR=deephyper/latest
+else
+    DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
+fi
 
 # MPI source on ThetaGPU
 MPI=/lus/theta-fs0/software/thetagpu/openmpi-4.0.5
@@ -269,8 +272,13 @@ echo Clone Tensorflow
 cd $DH_INSTALL_BASE_DIR
 git clone $TF_REPO_URL
 cd tensorflow
-echo Checkout Tensorflow tag $TF_REPO_TAG
-git checkout $TF_REPO_TAG
+
+if [[ -z "$TF_REPO_TAG" ]]; then
+    echo Checkout TensorFlow master
+else
+    echo Checkout TensorFlow tag $TF_REPO_TAG
+    git checkout $TF_REPO_TAG
+fi
 BAZEL_VERSION=$(cat .bazelversion)
 echo Found Tensorflow depends on Bazel version $BAZEL_VERSION
 
@@ -321,8 +329,12 @@ echo Clone PyTorch
 
 git clone --recursive $PT_REPO_URL
 cd pytorch
-echo Checkout PyTorch tag $PT_REPO_TAG
-git checkout $PT_REPO_TAG
+if [[ -z "$PT_REPO_TAG" ]]; then
+    echo Checkout PyTorch master
+else
+    echo Checkout PyTorch tag $PT_REPO_TAG
+    git checkout $PT_REPO_TAG
+fi
 
 echo Install PyTorch
 
@@ -351,11 +363,17 @@ pip install $(basename $PT_WHEEL)
 
 cd $DH_INSTALL_BASE_DIR
 
-echo Clone Horovod $HOROVOD_REPO_TAG git repo
+echo Clone Horovod
 
 git clone --recursive $HOROVOD_REPO_URL
 cd horovod
-git checkout $HOROVOD_REPO_TAG
+
+if [[ -z "$HOROVOD_REPO_TAG" ]]; then
+    echo Checkout Horovod master
+else
+    echo Checkout Horovod tag $HOROVOD_REPO_TAG
+    git checkout $HOROVOD_REPO_TAG
+fi
 
 echo Build Horovod Wheel using MPI from $MPI
 export LD_LIBRARY_PATH=$MPI/lib:$LD_LIBRARY_PATH
@@ -377,9 +395,22 @@ echo Adding module snooper so we can tell what modules people are using
 ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py
 
 # DeepHyper stuff
-pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November 2019
 export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
-pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
+
+if [[ -z "$DH_REPO_TAG" ]]; then
+    echo Clone and checkout DeepHyper master from git
+    cd $DH_INSTALL_BASE_DIR
+    git clone $DH_REPO_URL
+    cd deephyper
+    pip install -e ".[analytics,balsam,deepspace,hvd]"
+    cd ..
+    cd $DH_INSTALL_BASE_DIR
+else
+    echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
+    pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November 2019
+    pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
+fi
+
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'

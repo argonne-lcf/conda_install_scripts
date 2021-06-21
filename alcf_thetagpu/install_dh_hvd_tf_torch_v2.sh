@@ -10,7 +10,6 @@
 # unset *_TAG variables to build latest master
 DH_REPO_TAG="0.2.5"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
-# KGF: add switch for "latest" --> master
 
 TF_REPO_TAG="v2.4.2" # requires NumPy 1.19.x
 PT_REPO_TAG="v1.9.0"
@@ -55,7 +54,7 @@ TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
 #TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
 
-# Tensorflow Config flags (for ./configure run)
+# TensorFlow Config flags (for ./configure run)
 export TF_CUDA_COMPUTE_CAPABILITIES=8.0
 export TF_CUDA_VERSION=$CUDA_VERSION_MAJOR
 export TF_CUDNN_VERSION=$CUDNN_VERSION_MAJOR
@@ -106,15 +105,16 @@ echo Installing tensorflow into $DH_INSTALL_BASE_DIR
 # needed for outside communication on ThetaGPU
 wget -q --spider http://google.com
 if [ $? -eq 0 ]; then
-    # allocation without --attrs=pubnet on ThetaGPU
+    # interactive allocation without --attrs=pubnet on ThetaGPU
     echo "Network Online"
     # be sure not to inherit these vars from dotfiles
     unset https_proxy
     unset http_proxy
 else
-   echo "Network Offline, setting proxy envs"
-   export https_proxy=http://proxy.tmi.alcf.anl.gov:3128
-   export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
+    # noninteractive job without --attrs=pubnet on ThetaGPU
+    echo "Network Offline, setting proxy envs"
+    export https_proxy=http://proxy.tmi.alcf.anl.gov:3128
+    export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
 fi
 
 set -e
@@ -260,15 +260,16 @@ EOF
 
 
 ########
-### Install Tensorflow
+### Install TensorFlow
 ########
 
 
 echo Conda install some dependencies
-conda install -y cmake zip unzip
+
+conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
 conda update -y pip
 
-echo Clone Tensorflow
+echo Clone TensorFlow
 cd $DH_INSTALL_BASE_DIR
 git clone $TF_REPO_URL
 cd tensorflow
@@ -277,10 +278,10 @@ if [[ -z "$TF_REPO_TAG" ]]; then
     echo Checkout TensorFlow master
 else
     echo Checkout TensorFlow tag $TF_REPO_TAG
-    git checkout $TF_REPO_TAG
+    git checkout --recurse-submodules $TF_REPO_TAG
 fi
 BAZEL_VERSION=$(cat .bazelversion)
-echo Found Tensorflow depends on Bazel version $BAZEL_VERSION
+echo Found TensorFlow depends on Bazel version $BAZEL_VERSION
 
 cd $DH_INSTALL_BASE_DIR
 echo Download Bazel binaries
@@ -295,24 +296,24 @@ export PATH=$PATH:/$BAZEL_INSTALL_PATH/bin
 
 cd $DH_INSTALL_BASE_DIR
 
-echo Install Tensorflow Dependencies
+echo Install TensorFlow Dependencies
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
+0D
 
-
-echo Configure Tensorflow
+echo Configure TensorFlow
 cd tensorflow
 export PYTHON_BIN_PATH=$(which python)
 export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0])')
 ./configure
-echo Bazel Build Tensorflow
+echo Bazel Build TensorFlow
 HOME=$DOWNLOAD_PATH bazel build --config=cuda //tensorflow/tools/pip_package:build_pip_package
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
-echo Install Tensorflow
+echo Install TensorFlow
 pip install $(find $WHEEL_DIR/ -name "tensorflow*.whl" -type f)
 
 
@@ -321,10 +322,6 @@ pip install $(find $WHEEL_DIR/ -name "tensorflow*.whl" -type f)
 ########
 
 cd $DH_INSTALL_BASE_DIR
-
-echo Conda install some dependencies
-conda install -y cmake zip unzip numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
-conda update -y pip
 echo Clone PyTorch
 
 git clone --recursive $PT_REPO_URL
@@ -333,7 +330,7 @@ if [[ -z "$PT_REPO_TAG" ]]; then
     echo Checkout PyTorch master
 else
     echo Checkout PyTorch tag $PT_REPO_TAG
-    git checkout $PT_REPO_TAG
+    git checkout --recurse-submodules $PT_REPO_TAG
 fi
 
 echo Install PyTorch
@@ -372,7 +369,7 @@ if [[ -z "$HOROVOD_REPO_TAG" ]]; then
     echo Checkout Horovod master
 else
     echo Checkout Horovod tag $HOROVOD_REPO_TAG
-    git checkout $HOROVOD_REPO_TAG
+    git checkout --recurse-submodules $HOROVOD_REPO_TAG
 fi
 
 echo Build Horovod Wheel using MPI from $MPI
@@ -386,9 +383,9 @@ HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
 echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall $HVD_WHEEL
 
-echo Install TensorBoard profiler plugin
+echo Pip install TensorBoard profiler plugin
 pip install tensorboard_plugin_profile tensorflow_addons
-echo Install other packages
+echo Pip install other packages
 pip install pandas h5py matplotlib scikit-learn scipy
 
 echo Adding module snooper so we can tell what modules people are using
@@ -396,6 +393,9 @@ ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(pyt
 
 # DeepHyper stuff
 export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
+
+pip install 'tensorflow_probability==0.12.2'
+# KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
 if [[ -z "$DH_REPO_TAG" ]]; then
     echo Clone and checkout DeepHyper master from git
@@ -406,6 +406,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd ..
     cd $DH_INSTALL_BASE_DIR
 else
+    # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
     echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
     pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November 2019
     pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
@@ -420,3 +421,8 @@ chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 
 chmod -R a-w $DH_INSTALL_BASE_DIR/
+
+# KGF: still need to apply manual postfix for the 4x following warnings that appear whenever "conda list" or other commands are run
+# WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash ... /lus/theta-fs0/software/thetagpu/conda/deephyper/0.2.5/mconda3/conda-meta/setuptools-52.0.0-py38h06a4308_0.json
+
+# KGF: Do "chmod -R u+w ." in mconda3/conda-meta/, run "conda list", then "chmod -R a-w ."

@@ -152,8 +152,8 @@ fi
 eval "\$(\$DIR/bin/conda shell.\${preferred_shell} hook)"
 
 # test network
-unset https_proxy
-unset http_proxy
+# unset https_proxy
+# unset http_proxy
 wget -q --spider -T 10 http://google.com
 if [ \$? -eq 0 ]; then
     echo "Network Online"
@@ -210,6 +210,9 @@ pkgs_dirs:
    - \$HOME/.conda/pkgs
 EOF
 
+# KGF: uncommenting the 2x unset commands in the above setup.sh causes the following
+# source command to return a nonzero error code and tripping the above "set -e" to exit
+# Why?
 
 # move to base install directory
 cd $DH_INSTALL_BASE_DIR
@@ -314,6 +317,8 @@ echo Configure TensorFlow
 cd tensorflow
 export PYTHON_BIN_PATH=$(which python)
 export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0])')
+# Auto-Configuration Warning: 'TMP' environment variable is not set, using 'C:\Windows\Temp' as default
+export TMP=/tmp
 ./configure
 echo Bazel Build TensorFlow
 HOME=$DOWNLOAD_PATH bazel build --config=cuda //tensorflow/tools/pip_package:build_pip_package

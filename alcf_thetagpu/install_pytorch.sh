@@ -55,7 +55,7 @@ mkdir -p $WHEEL_DIR
 # confirm install path
 echo Installing pytorch into $PT_INSTALL_BASE_DIR
 read -p "Are you sure? " -n 1 -r
-echo  
+echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     echo OK, you asked for it...
@@ -224,7 +224,7 @@ cd $PT_INSTALL_BASE_DIR
 
 echo Clone Horovod $HOROVOD_REPO_TAG git repo
 
-git clone --recursive $HOROVOD_REPO_URL 
+git clone --recursive $HOROVOD_REPO_URL
 cd horovod
 git checkout $HOROVOD_REPO_TAG
 
@@ -232,7 +232,7 @@ echo Build Horovod using MPI from $MPI
 export LD_LIBRARY_PATH=$MPI/lib:$LD_LIBRARY_PATH
 export PATH=$MPI/bin:$PATH
 
-HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITHOUT_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel 
+HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITHOUT_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 echo copying horovod wheel $HVD_WHL
 cp $HVD_WHL $WHEEL_DIR/
@@ -255,4 +255,3 @@ chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 echo Change to read-only
 chmod -R a-w $PT_INSTALL_BASE_DIR/
-

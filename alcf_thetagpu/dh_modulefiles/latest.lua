@@ -2,8 +2,8 @@ help([[
 The Anaconda python environment.
 Includes build of TensorFlow, PyTorch, DeepHyper from tagged versions of the git repos
 DeepHyper version tag: e29af5a
-TensorFlow version tag: 2.4.2
-Horovod version tag: 0.21.3
+TensorFlow version tag: 2.5.0
+Horovod version tag: 0.22.1
 PyTorch version tag: "1.10.0a0+git1dee99c"
 You can modify this environment as follows:
 

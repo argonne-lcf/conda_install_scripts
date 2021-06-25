@@ -258,6 +258,10 @@ EOF
 echo Conda install some dependencies
 
 conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
+
+# CUDA only: Add LAPACK support for the GPU if needed
+conda install -c pytorch magma-cuda113
+
 conda update -y pip
 
 echo Clone TensorFlow

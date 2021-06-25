@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export CUDA_VISIBLE_DEVICES=4
+
 # As of June 14 2021
 # This script will install (from scratch) DeepHyper, TensorFlow, PyTorch, and Horovod on ThetaGPU
 # 1 - Grab worker node interactively for 120 min (full-node queue)
@@ -258,6 +260,10 @@ EOF
 echo Conda install some dependencies
 
 conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
+
+# CUDA only: Add LAPACK support for the GPU if needed
+conda install -c pytorch magma-cuda110
+
 conda update -y pip
 
 echo Clone TensorFlow

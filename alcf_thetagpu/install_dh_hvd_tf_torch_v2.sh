@@ -251,6 +251,7 @@ puts stdout "source \$CONDA_PREFIX/setup.sh"
 module-whatis  "miniconda installation"
 EOF
 
+set -e
 
 ########
 ### Install TensorFlow
@@ -262,7 +263,7 @@ echo Conda install some dependencies
 conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
 
 # CUDA only: Add LAPACK support for the GPU if needed
-conda install -c pytorch magma-cuda110
+conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 
 conda update -y pip
 
@@ -308,7 +309,7 @@ export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0]
 export TMP=/tmp
 ./configure
 echo Bazel Build TensorFlow
-HOME=$DOWNLOAD_PATH bazel build --config=cuda //tensorflow/tools/pip_package:build_pip_package
+HOME=$DOWNLOAD_PATH bazel build --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
 echo Install TensorFlow
@@ -419,6 +420,8 @@ chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 
 chmod -R a-w $DH_INSTALL_BASE_DIR/
+
+set +e
 
 # KGF: still need to apply manual postfix for the 4x following warnings that appear whenever "conda list" or other commands are run
 # WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash ... /lus/theta-fs0/software/thetagpu/conda/deephyper/0.2.5/mconda3/conda-meta/setuptools-52.0.0-py38h06a4308_0.json

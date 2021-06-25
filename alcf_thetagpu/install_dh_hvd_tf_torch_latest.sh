@@ -117,7 +117,6 @@ else
     export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
 fi
 
-##### set -e
 
 # set Conda installation folder and where downloaded content will stay
 CONDA_PREFIX_PATH=$DH_INSTALL_BASE_DIR/mconda3
@@ -249,18 +248,18 @@ puts stdout "source \$CONDA_PREFIX/setup.sh"
 module-whatis  "miniconda installation"
 EOF
 
+set -e
 
 ########
 ### Install TensorFlow
 ########
-
 
 echo Conda install some dependencies
 
 conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
 
 # CUDA only: Add LAPACK support for the GPU if needed
-conda install -c pytorch magma-cuda113
+conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 
 conda update -y pip
 
@@ -315,7 +314,7 @@ export TMP=/tmp
 
 ./configure
 echo Bazel Build TensorFlow
-HOME=$DOWNLOAD_PATH bazel build --config=cuda //tensorflow/tools/pip_package:build_pip_package
+HOME=$DOWNLOAD_PATH bazel build --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
 echo Install TensorFlow
@@ -346,10 +345,25 @@ export CUDNN_ROOT=$CUDNN_BASE
 export USE_TENSORRT=ON
 export TENSORRT_ROOT=$TENSORRT_BASE
 export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
-export TENSORRT_LIBRARY=$TENSORRT_BASE/lib/libmyelin.so
+#export TENSORRT_LIBRARY=$TENSORRT_BASE/lib/libmyelin.so
+export TENSORRT_LIBRARY=$TENSORRT_BASE/lib
 export TENSORRT_LIBRARY_INFER=$TENSORRT_BASE/lib/libnvinfer.so
 export TENSORRT_LIBRARY_INFER_PLUGIN=$TENSORRT_BASE/lib/libnvinfer_plugin.so
 export TENSORRT_INCLUDE_DIR=$TENSORRT_BASE/include
+# KGF:
+# pytorch/cmake/public/cuda.cmake
+  # 116   find_path(TENSORRT_INCLUDE_DIR NvInfer.h
+  # 117     HINTS ${TENSORRT_ROOT} ${CUDA_TOOLKIT_ROOT_DIR}
+  # 118     PATH_SUFFIXES include)
+  # 119   find_library(TENSORRT_LIBRARY nvinfer
+  # 120     HINTS ${TENSORRT_ROOT} ${CUDA_TOOLKIT_ROOT_DIR}
+  # 121     PATH_SUFFIXES lib lib64 lib/x64)
+  # 122   find_package_handle_standard_args(
+  # 123     TENSORRT DEFAULT_MSG TENSORRT_INCLUDE_DIR TENSORRT_LIBRARY)
+  # 124   if(TENSORRT_FOUND)
+# ---> Could NOT find TENSORRT (missing: TENSORRT_INCLUDE_DIR TENSORRT_LIBRARY)
+# USE_TENSORRT: OFF in the Summary
+# but then later: cmake ... -DUSE_TENSORRT=ON
 python setup.py bdist_wheel
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
 echo copying pytorch wheel file $PT_WHEEL
@@ -427,6 +441,8 @@ rm -rf $DOWNLOAD_PATH
 
 chmod -R a-w $DH_INSTALL_BASE_DIR/
 
+
+set +e
 # KGF: still need to apply manual postfix for the 4x following warnings that appear whenever "conda list" or other commands are run
 # WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash ... /lus/theta-fs0/software/thetagpu/conda/deephyper/0.2.5/mconda3/conda-meta/setuptools-52.0.0-py38h06a4308_0.json
 

@@ -41,7 +41,7 @@ CUDA_DEPS_BASE=/lus/theta-fs0/software/thetagpu/cuda
 
 CUDNN_VERSION_MAJOR=8
 CUDNN_VERSION_MINOR=2
-CUDNN_VERSION_EXTRA=0.33
+CUDNN_VERSION_EXTRA=0.53
 CUDNN_VERSION=$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR.$CUDNN_VERSION_EXTRA
 CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
 
@@ -55,6 +55,12 @@ TENSORRT_VERSION_MINOR=0.0.3
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 #TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
 TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+# KGF: TensorRT 8.x only supported in TensorFlow as of 2021-06-25 (f8e2aa0db)
+# https://github.com/tensorflow/tensorflow/issues/49150
+# https://github.com/tensorflow/tensorflow/pull/48917
+# and TRT 7.x is incompatible with CUDA 11.3 (requires 10.2, 11.0, 11.1, 11.2)
+# Disable TF+TensorRT for now
+export TF_NEED_TENSORRT=0
 
 # TensorFlow Config flags (for ./configure run)
 export TF_CUDA_COMPUTE_CAPABILITIES=8.0
@@ -309,7 +315,7 @@ export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0]
 export TMP=/tmp
 ./configure
 echo Bazel Build TensorFlow
-HOME=$DOWNLOAD_PATH bazel build --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+HOME=$DOWNLOAD_PATH bazel build --jobs=4000 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
 echo Install TensorFlow

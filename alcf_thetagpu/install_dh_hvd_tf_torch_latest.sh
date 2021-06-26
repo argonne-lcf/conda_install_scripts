@@ -314,7 +314,7 @@ export TMP=/tmp
 
 ./configure
 echo Bazel Build TensorFlow
-HOME=$DOWNLOAD_PATH bazel build --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+HOME=$DOWNLOAD_PATH bazel build --jobs=4000 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
 echo Install TensorFlow

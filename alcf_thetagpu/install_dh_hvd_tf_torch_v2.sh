@@ -73,7 +73,7 @@ export TF_NEED_OPENCL=0
 export TF_NEED_MPI=0
 export TF_NEED_ROCM=0
 export TF_NEED_CUDA=1
-# KGF: TensorRT 8.x only supported in TensorFlow as of 2021-06-25 (f8e2aa0db)
+# KGF: TensorRT 8.x only supported in TensorFlow as of 2021-06-24 (f8e2aa0db)
 # https://github.com/tensorflow/tensorflow/issues/49150
 # https://github.com/tensorflow/tensorflow/pull/48917
 # and TRT 7.x is incompatible with CUDA 11.3 (requires 10.2, 11.0, 11.1, 11.2)

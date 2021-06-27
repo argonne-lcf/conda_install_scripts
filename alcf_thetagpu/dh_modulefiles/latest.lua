@@ -2,9 +2,9 @@ help([[
 The Anaconda python environment.
 Includes build of TensorFlow, PyTorch, DeepHyper from tagged versions of the git repos
 DeepHyper version tag: e29af5a
-TensorFlow version tag: 2.5.0
+TensorFlow version tag: pre-2.6.0 (e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a)
 Horovod version tag: 0.22.1
-PyTorch version tag: "1.10.0a0+git1dee99c"
+PyTorch version tag: 1.10.0a0+gite1bd496
 You can modify this environment as follows:
 
   - Extend this environment locally
@@ -19,7 +19,7 @@ https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
 ]])
 
 whatis("Name: conda")
-whatis("Version: ${VER}")
+whatis("Version: 4.10.1")
 whatis("Category: python conda")
 whatis("Keywords: python conda")
 whatis("Description: Base Anaconda python environment")
@@ -41,10 +41,10 @@ setenv("PYTHONUSERBASE",pathJoin("$HOME/.local",myModuleFullName()))
 setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
-prepend_path("LD_LIBRARY_PATH","/usr/local/cuda-11.0/lib64")
-prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/cudnn-11.0-linux-x64-v8.1.1.33/lib64")
-prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.9.6-1+cuda11.0_x86_64/lib")
-prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/TensorRT-7.2.3.4.Ubuntu-18.04.x86_64-gnu.cuda-11.0.cudnn8.1/lib")
+prepend_path("LD_LIBRARY_PATH","/usr/local/cuda-11.3/lib64")
+prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/cudnn-11.3-linux-x64-v8.2.0.53/lib64")
+prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.9.8-1+cuda11.3_x86_64/lib")
+prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/TensorRT-8.0.0.3.Linux.x86_64-gnu.cuda-11.3.cudnn8.2/lib")
 
 setenv("https_proxy","http://proxy.tmi.alcf.anl.gov:3128")
 setenv("http_proxy","http://proxy.tmi.alcf.anl.gov:3128")

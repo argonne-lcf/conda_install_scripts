@@ -377,11 +377,11 @@ else
     git checkout --recurse-submodules $HOROVOD_REPO_TAG
 fi
 
-echo Build Horovod Wheel using MPI from $MPI
+echo Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}
 export LD_LIBRARY_PATH=$MPI/lib:$LD_LIBRARY_PATH
 export PATH=$MPI/bin:$PATH
 
-HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
+HOROVOD_CUDA_HOME=${CUDA_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEEL_DIR/
 HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)

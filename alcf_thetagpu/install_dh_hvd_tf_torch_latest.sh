@@ -91,6 +91,7 @@ DH_INSTALL_BASE_DIR=$THISDIR/$DH_INSTALL_SUBDIR
 WHEEL_DIR=$DH_INSTALL_BASE_DIR/wheels
 
 # confirm install path
+echo On ThetaGPU $HOSTNAME
 echo Installing module into $DH_INSTALL_BASE_DIR
 #read -p "Are you sure? " -n 1 -r
 #echo

@@ -444,7 +444,7 @@ fi
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper)
-pip uninstall 'keras-nightly' || true
+pip uninstall -y 'keras-nightly' || true
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/

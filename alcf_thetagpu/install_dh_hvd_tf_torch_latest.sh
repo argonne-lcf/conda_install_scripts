@@ -11,7 +11,7 @@
 #DH_REPO_TAG="0.2.5"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-#TF_REPO_TAG="v2.4.2" # requires NumPy 1.19.x
+TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
 #PT_REPO_TAG="v1.9.0"
 HOROVOD_REPO_TAG="v0.22.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
@@ -315,7 +315,11 @@ export TMP=/tmp
 
 ./configure
 echo Bazel Build TensorFlow
-HOME=$DOWNLOAD_PATH bazel build --jobs=4000 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+# KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores).
+# Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max
+# even if --jobs=500
+HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
 echo Install TensorFlow

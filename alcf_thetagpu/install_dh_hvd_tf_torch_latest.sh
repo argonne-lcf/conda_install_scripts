@@ -429,7 +429,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd $DH_INSTALL_BASE_DIR
     git clone $DH_REPO_URL
     cd deephyper
-    pip install -e ".[analytics,balsam,deepspace,hvd]"
+    pip install ".[analytics,balsam,deepspace,hvd]"
     cd ..
     cd $DH_INSTALL_BASE_DIR
 else

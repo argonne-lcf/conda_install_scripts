@@ -436,6 +436,9 @@ echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 
+# KGF: see below
+conda list
+
 chmod -R a-w $DH_INSTALL_BASE_DIR/
 
 set +e
@@ -443,4 +446,4 @@ set +e
 # KGF: still need to apply manual postfix for the 4x following warnings that appear whenever "conda list" or other commands are run
 # WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash ... /lus/theta-fs0/software/thetagpu/conda/deephyper/0.2.5/mconda3/conda-meta/setuptools-52.0.0-py38h06a4308_0.json
 
-# KGF: Do "chmod -R u+w ." in mconda3/conda-meta/, run "conda list", then "chmod -R a-w ."
+# KGF: Do "chmod -R u+w ." in mconda3/conda-meta/, run "conda list", then "chmod -R a-w ." Or, try

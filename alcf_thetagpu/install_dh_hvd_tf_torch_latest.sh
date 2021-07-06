@@ -452,6 +452,9 @@ echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 
+# KGF: see below
+conda list
+
 chmod -R a-w $DH_INSTALL_BASE_DIR/
 
 

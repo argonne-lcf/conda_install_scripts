@@ -5,6 +5,9 @@ DeepHyper version tag: e29af5a
 TensorFlow version tag: pre-2.6.0 (c837cf8963d4ef9cb3b3b9e8787cb35f21b68f9d)
 Horovod version tag: 0.22.1
 PyTorch version tag: 1.10.0a0+gitfbd4cb1
+- DDP with NCCL (2.9.9+cuda11.0) does not work for this module
+- This PyTorch version has some issues with torchvision and Pillow (https://github.com/pytorch/pytorch/issues/61125)
+
 You can modify this environment as follows:
 
   - Extend this environment locally

@@ -5,6 +5,8 @@ DeepHyper version tag: 0.2.5
 TensorFlow version tag: 2.4.2
 Horovod version tag: 0.21.3
 PyTorch version tag: 1.9.0a0+gitd69c22d
+- DDP with NCCL (2.9.9-1+cuda11.3, built by Adam Scovel) works in this module
+
 You can modify this environment as follows:
 
   - Extend this environment locally

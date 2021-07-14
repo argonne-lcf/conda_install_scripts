@@ -431,6 +431,8 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd $DH_INSTALL_BASE_DIR
     git clone $DH_REPO_URL
     cd deephyper
+    # KGF: use of GitFlow means that master branch might be too old for us
+    #git checkout develop
     pip install ".[analytics,balsam,deepspace,hvd]"
     cd ..
     cd $DH_INSTALL_BASE_DIR
@@ -447,6 +449,8 @@ pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
 pip uninstall -y 'keras' || true
+# KGF: the above line might not work. Double check with "horovodrun --check-build". Confirmed working version of keras-nightly as of 2021-07-14
+pip install 'keras-nightly~=2.6.0.dev2021052700' || true
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/

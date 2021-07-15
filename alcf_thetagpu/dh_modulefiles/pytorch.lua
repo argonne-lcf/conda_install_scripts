@@ -32,6 +32,7 @@ depends_on("openmpi/openmpi-4.0.5")
 
 local conda_dir = "/lus/theta-fs0/software/thetagpu/conda/2021-06-26/mconda3"
 local funcs = "conda __conda_activate __conda_hashr __conda_reactivate __add_sys_prefix_to_path"
+local home = os.getenv("HOME")
 
 -- Specify where system and user environments should be created
 -- setenv("CONDA_ENVS_PATH", pathJoin(conda_dir,"envs"))
@@ -39,7 +40,7 @@ local funcs = "conda __conda_activate __conda_hashr __conda_reactivate __add_sys
 -- setenv("CONDA_PKGS_DIRS", pathJoin(conda_dir,"pkgs"))
 -- set environment name for prompt tag
 setenv("ENV_NAME",myModuleFullName())
-setenv("PYTHONUSERBASE",pathJoin("$HOME/.local",myModuleFullName()))
+setenv("PYTHONUSERBASE",pathJoin(home,".local/",myModuleFullName()))
 setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries

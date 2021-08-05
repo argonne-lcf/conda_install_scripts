@@ -3,14 +3,21 @@
 PYTHON_VERSION=3
 CONDA_VERSION=latest
 BASE_DIR=$PWD/miniconda$PYTHON_VERSION
-DOWNLOAD_PATH=$BASE_DIR/DOWNLOADS
 
 if [ $# -eq 0 ]
 then
    PREFIX_PATH=$BASE_DIR/$CONDA_VERSION
 else
    PREFIX_PATH=$1
-fi 
+fi
+
+WHEEL_DIR=$PREFIX_PATH/wheels
+DOWNLOAD_PATH=$PREFIX_PATH/DOWNLOADS
+CONDA_INST_PATH=$PREFIX_PATH/mconda3
+
+# Horovod source and version
+HOROVOD_REPO_URL=https://github.com/uber/horovod.git
+HOROVOD_REPO_TAG=v0.21.3
 
 echo Installing into $PREFIX_PATH
 read -p "Are you sure? " -n 1 -r
@@ -27,10 +34,12 @@ umask 0022
 
 mkdir -p $PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
+mkdir -p $WHEEL_DIR
 
 MINICONDA_INSTALL_FILE=Miniconda$PYTHON_VERSION-$CONDA_VERSION-Linux-x86_64.sh
 
-if [ ! -f $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE ]; then
+if [[ ! -f $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE ]] || [[ `find $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE -ctime +30` ]]; then
+   rm -f $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE
    echo Downloading miniconda installer
    wget https://repo.continuum.io/miniconda/$MINICONDA_INSTALL_FILE -P $DOWNLOAD_PATH
    
@@ -38,10 +47,10 @@ if [ ! -f $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE ]; then
 fi
 
 echo Installing Miniconda
-$DOWNLOAD_PATH/Miniconda$PYTHON_VERSION-$CONDA_VERSION-Linux-x86_64.sh -b -p $PREFIX_PATH -u
+$DOWNLOAD_PATH/Miniconda$PYTHON_VERSION-$CONDA_VERSION-Linux-x86_64.sh -b -p $CONDA_INST_PATH  -u
 
-echo moving into $PREFIX_PATH
-cd $PREFIX_PATH
+echo moving into $CONDA_INST_PATH
+cd $CONDA_INST_PATH
 
 
 PYTHON_VER=$(ls -d lib/python?.? | tail -c4)
@@ -49,8 +58,14 @@ echo PYTHON_VER=$PYTHON_VER
 
 # create a setup file
 cat > setup.sh << EOF
-DIR=\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )
 preferred_shell=\$(basename \$SHELL)
+
+if [ -n "\$ZSH_EVAL_CONTEXT" ]; then
+    DIR=\$( cd "\$( dirname "\$0" )" && pwd )
+else  # bash, sh, etc.
+    DIR=\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )
+fi
+
 eval "\$(\$DIR/bin/conda shell.\${preferred_shell} hook)"
 EOF
 
@@ -109,7 +124,7 @@ set HOME          $::env(HOME)
 set PYTHON_LEVEL                 $PYTHON_VER
 set CONDA_LEVEL                  $CONDA_VERSION
 set MINICONDA_LEVEL              $PYTHON_VERSION
-set CONDA_PREFIX                 $PREFIX_PATH
+set CONDA_PREFIX                 $CONDA_INST_PATH
 setenv CONDA_PREFIX              \$CONDA_PREFIX
 setenv PYTHONUSERBASE            \$HOME/.local/\$_module_name
 setenv ENV_NAME                  \$_module_name
@@ -122,6 +137,7 @@ EOF
 cat > .condarc << EOF
 env_prompt: "(\$ENV_NAME/\$CONDA_DEFAULT_ENV) "
 pkgs_dirs:
+   - \$HOME/.local/conda/\$ENV_NAME/pkgs
    - \$CONDA_PREFIX/pkgs
 EOF
 
@@ -129,25 +145,48 @@ EOF
 echo setting up conda environment
 module load $(pwd)/modulefile
 conda config --remove channels intel
+conda install -y cmake
 
 echo CONDA BINARY: $(which conda)
 echo CONDA VERSION: $(conda --version)
-
-
+pip install --upgrade pip
+echo PIP VERSION: $(pip --version)
 
 echo install tensorflow 
+cd $PREFIX_PATH
 
 # install tensorflow depenedencies
-conda install -y tensorflow 
+pip install tensorflow
 
 # install pytorch
 echo install pytorch
-conda install -y pytorch torchvision
+pip install torch torchvision
 
 echo install other tools
-conda install -y scikit-learn scikit-image pandas matplotlib h5py  
+pip install scikit-learn scikit-image pandas matplotlib h5py scikit-optimize virtualenv tensorboard_plugin_profile tensorflow_addons
 
-echo install horovod
-conda install -y -c alcf-theta horovod
+########
+### Install Horovod
+########
+module swap PrgEnv-intel PrgEnv-gnu
+module swap gcc gcc/8.3.0
+export CRAY_CPU_TARGET=mic-knl
+echo Clone Horovod $HOROVOD_REPO_TAG git repo
+
+git clone --recursive $HOROVOD_REPO_URL
+cd horovod
+git checkout $HOROVOD_REPO_TAG
+
+#echo Build Horovod Wheel using MPI from $MPI
+#export LD_LIBRARY_PATH=$MPI/lib:$LD_LIBRARY_PATH
+#export PATH=$MPI/bin:$PATH
+
+HOROVOD_CMAKE=$(which cmake) HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 CC=$(which cc) CXX=$(which CC) python setup.py bdist_wheel
+HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
+cp $HVD_WHL $WHEEL_DIR/
+HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
+echo Install Horovod $HVD_WHEEL
+pip install --force-reinstall $HVD_WHEEL
+
 
 

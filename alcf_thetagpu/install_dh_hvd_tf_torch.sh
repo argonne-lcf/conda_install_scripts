@@ -431,6 +431,13 @@ fi
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
+# https://github.com/tensorflow/tensorflow/issues/46840#issuecomment-872946341
+# https://github.com/pytorch/vision/issues/4146
+# https://github.com/pytorch/vision/pull/4148
+# https://github.com/pytorch/vision/issues/2632
+pip install "pillow!=8.3.0,>=6.2.0"  # 8.3.1 seems to be fine with torchvision and dataloader
+# KGF: torchvision will try to install its own .whl for PyTorch 1.9.0 even if 1.9.0a0+gitd69c22d is installed, e.g.
+pip install --no-deps torchvision
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/

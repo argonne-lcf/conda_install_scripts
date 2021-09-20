@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export CUDA_VISIBLE_DEVICES=4
-
 # As of June 14 2021
 # This script will install (from scratch) DeepHyper, TensorFlow, PyTorch, and Horovod on ThetaGPU
 # 1 - Grab worker node interactively for 120 min (full-node queue)
@@ -10,12 +8,12 @@ export CUDA_VISIBLE_DEVICES=4
 # 4 - wait for it to complete
 
 # unset *_TAG variables to build latest master
-DH_REPO_TAG="0.2.5"
+#DH_REPO_TAG="0.2.5"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-TF_REPO_TAG="v2.4.2" # requires NumPy 1.19.x
-PT_REPO_TAG="v1.9.0"
-HOROVOD_REPO_TAG="v0.21.3"
+TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
+#PT_REPO_TAG="v1.9.0"
+HOROVOD_REPO_TAG="v0.22.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
@@ -73,17 +71,11 @@ export TF_NEED_OPENCL=0
 export TF_NEED_MPI=0
 export TF_NEED_ROCM=0
 export TF_NEED_CUDA=1
-# KGF: TensorRT 8.x only supported in TensorFlow as of 2021-06-24 (f8e2aa0db)
-# https://github.com/tensorflow/tensorflow/issues/49150
-# https://github.com/tensorflow/tensorflow/pull/48917
-# and TRT 7.x is incompatible with CUDA 11.3 (requires 10.2, 11.0, 11.1, 11.2)
-# Disable TF+TensorRT for now
-export TF_NEED_TENSORRT=0
+export TF_NEED_TENSORRT=1
 export TF_CUDA_PATHS=$CUDA_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
 export GCC_HOST_COMPILER_PATH=$(which gcc)
 export CC_OPT_FLAGS="-march=native -Wno-sign-compare"
 export TF_SET_ANDROID_WORKSPACE=0
-
 
 # get the folder where this script is living
 if [ -n "$ZSH_EVAL_CONTEXT" ]; then
@@ -126,7 +118,6 @@ else
     export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
 fi
 
-#####set -e
 
 # set Conda installation folder and where downloaded content will stay
 CONDA_PREFIX_PATH=$DH_INSTALL_BASE_DIR/mconda3
@@ -264,7 +255,6 @@ set -e
 ### Install TensorFlow
 ########
 
-
 echo Conda install some dependencies
 
 conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
@@ -309,17 +299,27 @@ pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
 echo Configure TensorFlow
+
+# KGF: avoid problem when building post 2.5.0 master (762790710496e04801ec17dd7f012fd9aa37a1df)
+# ERROR: /lus/theta-fs0/software/thetagpu/conda/deephyper/latest/tensorflow/tensorflow/core/kernels/mlir_generated/BUILD:910:23: compile tensorflow/core/kernels/mlir_generated/bitwise_xor_gpu_i32_i32_kernel_generator_kernel.o failed (Exit 1): tf_to_kernel failed: error executing command bazel-out/k8-opt/bin/tensorflow/compiler/mlir/tools/kernel_gen/tf_to_kernel '--tile_sizes=1024' '--max-supported-rank=5' '--arch=compute_80' ... (remaining 4 argument(s) skipped)
+# 2021-06-21 21:49:28.967640: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:210] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+# 2021-06-21 21:49:29.052480: W tensorflow/compiler/mlir/tools/kernel_gen/kernel_creator.cc:385] There should be exactly one GPU Module, but got 8. Currently we leak memory if there is more than one module, see https://bugs.llvm.org/show_bug.cgi?id=48385
+export CUDA_VISIBLE_DEVICES=0
+
+
 cd tensorflow
 export PYTHON_BIN_PATH=$(which python)
 export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0])')
 # Auto-Configuration Warning: 'TMP' environment variable is not set, using 'C:\Windows\Temp' as default
 export TMP=/tmp
+
 ./configure
 echo Bazel Build TensorFlow
-# KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores)
+# KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores).
 # Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max
 # even if --jobs=500
 HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
 echo Install TensorFlow
@@ -350,10 +350,25 @@ export CUDNN_ROOT=$CUDNN_BASE
 export USE_TENSORRT=ON
 export TENSORRT_ROOT=$TENSORRT_BASE
 export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
-export TENSORRT_LIBRARY=$TENSORRT_BASE/lib/libmyelin.so
+#export TENSORRT_LIBRARY=$TENSORRT_BASE/lib/libmyelin.so
+export TENSORRT_LIBRARY=$TENSORRT_BASE/lib
 export TENSORRT_LIBRARY_INFER=$TENSORRT_BASE/lib/libnvinfer.so
 export TENSORRT_LIBRARY_INFER_PLUGIN=$TENSORRT_BASE/lib/libnvinfer_plugin.so
 export TENSORRT_INCLUDE_DIR=$TENSORRT_BASE/include
+# KGF:
+# pytorch/cmake/public/cuda.cmake
+  # 116   find_path(TENSORRT_INCLUDE_DIR NvInfer.h
+  # 117     HINTS ${TENSORRT_ROOT} ${CUDA_TOOLKIT_ROOT_DIR}
+  # 118     PATH_SUFFIXES include)
+  # 119   find_library(TENSORRT_LIBRARY nvinfer
+  # 120     HINTS ${TENSORRT_ROOT} ${CUDA_TOOLKIT_ROOT_DIR}
+  # 121     PATH_SUFFIXES lib lib64 lib/x64)
+  # 122   find_package_handle_standard_args(
+  # 123     TENSORRT DEFAULT_MSG TENSORRT_INCLUDE_DIR TENSORRT_LIBRARY)
+  # 124   if(TENSORRT_FOUND)
+# ---> Could NOT find TENSORRT (missing: TENSORRT_INCLUDE_DIR TENSORRT_LIBRARY)
+# USE_TENSORRT: OFF in the Summary
+# but then later: cmake ... -DUSE_TENSORRT=ON
 python setup.py bdist_wheel
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
 echo copying pytorch wheel file $PT_WHEEL
@@ -406,7 +421,7 @@ ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(pyt
 # DeepHyper stuff
 export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
 
-pip install 'tensorflow_probability==0.12.2'
+pip install 'tensorflow_probability==0.13.0'
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
 if [[ -z "$DH_REPO_TAG" ]]; then
@@ -414,7 +429,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd $DH_INSTALL_BASE_DIR
     git clone $DH_REPO_URL
     cd deephyper
-    pip install -e ".[analytics,balsam,deepspace,hvd]"
+    pip install ".[analytics,balsam,deepspace,hvd]"
     cd ..
     cd $DH_INSTALL_BASE_DIR
 else
@@ -428,14 +443,17 @@ fi
 # random inconsistencies that pop up with the specific "pip installs" from earlier
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 
+# KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
+pip uninstall -y 'keras' || true
+
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 
 chmod -R a-w $DH_INSTALL_BASE_DIR/
 
-set +e
 
+set +e
 # KGF: still need to apply manual postfix for the 4x following warnings that appear whenever "conda list" or other commands are run
 # WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash ... /lus/theta-fs0/software/thetagpu/conda/deephyper/0.2.5/mconda3/conda-meta/setuptools-52.0.0-py38h06a4308_0.json
 

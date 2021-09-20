@@ -11,7 +11,7 @@
 #DH_REPO_TAG="0.2.5"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
+#TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
 #PT_REPO_TAG="v1.9.0"
 HOROVOD_REPO_TAG="v0.22.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
@@ -20,7 +20,7 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # where to install relative to current path
 if [[ -z "$DH_REPO_TAG" ]]; then
-    DH_INSTALL_SUBDIR=deephyper/latest
+    DH_INSTALL_SUBDIR='2021-06-28/'
 else
     DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
 fi
@@ -44,9 +44,11 @@ CUDNN_VERSION=$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR.$CUDNN_VERSION_EXTRA
 CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
 
 NCCL_VERSION_MAJOR=2
-NCCL_VERSION_MINOR=9.8-1
+NCCL_VERSION_MINOR=9.9-1
 NCCL_VERSION=$NCCL_VERSION_MAJOR.$NCCL_VERSION_MINOR
 NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
+# KGF: no Extended Compatibility in  NCCL
+NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64
 
 TENSORRT_VERSION_MAJOR=8
 TENSORRT_VERSION_MINOR=0.0.3
@@ -429,7 +431,9 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd $DH_INSTALL_BASE_DIR
     git clone $DH_REPO_URL
     cd deephyper
-    pip install -e ".[analytics,balsam,deepspace,hvd]"
+    # KGF: use of GitFlow means that master branch might be too old for us
+    #git checkout develop
+    pip install ".[analytics,balsam,deepspace,hvd]"
     cd ..
     cd $DH_INSTALL_BASE_DIR
 else
@@ -445,10 +449,15 @@ pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
 pip uninstall -y 'keras' || true
+# KGF: the above line might not work. Double check with "horovodrun --check-build". Confirmed working version of keras-nightly as of 2021-07-14
+pip install 'keras-nightly~=2.6.0.dev2021052700' || true
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
+
+# KGF: see below
+conda list
 
 chmod -R a-w $DH_INSTALL_BASE_DIR/
 

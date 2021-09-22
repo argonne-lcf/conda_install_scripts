@@ -12,18 +12,21 @@
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 #TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
-#PT_REPO_TAG="v1.9.0"
+TF_REPO_TAG="v2.6.0"
+PT_REPO_TAG="v1.9.1"
 HOROVOD_REPO_TAG="v0.22.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # where to install relative to current path
-if [[ -z "$DH_REPO_TAG" ]]; then
-    DH_INSTALL_SUBDIR='2021-06-28/'
-else
-    DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
-fi
+# if [[ -z "$DH_REPO_TAG" ]]; then
+#     DH_INSTALL_SUBDIR='2021-06-28/'
+# else
+#     DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
+# fi
+
+DH_INSTALL_SUBDIR='2021-09-22/'
 
 # MPI source on ThetaGPU
 MPI=/lus/theta-fs0/software/thetagpu/openmpi-4.0.5
@@ -423,7 +426,8 @@ ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(pyt
 # DeepHyper stuff
 export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
 
-pip install 'tensorflow_probability==0.13.0'
+pip install 'tensorflow_probability==0.14.0'
+# KGF: 0.14.0 (2021-09-15) only compatible with TF 2.6.0
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
 if [[ -z "$DH_REPO_TAG" ]]; then
@@ -431,9 +435,9 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd $DH_INSTALL_BASE_DIR
     git clone $DH_REPO_URL
     cd deephyper
-    # KGF: use of GitFlow means that master branch might be too old for us
-    #git checkout develop
-    pip install ".[analytics,balsam,deepspace,hvd]"
+    # KGF: use of GitFlow means that master branch might be too old for us:
+    git checkout develop
+    pip install ".[analytics,deepspace,hvd]"
     cd ..
     cd $DH_INSTALL_BASE_DIR
 else

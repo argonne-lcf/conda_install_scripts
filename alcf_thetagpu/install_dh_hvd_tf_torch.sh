@@ -21,11 +21,11 @@ HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # where to install relative to current path
-if [[ -z "$DH_REPO_TAG" ]]; then
-    DH_INSTALL_SUBDIR='2021-06-26/'
-else
-    DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
-fi
+# if [[ -z "$DH_REPO_TAG" ]]; then
+#     DH_INSTALL_SUBDIR='2021-06-26/'
+# else
+#     DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
+# fi
 
 DH_INSTALL_SUBDIR='2021-06-26/'
 

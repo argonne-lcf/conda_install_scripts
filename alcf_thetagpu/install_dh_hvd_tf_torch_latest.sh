@@ -263,7 +263,7 @@ conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake c
 
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-
+conda install -y mamba
 conda update -y pip
 
 echo Clone TensorFlow

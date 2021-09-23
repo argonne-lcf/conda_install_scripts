@@ -132,7 +132,9 @@ mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 
 # Download and install conda for a base python installation
-CONDAVER=latest
+CONDAVER='py38_4.10.3'
+# "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
+# CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
 CONDA_INSTALL_SH=Miniconda3-$CONDAVER-Linux-x86_64.sh
 echo Downloading miniconda installer
@@ -437,6 +439,8 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd deephyper
     # KGF: use of GitFlow means that master branch might be too old for us:
     git checkout develop
+    # pip --version
+    # pip index versions deepspace
     pip install ".[analytics,deepspace,hvd]"
     cd ..
     cd $DH_INSTALL_BASE_DIR

@@ -140,7 +140,9 @@ mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 
 # Download and install conda for a base python installation
-CONDAVER=latest
+CONDAVER='py38_4.10.3'
+# "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
+# CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
 CONDA_INSTALL_SH=Miniconda3-$CONDAVER-Linux-x86_64.sh
 echo Downloading miniconda installer

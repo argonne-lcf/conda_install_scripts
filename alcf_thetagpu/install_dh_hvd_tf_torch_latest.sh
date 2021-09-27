@@ -327,10 +327,12 @@ echo Bazel Build TensorFlow
 # even if --jobs=500
 HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
 
-echo Run wheel building
+echo Build TensorFlow wheel
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
+
 echo Install TensorFlow
 pip install $(find $WHEEL_DIR/ -name "tensorflow*.whl" -type f)
+# KGF(2021-09-27): This installs Keras 2.6.0
 
 
 ########
@@ -433,14 +435,18 @@ pip install 'tensorflow_probability==0.14.0'
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
 if [[ -z "$DH_REPO_TAG" ]]; then
-    echo Clone and checkout DeepHyper master from git
+    echo Clone and checkout DeepHyper develop branch from git
     cd $DH_INSTALL_BASE_DIR
     git clone $DH_REPO_URL
     cd deephyper
     # KGF: use of GitFlow means that master branch might be too old for us:
     git checkout develop
-    # pip --version
-    # pip index versions deepspace
+    pip --version
+    pip index versions deepspace
+    pip install dh-scikit-optimize==0.9.0
+    # Do not use editable pip installs
+    # Uses deprecated egg format for symbolic link instead of wheels.
+    # This causes permissions issues with read-only easy-install.pth
     pip install ".[analytics,deepspace,hvd]"
     cd ..
     cd $DH_INSTALL_BASE_DIR
@@ -454,12 +460,19 @@ fi
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
-pip install 'nest_asyncio'  # likely already installed
 
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
-pip uninstall -y 'keras' || true
+####pip uninstall -y 'keras' || true
 # KGF: the above line might not work. Double check with "horovodrun --check-build". Confirmed working version of keras-nightly as of 2021-07-14
-pip install 'keras-nightly~=2.6.0.dev2021052700' || true
+#####pip install 'keras-nightly~=2.6.0.dev2021052700' || true
+
+# KGF(2021-09-27): Confusingly, these commands worked for a fresh install of TF 2.6.0, resulting in only keras-nightly, not keras, installed in Conda. However, when I went to modify the existing conda environment to 'pip install -e ".[analytics,deepspace,hvd]"' a newer version of DeepHyper, it reinstalled Keras 2.6.0, which I then manually uninstalled.
+
+# This broke "horovodrun --check-build" TensorFlow integration, and you could no longer even import tensorflow.
+
+# Uninstalling "keras-nightly" and reinstalling "Keras" seems to fix this, even though it is the opposite setup from the original (working) install script. Seems to be a different behavior depending on whether or not the TensorFlow build is from a tagged release vs. unstable master. E.g. conda/2021-06-26 (tagged version) installed keras 2.4.3, conda/2021-06-28 installed keras-nightly 2.6.0.dev2021062500
+
+# Where does TensorFlow define a Keras dependency when you build a wheel from source??
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/

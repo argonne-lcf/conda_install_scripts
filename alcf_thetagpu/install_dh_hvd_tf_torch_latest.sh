@@ -473,6 +473,8 @@ pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 # Uninstalling "keras-nightly" and reinstalling "Keras" seems to fix this, even though it is the opposite setup from the original (working) install script. Seems to be a different behavior depending on whether or not the TensorFlow build is from a tagged release vs. unstable master. E.g. conda/2021-06-26 (tagged version) installed keras 2.4.3, conda/2021-06-28 installed keras-nightly 2.6.0.dev2021062500
 
 # Where does TensorFlow define a Keras dependency when you build a wheel from source??
+# ANSWER: https://github.com/tensorflow/tensorflow/commit/e457b3604ac31e7e0e38eaae8622509302f8c7d6#diff-f526feeafa1000c4773410bdc5417c4022cb2c7b686ae658b629beb541ae9112
+# They were temporarily using keras-nightly for the dep; switched away from that on 2021-08-09.
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/

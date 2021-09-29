@@ -273,7 +273,7 @@ set -e
 
 echo Conda install some dependencies
 
-conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
+conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz
 
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
@@ -310,7 +310,7 @@ cd $DH_INSTALL_BASE_DIR
 echo Install TensorFlow Dependencies
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
-pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker
+pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 

@@ -1,0 +1,25 @@
+#%Module2.0
+## miniconda3 modulefile
+##
+proc ModulesHelp { } {
+   global CONDA_LEVEL PYTHON_LEVEL MINICONDA_LEVEL
+   puts stderr "This module will add Miniconda $MINICONDA_LEVEL to your environment with conda version $CONDA_LEVEL and python version $PYTHON_LEVEL"
+}
+
+set _module_name  [module-info name]
+set is_module_rm  [module-info mode remove]
+set sys           [uname sysname]
+set os            [uname release]
+set HOME          $::env(HOME)
+
+set PYTHON_LEVEL                 3.8
+set CONDA_LEVEL                  py38_4.10.3
+set MINICONDA_LEVEL              3
+set CONDA_PREFIX                 /lus/theta-fs0/software/datascience/conda/conda/2021-09-22/mconda3
+setenv CONDA_PREFIX              $CONDA_PREFIX
+setenv PYTHONUSERBASE            $HOME/.local/$_module_name
+setenv ENV_NAME                  $_module_name
+setenv PYTHONSTARTUP             $CONDA_PREFIX/etc/pythonstart
+puts stdout "source $CONDA_PREFIX/setup.sh"
+
+module-whatis  "miniconda installation"

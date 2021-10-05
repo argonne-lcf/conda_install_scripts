@@ -1,8 +1,10 @@
 #!/bin/bash
 
+set -e
+
 PYTHON_VERSION=3
 CONDA_VERSION='py38_4.10.3'
-BASE_DIR=$PWD/miniconda$PYTHON_VERSION
+#BASE_DIR=$PWD/miniconda$PYTHON_VERSION
 
 # if [ $# -eq 0 ]
 # then
@@ -151,7 +153,7 @@ EOF
 # setup area
 echo setting up conda environment
 module load $(pwd)/modulefile
-conda config --remove channels intel
+conda config --remove channels intel || true
 conda install -y cmake
 conda install -y -c conda-forge mamba
 
@@ -200,13 +202,17 @@ HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
 echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall $HVD_WHEEL
 
+# KGF: sometimes throws errors?
+set +e
+pip install mpi4py
+set -e
 
 pip install 'tensorflow_probability==0.14.0'
 
 
 if [[ -z "$DH_REPO_TAG" ]]; then
     echo Clone and checkout DeepHyper develop branch from git
-    cd $DH_INSTALL_BASE_DIR
+    cd $PREFIX_PATH
     git clone $DH_REPO_URL
     cd deephyper
     # KGF: use of GitFlow means that master branch might be too old for us:
@@ -219,10 +225,14 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # This causes permissions issues with read-only easy-install.pth
     pip install ".[analytics,deepspace,hvd]"
     cd ..
-    cd $DH_INSTALL_BASE_DIR
+    cd $PREFIX_PATH
 else
     # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
     echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
     pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November 2019
     pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
+
+chmod -R a-w $PREFIX_PATH
+
+set +e

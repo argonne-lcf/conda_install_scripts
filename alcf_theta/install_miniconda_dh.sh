@@ -233,6 +233,9 @@ else
     pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
 
+pip install "pillow!=8.3.0,>=6.2.0"
+pip install --no-deps torchvision
+
 chmod -R a-w $PREFIX_PATH
 
 set +e

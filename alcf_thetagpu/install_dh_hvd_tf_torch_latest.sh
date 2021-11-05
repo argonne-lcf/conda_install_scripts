@@ -467,6 +467,7 @@ pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 pip install "pillow!=8.3.0,>=6.2.0"  # 8.3.1 seems to be fine with torchvision and dataloader
 # KGF: torchvision will try to install its own .whl for PyTorch 1.9.0 even if 1.9.0a0+gitd69c22d is installed, e.g
 pip install --no-deps torchvision
+pip install --no-deps timm
 
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
 ####pip uninstall -y 'keras' || true
@@ -498,3 +499,9 @@ set +e
 # WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash ... /lus/theta-fs0/software/thetagpu/conda/deephyper/0.2.5/mconda3/conda-meta/setuptools-52.0.0-py38h06a4308_0.json
 
 # KGF: Do "chmod -R u+w ." in mconda3/conda-meta/, run "conda list", then "chmod -R a-w ."
+
+
+# https://github.com/deephyper/deephyper/issues/110
+# KGF: check that CONDA_DIR/mconda3/lib/python3.8/site-packages/easy-install.pth does not exist as an empty file
+# rm it to prevent it from appearing in cloned conda environments (with read-only permissions), preventing users
+# from instalilng editable pip installs in their own envs!

@@ -468,6 +468,7 @@ pip install "pillow!=8.3.0,>=6.2.0"  # 8.3.1 seems to be fine with torchvision a
 # KGF: torchvision will try to install its own .whl for PyTorch 1.9.0 even if 1.9.0a0+gitd69c22d is installed, e.g
 pip install --no-deps torchvision
 pip install --no-deps timm
+pip install opencv-python-headless
 
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
 ####pip uninstall -y 'keras' || true

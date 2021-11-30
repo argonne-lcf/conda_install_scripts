@@ -174,7 +174,7 @@ pip install 'tensorflow_probability==0.14.0'
 
 # install pytorch
 echo Pip installing PyTorch
-pip install torch torchvision
+pip install torch
 
 echo Pip installing other tools
 pip install scikit-learn scikit-image pandas matplotlib h5py scikit-optimize virtualenv tensorboard_plugin_profile tensorflow_addons scipy

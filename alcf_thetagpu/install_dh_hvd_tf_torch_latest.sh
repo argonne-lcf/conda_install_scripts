@@ -12,7 +12,7 @@
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 #TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
-TF_REPO_TAG="v2.7.0"
+#TF_REPO_TAG="v2.7.0"
 PT_REPO_TAG="v1.10.0"
 HOROVOD_REPO_TAG="v0.23.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
@@ -54,10 +54,17 @@ NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
 NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64
 
 TENSORRT_VERSION_MAJOR=8
+# TensorFlow 2.7.0 does not yet support TRT 8.2.x as of 2021-11-30
+# https://github.com/tensorflow/tensorflow/pull/52342
+
+# support merged into master on 2021-11-11: https://github.com/tensorflow/tensorflow/pull/52932
 TENSORRT_VERSION_MINOR=2.1.8
+#TENSORRT_VERSION_MINOR=0.0.3
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 #TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+# KGF: uncomment this once TF supports TRT 8.2
 TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+
 
 # TensorFlow Config flags (for ./configure run)
 export TF_CUDA_COMPUTE_CAPABILITIES=8.0
@@ -450,7 +457,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
-    pip install ".[analytics,deepspace,hvd]"
+    pip install ".[analytics,hvd]"  # deepspace extra preseent in v0.3.3 but removed in develop branch
     cd ..
     cd $DH_INSTALL_BASE_DIR
 else

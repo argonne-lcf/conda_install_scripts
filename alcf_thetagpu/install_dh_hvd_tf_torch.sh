@@ -310,7 +310,9 @@ cd $DH_INSTALL_BASE_DIR
 echo Install TensorFlow Dependencies
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
-pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
+#pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
+# KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
+pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker pydot
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 

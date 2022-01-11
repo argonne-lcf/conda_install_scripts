@@ -13,7 +13,7 @@ CONDA_VERSION='py38_4.10.3'
 #    PREFIX_PATH=$1
 # fi
 
-PREFIX_PATH=$PWD/2021-09-22
+PREFIX_PATH=$PWD/2021-09-22-smartsim
 
 WHEEL_DIR=$PREFIX_PATH/wheels
 DOWNLOAD_PATH=$PREFIX_PATH/DOWNLOADS
@@ -156,6 +156,8 @@ module load $(pwd)/modulefile
 conda config --remove channels intel || true
 conda install -y cmake
 conda install -y -c conda-forge mamba
+conda install -y -c conda-forge git-lfs
+git lfs install
 
 echo CONDA BINARY: $(which conda)
 echo CONDA VERSION: $(conda --version)
@@ -163,7 +165,6 @@ pip install --upgrade pip
 echo PIP VERSION: $(pip --version)
 
 echo Pip installing TensorFlow and TF probability
-cd $PREFIX_PATH
 
 # install tensorflow depenedencies
 pip install 'tensorflow==2.6.0'
@@ -174,19 +175,38 @@ pip install 'tensorflow_probability==0.14.0'
 
 # install pytorch
 echo Pip installing PyTorch
-pip install torch
+pip install 'torch==1.7.1'
 
 echo Pip installing other tools
 pip install scikit-learn scikit-image pandas matplotlib h5py scikit-optimize virtualenv tensorboard_plugin_profile tensorflow_addons scipy
 
+echo install smartsim
+git clone https://github.com/CrayLabs/SmartSim.git --depth=1 --branch v0.3.2 smartsim-0.3.2
+cd smartsim-0.3.2
+pip install -e .[dev,ml]
+smart -v --device cpu
+
+echo install smartredis
+cd ..
+git clone https://github.com/CrayLabs/SmartRedis.git --depth=1 --branch v0.2.0 smartredis-0.2.0
+cd smartredis-0.2.0
+pip install -e .[dev]
+
+export CC=/opt/gcc/9.3.0/bin/gcc
+export CXX=/opt/gcc/9.3.0/bin/g++
+make deps
+make test-deps
+make lib
+
 ########
 ### Install Horovod
 ########
+cd $PREFIX_PATH
 module swap PrgEnv-intel PrgEnv-gnu
 module swap gcc gcc/8.3.0
 export CRAY_CPU_TARGET=mic-knl
 echo Clone Horovod $HOROVOD_REPO_TAG git repo
-
+echo $CC $CXX
 git clone --recursive $HOROVOD_REPO_URL
 cd horovod
 git checkout $HOROVOD_REPO_TAG
@@ -208,33 +228,12 @@ pip install mpi4py
 set -e
 
 pip install 'tensorflow_probability==0.14.0'
-
-
-if [[ -z "$DH_REPO_TAG" ]]; then
-    echo Clone and checkout DeepHyper develop branch from git
-    cd $PREFIX_PATH
-    git clone $DH_REPO_URL
-    cd deephyper
-    # KGF: use of GitFlow means that master branch might be too old for us:
-    git checkout develop
-    pip --version
-    pip index versions deepspace
-    pip install dh-scikit-optimize==0.9.0
-    # Do not use editable pip installs
-    # Uses deprecated egg format for symbolic link instead of wheels.
-    # This causes permissions issues with read-only easy-install.pth
-    pip install ".[analytics,deepspace,hvd]"
-    cd ..
-    cd $PREFIX_PATH
-else
-    # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
-    echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
-    pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November 2019
-    pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
-fi
+pip install 'deephyper==0.3.0'
 
 pip install "pillow!=8.3.0,>=6.2.0"
 pip install --no-deps torchvision
+
+
 
 chmod -R a-w $PREFIX_PATH
 

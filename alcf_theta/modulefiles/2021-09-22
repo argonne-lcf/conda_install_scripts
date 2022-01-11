@@ -15,7 +15,7 @@ set HOME          $::env(HOME)
 set PYTHON_LEVEL                 3.8
 set CONDA_LEVEL                  py38_4.10.3
 set MINICONDA_LEVEL              3
-set CONDA_PREFIX                 /lus/theta-fs0/software/datascience/conda/conda/2021-09-22/mconda3
+set CONDA_PREFIX                 /lus/theta-fs0/software/datascience/conda/2021-09-22/mconda3
 setenv CONDA_PREFIX              $CONDA_PREFIX
 setenv PYTHONUSERBASE            $HOME/.local/$_module_name
 setenv ENV_NAME                  $_module_name

@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# KGF: relocated /lus/theta-fs0/software/datascience/conda/2021-09-22/
+# from /lus/theta-fs0/software/datascience/conda/conda/2021-09-22/
+# on 2022-01-10 using simple mv command. Might have broken pkgs?
+
+# Needed to manually edit the Python shebang on the first line of:
+# /lus/theta-fs0/software/datascience/conda/2021-09-22/mconda3/bin/conda
+
+# Even the modulefile calls (at the end):
+# puts stdout "source $CONDA_PREFIX/setup.sh"
+
+# which itself calls
+# eval "$($DIR/bin/conda shell.${preferred_shell} hook)"
+
 set -e
 
 PYTHON_VERSION=3

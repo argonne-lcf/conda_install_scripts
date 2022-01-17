@@ -483,6 +483,8 @@ pip install --no-deps torchvision
 pip install --no-deps timm
 pip install opencv-python-headless
 
+pip install onnxruntime tf2onnx
+
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
 ####pip uninstall -y 'keras' || true
 # KGF: the above line might not work. Double check with "horovodrun --check-build". Confirmed working version of keras-nightly as of 2021-07-14

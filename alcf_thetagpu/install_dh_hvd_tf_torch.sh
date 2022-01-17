@@ -445,6 +445,8 @@ pip install --no-deps torchvision
 pip install --no-deps timm
 pip install opencv-python-headless
 
+pip install onnx onnxruntime tf2onnx
+
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH

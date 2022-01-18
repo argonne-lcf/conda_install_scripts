@@ -1,0 +1,12 @@
+{
+ "argv": [
+  "/lus/theta-fs0/software/thetagpu/conda/2021-09-22/mconda3/bin/python",
+  "-m",
+  "ipykernel_launcher",
+  "-f",
+  "{connection_file}"
+ ],
+ "display_name": "conda/2021-09-22",
+ "language": "python",
+ "env": {"LD_LIBRARY_PATH":"/lus/theta-fs0/software/thetagpu/cuda/TensorRT-8.0.0.3.Linux.x86_64-gnu.cuda-11.3.cudnn8.2/lib:/lus/theta-fs0/software/thetagpu/cuda/nccl_2.9.9-1+cuda11.0_x86_64/lib:/lus/theta-fs0/software/thetagpu/cuda/cudnn-11.3-linux-x64-v8.2.0.53/lib64:/usr/local/cuda-11.3/lib64:/lus/theta-fs0/software/thetagpu/openmpi-4.0.5/ucx-1.9.0rc7/lib:/lus/theta-fs0/software/thetagpu/openmpi-4.0.5/lib:/dbhome/db2cat/sqllib/lib64:/dbhome/db2cat/sqllib/lib64/gskit:/dbhome/db2cat/sqllib/lib32"}
+}

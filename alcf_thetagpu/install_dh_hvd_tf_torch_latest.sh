@@ -497,9 +497,9 @@ pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # import cupy.cuda.cudnn
 # import cupy.cuda.nccl
 # cupy.cuda.cudnn.getVersion()
-#       8300 (does NOT match version 8.2.4 in
+#       8300 (does NOT match version 8.2.4.15 in /lus/theta-fs0/software/thetagpu/cuda/ that conda/2021-11-30 was built with)
 # cupy.cuda.nccl.get_version()
-#       21104 (matches version in
+#       21104 (matches version in /lus/theta-fs0/software/thetagpu/cuda/ ...)
 
 # https://docs.cupy.dev/en/stable/upgrade.html?highlight=cutensor#compatibility-matrix
 # https://docs.cupy.dev/en/stable/reference/environment.html?highlight=cutensor#envvar-CUTENSOR_PATH

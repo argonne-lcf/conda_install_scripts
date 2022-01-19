@@ -485,6 +485,27 @@ pip install opencv-python-headless
 
 pip install onnx onnxruntime tf2onnx
 
+pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+# conda install -c conda-forge cupy cudnn cutensor nccl
+# https://github.com/cupy/cupy/issues/4850
+## https://docs.cupy.dev/en/stable/install.html?highlight=cutensor#additional-cuda-libraries
+# KGF: installed CuPy 10.0.0, no cuTENSOR, cuSPARSELt installed
+
+# Reason: ImportError (libcutensor.so.1: cannot open shared object file: No such file or directory)
+# python -m cupyx.tools.install_library --library cutensor --cuda 11.4
+
+# import cupy.cuda.cudnn
+# import cupy.cuda.nccl
+# cupy.cuda.cudnn.getVersion()
+#       8300 (does NOT match version 8.2.4 in
+# cupy.cuda.nccl.get_version()
+#       21104 (matches version in
+
+# https://docs.cupy.dev/en/stable/upgrade.html?highlight=cutensor#compatibility-matrix
+# https://docs.cupy.dev/en/stable/reference/environment.html?highlight=cutensor#envvar-CUTENSOR_PATH
+
+
+# ------------------------------------------------
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
 ####pip uninstall -y 'keras' || true
 # KGF: the above line might not work. Double check with "horovodrun --check-build". Confirmed working version of keras-nightly as of 2021-07-14

@@ -484,7 +484,9 @@ pip install --no-deps timm
 pip install opencv-python-headless
 
 pip install onnx onnxruntime tf2onnx
-
+pip install transformers
+pip install scikit-image
+pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # conda install -c conda-forge cupy cudnn cutensor nccl
 # https://github.com/cupy/cupy/issues/4850

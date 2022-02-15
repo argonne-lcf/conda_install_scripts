@@ -220,7 +220,7 @@ del os, atexit, rlcompleter, save_history, historyPath
 EOF
 
 cat > .condarc << EOF
-env_prompt: "(\$ENV_NAME/\$CONDA_DEFAULT_ENV) "
+env_prompt: "(${DH_INSTALL_SUBDIR}/{default_env}) "
 pkgs_dirs:
    - \$HOME/.conda/pkgs
 EOF

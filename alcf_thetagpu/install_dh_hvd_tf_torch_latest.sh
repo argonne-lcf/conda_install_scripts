@@ -219,8 +219,22 @@ atexit.register(save_history)
 del os, atexit, rlcompleter, save_history, historyPath
 EOF
 
+# KGF: $CONDA_ENV (e.g. conda/2021-11-30) is not an official conda var; set by us in modulefile
+# $CONDA_DEFAULT_ENV (short name of current env) and $CONDA_PREFIX (full path) are official,
+# but barely documented. powerlevel10k wont parse env variables when outputting the prompt,
+# so best not to leave \$CONDA_ENV unparsed in env_prompt
+# https://github.com/romkatv/powerlevel10k/issues/762#issuecomment-633389123
+# # env_prompt (str)
+# #   Template for prompt modification based on the active environment.
+# #   Currently supported template variables are '{prefix}', '{name}', and
+# #   '{default_env}'. '{prefix}' is the absolute path to the active
+# #   environment. '{name}' is the basename of the active environment
+# #   prefix. '{default_env}' holds the value of '{name}' if the active
+# #   environment is a conda named environment ('-n' flag), or otherwise
+# #   holds the value of '{prefix}'. Templating uses python's str.format()
+# #   method.
 cat > .condarc << EOF
-env_prompt: "(\$ENV_NAME/\$CONDA_DEFAULT_ENV) "
+env_prompt: "(${DH_INSTALL_SUBDIR}/{default_env}) "
 pkgs_dirs:
    - \$HOME/.conda/pkgs
 EOF

@@ -26,7 +26,8 @@ CONDA_VERSION='py38_4.10.3'
 #    PREFIX_PATH=$1
 # fi
 
-PREFIX_PATH=$PWD/2021-09-22
+CONDA_DIR=2021-09-22
+PREFIX_PATH=$PWD/$CONDA_DIR
 
 WHEEL_DIR=$PREFIX_PATH/wheels
 DOWNLOAD_PATH=$PREFIX_PATH/DOWNLOADS
@@ -157,7 +158,7 @@ module-whatis  "miniconda installation"
 EOF
 
 cat > .condarc << EOF
-env_prompt: "(\$ENV_NAME/\$CONDA_DEFAULT_ENV) "
+env_prompt: "(${CONDA_DIR}/{default_env}) "
 pkgs_dirs:
    - \$HOME/.local/conda/\$ENV_NAME/pkgs
    - \$CONDA_PREFIX/pkgs

@@ -218,7 +218,8 @@ pip install --force-reinstall $HVD_WHEEL
 
 # KGF: sometimes throws errors?
 set +e
-pip install mpi4py
+# last built with cc=/opt/cray/pe/craype/2.6.5/bin/cc, PrgEnv-intel/6.0.7 loaded (unlike in this script)
+env MPICC=cc pip install mpi4py --no-cache-dir
 set -e
 
 pip install 'tensorflow_probability==0.14.0'

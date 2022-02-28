@@ -497,7 +497,16 @@ pip install --no-deps torchvision
 pip install --no-deps timm
 pip install opencv-python-headless
 
-pip install onnx onnxruntime tf2onnx
+pip install onnx
+pip install onnxruntime-gpu  # onnxruntime is CPU-only. onnxruntime-gpu includes most CPU abilities
+# https://github.com/microsoft/onnxruntime/issues/10685
+# onnxruntime probably wont work on ThetaGPU single-gpu queue with CPU thread affinity
+# https://github.com/microsoft/onnxruntime/issues/8313
+pip install tf2onnx  # frontend for ONNX. tf->onnx
+pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) for ONNX
+# https://github.com/onnx/onnx-tensorflow/issues/1010
+# https://github.com/onnx/tensorflow-onnx/issues/1793
+# https://github.com/onnx/onnx-tensorflow/issues/422
 pip install transformers
 pip install scikit-image
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)

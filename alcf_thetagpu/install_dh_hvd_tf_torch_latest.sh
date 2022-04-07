@@ -286,7 +286,7 @@ set -e
 
 echo Conda install some dependencies
 
-conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba
+conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba pymongo
 
 # CUDA only: Add LAPACK support for the GPU if needed
 # conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
@@ -449,7 +449,8 @@ pip install --force-reinstall $HVD_WHEEL
 echo Pip install TensorBoard profiler plugin
 pip install tensorboard_plugin_profile tensorflow_addons
 echo Pip install other packages
-pip install pandas h5py matplotlib scikit-learn scipy
+pip install pandas h5py matplotlib scikit-learn scipy pytest
+pip install sacred wandb # Denis requests, April 2022
 
 echo Adding module snooper so we can tell what modules people are using
 ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py

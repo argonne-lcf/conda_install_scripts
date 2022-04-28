@@ -21,11 +21,11 @@ HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # where to install relative to current path
-if [[ -z "$DH_REPO_TAG" ]]; then
-    DH_INSTALL_SUBDIR='2021-06-26/'
-else
-    DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
-fi
+# if [[ -z "$DH_REPO_TAG" ]]; then
+#     DH_INSTALL_SUBDIR='2021-06-26/'
+# else
+#     DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
+# fi
 
 DH_INSTALL_SUBDIR='2021-06-26/'
 
@@ -140,7 +140,9 @@ mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 
 # Download and install conda for a base python installation
-CONDAVER=latest
+CONDAVER='py38_4.10.3'
+# "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
+# CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
 CONDA_INSTALL_SH=Miniconda3-$CONDAVER-Linux-x86_64.sh
 echo Downloading miniconda installer
@@ -218,7 +220,7 @@ del os, atexit, rlcompleter, save_history, historyPath
 EOF
 
 cat > .condarc << EOF
-env_prompt: "(\$ENV_NAME/\$CONDA_DEFAULT_ENV) "
+env_prompt: "(${DH_INSTALL_SUBDIR}/{default_env}) "
 pkgs_dirs:
    - \$HOME/.conda/pkgs
 EOF
@@ -271,11 +273,11 @@ set -e
 
 echo Conda install some dependencies
 
-conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses
+conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba
 
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-
+conda install -y -c conda-forge mamba
 conda update -y pip
 
 echo Clone TensorFlow
@@ -308,7 +310,9 @@ cd $DH_INSTALL_BASE_DIR
 echo Install TensorFlow Dependencies
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
-pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker
+#pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
+# KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
+pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker pydot
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
@@ -438,6 +442,10 @@ pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 pip install "pillow!=8.3.0,>=6.2.0"  # 8.3.1 seems to be fine with torchvision and dataloader
 # KGF: torchvision will try to install its own .whl for PyTorch 1.9.0 even if 1.9.0a0+gitd69c22d is installed, e.g.
 pip install --no-deps torchvision
+pip install --no-deps timm
+pip install opencv-python-headless
+
+pip install onnx onnxruntime tf2onnx
 
 echo Cleaning up
 chmod -R u+w $DOWNLOAD_PATH/
@@ -454,3 +462,8 @@ set +e
 # WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash ... /lus/theta-fs0/software/thetagpu/conda/deephyper/0.2.5/mconda3/conda-meta/setuptools-52.0.0-py38h06a4308_0.json
 
 # KGF: Do "chmod -R u+w ." in mconda3/conda-meta/, run "conda list", then "chmod -R a-w ." Or, try
+
+# https://github.com/deephyper/deephyper/issues/110
+# KGF: check that CONDA_DIR/mconda3/lib/python3.8/site-packages/easy-install.pth does not exist as an empty file
+# rm it to prevent it from appearing in cloned conda environments (with read-only permissions), preventing users
+# from instalilng editable pip installs in their own envs!

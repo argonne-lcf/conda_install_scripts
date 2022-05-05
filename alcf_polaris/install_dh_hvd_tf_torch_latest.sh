@@ -59,7 +59,7 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 # CUDA path and version information
 ############################
 
-CUDA_DEPS_BASE=/home/parton/cuda
+CUDA_DEPS_BASE=/soft/datascience/cuda
 
 CUDA_VERSION_MAJOR=11
 CUDA_VERSION_MINOR=4
@@ -67,7 +67,7 @@ CUDA_VERSION_MINI=4
 CUDA_VERSION_BUILD=470.82.01
 CUDA_VERSION=$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
 CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
-CUDA_BASE=$CUDA_DEPS_BASE/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
+CUDA_TOOLKIT_BASE=$CUDA_DEPS_BASE/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
 
 CUDNN_VERSION_MAJOR=8
 CUDNN_VERSION_MINOR=2
@@ -139,11 +139,12 @@ fi
 
 module switch PrgEnv-nvidia PrgEnv-gnu
 
-export CUDA_BASE=$CUDA_BASE
+export CUDA_BASE=$CUDA_DEPS_BASE
+export CUDA_TOOLKIT_BASE=$CUDA_TOOLKIT_BASE
 export CUDNN_BASE=$CUDNN_BASE
 export NCCL_BASE=$NCCL_BASE
-export LD_LIBRARY_PATH=\$CUDA_BASE/lib64:\$CUDNN_BASE/lib64:\$NCCL_BASE/lib:\$LD_LIBRARY_PATH
-export PATH=\$CUDA_BASE/bin:\$PATH
+export LD_LIBRARY_PATH=\$CUDA_TOOLKIT_BASE/lib64:\$CUDNN_BASE/lib64:\$NCCL_BASE/lib:\$LD_LIBRARY_PATH
+export PATH=\$CUDA_TOOLKIT_BASE/bin:\$PATH
 EOF
 
 #######
@@ -183,6 +184,36 @@ atexit.register(save_history)
 # cleanup
 del os, atexit, rlcompleter, save_history, historyPath
 EOF
+
+
+PYTHON_VER=$(ls -d lib/python?.? | tail -c4)
+echo PYTHON_VER=$PYTHON_VER
+
+cat > modulefile << EOF
+#%Module2.0
+## miniconda$PYTHON_VERSION modulefile
+##
+proc ModulesHelp { } {
+   global CONDA_LEVEL PYTHON_LEVEL MINICONDA_LEVEL
+   puts stderr "This module will add Miniconda \$MINICONDA_LEVEL to your environment with conda version \$CONDA_LEVEL and python version \$PYTHON_LEVEL"
+}
+set _module_name  [module-info name]
+set is_module_rm  [module-info mode remove]
+set sys           [uname sysname]
+set os            [uname release]
+set HOME          $::env(HOME)
+set PYTHON_LEVEL                 $PYTHON_VER
+set CONDA_LEVEL                  $CONDAVER
+set MINICONDA_LEVEL              $PYTHON_VERSION
+set CONDA_PREFIX                 $CONDA_PREFIX_PATH
+setenv CONDA_PREFIX              \$CONDA_PREFIX
+setenv PYTHONUSERBASE            \$HOME/.local/\$_module_name
+setenv ENV_NAME                  \$_module_name
+setenv PYTHONSTARTUP             \$CONDA_PREFIX/etc/pythonstart
+puts stdout "source \$CONDA_PREFIX/setup.sh"
+module-whatis  "miniconda installation"
+EOF
+
 
 # KGF: $CONDA_ENV (e.g. conda/2021-11-30) is not an official conda var; set by us in modulefile
 # $CONDA_DEFAULT_ENV (short name of current env) and $CONDA_PREFIX (full path) are official,

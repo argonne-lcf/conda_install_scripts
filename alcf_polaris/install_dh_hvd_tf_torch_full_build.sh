@@ -52,6 +52,8 @@ HOROVOD_REPO_TAG="v0.24.3" # v0.22.1 released on 2021-06-10 should be compatible
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
+MPI4PY_REPO_URL=https://github.com/mpi4py/mpi4py.git
+MPI4PY_REPO_TAG="3.1.3"
 
 
 ###########################################
@@ -437,7 +439,8 @@ echo Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}
 #export LD_LIBRARY_PATH=$CRAY_MPICH_PREFIX/lib-abi-mpich:$NCCL_BASE/lib:$LD_LIBRARY_PATH
 #export PATH=$CRAY_MPICH_PREFIX/bin:$PATH
 
-HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
+echo MPI from environment: $MPICH_DIR 
+MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEELS_PATH/
 HVD_WHEEL=$(find $WHEELS_PATH/ -name "horovod*.whl" -type f)
@@ -454,7 +457,43 @@ pip install sacred wandb # Denis requests, April 2022
 ###### Install MPI4PY
 ############
 
-CC=cc CFLAGS=-noswitcherror python setup.py install
+cd $BASE_PATH
+
+echo Clone Mpi4py
+git clone $MPI4PY_REPO_URL
+cd mpi4py
+
+git checkout $MPI4PY_REPO_TAG
+
+LIBFAB_PATH=$(python -c "import os;x=os.environ['LD_LIBRARY_PATH'];x=x.split(':');x = [ i for i in x if 'libfabric' in i ];print(x[0])")
+echo $LD_LIBRARY_PATH
+echo $LIBFAB_PATH
+cat > mpi.cfg << EOF
+# MPI configuration for Polaris
+# ---------------------
+[mpi]
+
+mpi_dir              = $MPICH_DIR
+
+mpicc                = %(mpi_dir)s/bin/mpicc
+mpicxx               = %(mpi_dir)s/bin/mpicxx
+
+include_dirs         = %(mpi_dir)s/include
+library_dirs         = %(mpi_dir)s/lib
+
+## extra_compile_args   =
+extra_link_args      = -L$LIBFAB_PATH -lfabric
+## extra_objects        =
+
+EOF
+
+python setup.py build
+python setup.py bdist_wheel
+MPI4PY_WHL=$(find dist/ -name "mpi4py*.whl" -type f)
+mv $MPI4PY_WHL $WHEELS_PATH/
+MPI4PY_WHL=$(find $WHEELS_PATH/ -name "mpi4py*.whl" -type f)
+echo Install mpi4py $MPI4PY_WHL
+python -m pip install --force-reinstall $MPI4PY_WHL
 
 exit 0
 

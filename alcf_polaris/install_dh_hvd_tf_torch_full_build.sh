@@ -46,15 +46,12 @@ module switch PrgEnv-nvidia PrgEnv-gnu
 #DH_REPO_TAG="0.2.5"
 #DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-#TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
-#TF_REPO_TAG="v2.7.0"
-#PT_REPO_TAG="v1.10.0"
+TF_REPO_TAG="v2.8.0"
+PT_REPO_TAG="master" #"v1.11.0"
 HOROVOD_REPO_TAG="v0.24.3" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
-MPI4PY_REPO_URL=https://github.com/mpi4py/mpi4py.git
-MPI4PY_REPO_TAG="3.1.3"
 
 
 ###########################################
@@ -92,6 +89,35 @@ TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
 
 
+###########################################
+# TensorFlow Config flags (for ./configure run)
+############################
+export TF_CUDA_COMPUTE_CAPABILITIES=8.0
+export TF_CUDA_VERSION=$CUDA_VERSION_MAJOR
+export TF_CUDNN_VERSION=$CUDNN_VERSION_MAJOR
+export TF_TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR
+export TF_NCCL_VERSION=$NCCL_VERSION_MAJOR
+export CUDA_TOOLKIT_PATH=$CUDA_TOOLKIT_BASE
+export CUDNN_INSTALL_PATH=$CUDNN_BASE
+export NCCL_INSTALL_PATH=$NCCL_BASE
+export TENSORRT_INSTALL_PATH=$TENSORRT_BASE
+export TF_NEED_OPENCL_SYCL=0
+export TF_NEED_COMPUTECPP=0
+export TF_CUDA_CLANG=0
+export TF_NEED_OPENCL=0
+export TF_NEED_MPI=0
+export TF_NEED_ROCM=0
+export TF_NEED_CUDA=1
+# KGF: TensorRT 8.x only supported in TensorFlow as of 2021-06-24 (f8e2aa0db)
+# https://github.com/tensorflow/tensorflow/issues/49150
+# https://github.com/tensorflow/tensorflow/pull/48917
+# and TRT 7.x is incompatible with CUDA 11.3 (requires 10.2, 11.0, 11.1, 11.2)
+# Disable TF+TensorRT for now
+export TF_NEED_TENSORRT=1
+export TF_CUDA_PATHS=$CUDA_TOOLKIT_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
+export GCC_HOST_COMPILER_PATH=$(which gcc)
+export CC_OPT_FLAGS="-march=native -Wno-sign-compare"
+export TF_SET_ANDROID_WORKSPACE=0
 
 #############################################
 ## INSTALLING MiniConda
@@ -135,6 +161,7 @@ else  # bash, sh, etc.
 fi
 
 eval "\$(\$DIR/bin/conda shell.\${preferred_shell} hook)"
+
 
 # test network
 unset https_proxy
@@ -264,23 +291,114 @@ echo PYTHON VERSION: $(python --version)
 
 set -e
 
-conda update -y pip
-conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba
-
-
 ################################################
 ### Install TensorFlow
 ########
 
-python -m pip install tensorflow
+
+echo Conda install some dependencies
+
+conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba
+
+# CUDA only: Add LAPACK support for the GPU if needed
+#conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+#conda install -y -c conda-forge mamba
+conda update -y pip
+
+echo Clone TensorFlow
+cd $BASE_PATH
+git clone $TF_REPO_URL
+cd tensorflow
+
+if [[ -z "$TF_REPO_TAG" ]]; then
+    echo Checkout TensorFlow master
+else
+    echo Checkout TensorFlow tag $TF_REPO_TAG
+    git checkout --recurse-submodules $TF_REPO_TAG
+fi
+BAZEL_VERSION=$(cat .bazelversion)
+echo Found TensorFlow depends on Bazel version $BAZEL_VERSION
+
+cd $BASE_PATH
+echo Download Bazel binaries
+BAZEL_DOWNLOAD_URL=https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION
+BAZEL_INSTALL_SH=bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
+BAZEL_INSTALL_PATH=$BASE_PATH/bazel-$BAZEL_VERSION
+wget $BAZEL_DOWNLOAD_URL/$BAZEL_INSTALL_SH -P $DOWNLOAD_PATH
+chmod +x $DOWNLOAD_PATH/$BAZEL_INSTALL_SH
+echo Intall Bazel in $BAZEL_INSTALL_PATH
+bash $DOWNLOAD_PATH/$BAZEL_INSTALL_SH --prefix=$BAZEL_INSTALL_PATH
+export PATH=$PATH:/$BAZEL_INSTALL_PATH/bin
+
+cd $BASE_PATH
+
+echo Install TensorFlow Dependencies
+#pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
+# KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
+#pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
+# KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
+pip install -U pip wheel mock gast portpicker pydot
+pip install -U keras_applications --no-deps
+pip install -U keras_preprocessing --no-deps
+
+echo Configure TensorFlow
+cd tensorflow
+export PYTHON_BIN_PATH=$(which python)
+export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0])')
+# Auto-Configuration Warning: 'TMP' environment variable is not set, using 'C:\Windows\Temp' as default
+export TMP=/tmp
+./configure
+echo Bazel Build TensorFlow
+# KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores)
+# Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max
+# even if --jobs=500
+HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+echo Run wheel building
+./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEELS_PATH
+echo Install TensorFlow
+pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
+
 
 #################################################
 ### Install PyTorch
 ########
 
-wget https://download.pytorch.org/whl/cu113/torch-1.11.0%2Bcu113-cp38-cp38-linux_x86_64.whl
-python -m pip install *.whl
-python -m pip install torchvision
+
+cd $BASE_PATH
+echo Clone PyTorch
+
+git clone --recursive $PT_REPO_URL
+cd pytorch
+if [[ -z "$PT_REPO_TAG" ]]; then
+    echo Checkout PyTorch master
+else
+    echo Checkout PyTorch tag $PT_REPO_TAG
+    git checkout --recurse-submodules $PT_REPO_TAG
+fi
+
+echo Install PyTorch
+
+export USE_CUDA=1
+export USE_CUDNN=1
+export TORCH_CUDA_ARCH_LIST=8.0
+#export CUDA_TOOLKIT_ROOT_DIR=$CUDA_TOOLKIT_BASE
+#export CUDA_HOME=$CUDA_TOOLKIT_BASE
+#export NCCL_ROOT_DIR=$NCCL_BASE
+export CUDNN_ROOT=$CUDNN_BASE
+export USE_TENSORRT=ON
+export TENSORRT_ROOT=$TENSORRT_BASE
+export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
+#export TENSORRT_LIBRARY=$TENSORRT_BASE/lib/libmyelin.so
+#export TENSORRT_LIBRARY_INFER=$TENSORRT_BASE/lib/libnvinfer.so
+#export TENSORRT_LIBRARY_INFER_PLUGIN=$TENSORRT_BASE/lib/libnvinfer_plugin.so
+#export TENSORRT_INCLUDE_DIR=$TENSORRT_BASE/include
+CC=$(which cc) CXX=$(which CC) python setup.py bdist_wheel
+PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
+echo copying pytorch wheel file $PT_WHEEL
+cp $PT_WHEEL $WHEELS_PATH/
+cd $WHEELS_PATH
+echo pip installing $(basename $PT_WHEEL)
+pip install $(basename $PT_WHEEL)
 
 ################################################
 ### Install Horovod
@@ -307,10 +425,9 @@ echo Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}
 #export LD_LIBRARY_PATH=$CRAY_MPICH_PREFIX/lib-abi-mpich:$NCCL_BASE/lib:$LD_LIBRARY_PATH
 #export PATH=$CRAY_MPICH_PREFIX/bin:$PATH
 
-echo MPI from environment: $MPICH_DIR 
-MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
+HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
-mv $HVD_WHL $WHEELS_PATH/
+cp $HVD_WHL $WHEELS_PATH/
 HVD_WHEEL=$(find $WHEELS_PATH/ -name "horovod*.whl" -type f)
 echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall $HVD_WHEEL
@@ -318,52 +435,14 @@ pip install --force-reinstall $HVD_WHEEL
 echo Pip install TensorBoard profiler plugin
 pip install tensorboard_plugin_profile tensorflow_addons
 echo Pip install other packages
-pip install pandas h5py matplotlib scikit-learn scipy pytest filelock
+pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
-
-
 
 ####################################################
 ###### Install MPI4PY
 ############
 
-cd $BASE_PATH
-
-echo Clone Mpi4py
-git clone $MPI4PY_REPO_URL
-cd mpi4py
-
-git checkout $MPI4PY_REPO_TAG
-
-LIBFAB_PATH=$(python -c "import os;x=os.environ['LD_LIBRARY_PATH'];x=x.split(':');x = [ i for i in x if 'libfabric' in i ];print(x[0])")
-echo $LD_LIBRARY_PATH
-echo $LIBFAB_PATH
-cat > mpi.cfg << EOF
-# MPI configuration for Polaris
-# ---------------------
-[mpi]
-
-mpi_dir              = $MPICH_DIR
-
-mpicc                = %(mpi_dir)s/bin/mpicc
-mpicxx               = %(mpi_dir)s/bin/mpicxx
-
-include_dirs         = %(mpi_dir)s/include
-library_dirs         = %(mpi_dir)s/lib
-
-## extra_compile_args   =
-extra_link_args      = -L$LIBFAB_PATH -lfabric
-## extra_objects        =
-
-EOF
-
-python setup.py build
-python setup.py bdist_wheel
-MPI4PY_WHL=$(find dist/ -name "mpi4py*.whl" -type f)
-mv $MPI4PY_WHL $WHEELS_PATH/
-MPI4PY_WHL=$(find $WHEELS_PATH/ -name "mpi4py*.whl" -type f)
-echo Install mpi4py $MPI4PY_WHL
-python -m pip install --force-reinstall $MPI4PY_WHL
+CC=cc CFLAGS=-noswitcherror python setup.py install
 
 exit 0
 
@@ -379,7 +458,7 @@ pip install 'tensorflow_probability==0.14.0'
 
 if [[ -z "$DH_REPO_TAG" ]]; then
     echo Clone and checkout DeepHyper develop branch from git
-    cd $DH_INSTALL_BASE_DIR
+    cd $BASE_PATH
     git clone $DH_REPO_URL
     cd deephyper
     # KGF: use of GitFlow means that master branch might be too old for us:
@@ -392,7 +471,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # This causes permissions issues with read-only easy-install.pth
     pip install ".[analytics,hvd]"  # deepspace extra preseent in v0.3.3 but removed in develop branch
     cd ..
-    cd $DH_INSTALL_BASE_DIR
+    cd $BASE_PATH
 else
     # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
     echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
@@ -471,7 +550,7 @@ rm -rf $DOWNLOAD_PATH
 # KGF: see below
 conda list
 
-chmod -R a-w $DH_INSTALL_BASE_DIR/
+chmod -R a-w $BASE_PATH/
 
 
 set +e

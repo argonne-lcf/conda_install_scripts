@@ -348,6 +348,18 @@ export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0]
 # Auto-Configuration Warning: 'TMP' environment variable is not set, using 'C:\Windows\Temp' as default
 export TMP=/tmp
 ./configure
+
+# was getting an error related to tensorflow trying to call `/opt/cray/pe/gcc/11.2.0/bin/redirect` directly
+# however, this redirect is a bash script in the Cray PE GCC
+# `/opt/cray/pe/gcc/11.2.0/bin/gcc` and the other compiler commands in that folder are all symlinks
+# to the redirect script which simply replaces the base path in the command with the true location of the
+# commands which were in `/opt/cray/pe/gcc/11.2.0/bin/../snos/bin`
+# `redirect` is not intended to be called directly.
+# However, the tensorflow build environment saw that `gcc` was  symlink and dereferenced it to set:
+# GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/bin/redirect
+# at compile time, which fails. So we instead fix the gcc to use this:
+export GCC_HOST_COMPILER_PATH=$(which gcc)
+
 echo Bazel Build TensorFlow
 # KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores)
 # Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max

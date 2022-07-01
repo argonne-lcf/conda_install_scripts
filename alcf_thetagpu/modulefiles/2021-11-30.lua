@@ -29,7 +29,7 @@ whatis("Keywords: python conda")
 whatis("Description: Base Anaconda python environment")
 whatis("URL: https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html")
 
-depends_on("openmpi/openmpi-4.1.1_ucx-1.11.2_gcc-9.3.0")
+depends_on("openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0")
 -- KGF: probably don't need this; using copy in /lus/theta-fs0/software/thetagpu/cuda/nccl_2.11.4-1+cuda11.4_x86_64
 -- depends_on("nccl/nccl-v2.11.4-1_CUDA11.4")
 

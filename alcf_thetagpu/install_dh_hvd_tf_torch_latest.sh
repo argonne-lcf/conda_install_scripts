@@ -8,13 +8,13 @@
 # 4 - wait for it to complete
 
 # unset *_TAG variables to build latest master
-#DH_REPO_TAG="0.2.5"
+DH_REPO_TAG="0.4.0"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 #TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
-#TF_REPO_TAG="v2.7.0"
-PT_REPO_TAG="v1.10.0"
-HOROVOD_REPO_TAG="v0.23.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
+TF_REPO_TAG="v2.9.1"
+PT_REPO_TAG="v1.12.0"
+HOROVOD_REPO_TAG="v0.25.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
@@ -26,12 +26,12 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 #     DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
 # fi
 
-DH_INSTALL_SUBDIR='2021-11-30/'
+DH_INSTALL_SUBDIR='2022-07-01/'
 
 # MPI source on ThetaGPU
-MPI=/lus/theta-fs0/software/thetagpu/openmpi/openmpi-4.1.1_ucx-1.11.2_gcc-9.3.0
+MPI=/lus/theta-fs0/software/thetagpu/openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0
 
-
+# KGF(2022-07-01): should probably upgrade CUDA runtime and driver to 11.6
 # CUDA path and version information
 CUDA_VERSION_MAJOR=11
 CUDA_VERSION_MINOR=4
@@ -41,15 +41,17 @@ CUDA_BASE=/usr/local/cuda-$CUDA_VERSION
 CUDA_DEPS_BASE=/lus/theta-fs0/software/thetagpu/cuda
 
 CUDNN_VERSION_MAJOR=8
-CUDNN_VERSION_MINOR=2
-CUDNN_VERSION_EXTRA=4.15
+CUDNN_VERSION_MINOR=4
+CUDNN_VERSION_EXTRA=1.50
 CUDNN_VERSION=$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR.$CUDNN_VERSION_EXTRA
-CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
+#CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
+CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive
 
 NCCL_VERSION_MAJOR=2
-NCCL_VERSION_MINOR=11.4-1
+NCCL_VERSION_MINOR=12.12-1
 NCCL_VERSION=$NCCL_VERSION_MAJOR.$NCCL_VERSION_MINOR
-NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
+#NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
+NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.12.12-1+cuda11.6_x86_64
 # KGF: no Extended Compatibility in NCCL --- use older NCCL version built with CUDA 11.0 until
 # GPU device kernel driver upgraded from 11.0 ---> 11.4 in November 2021
 #NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64
@@ -59,12 +61,11 @@ TENSORRT_VERSION_MAJOR=8
 # https://github.com/tensorflow/tensorflow/pull/52342
 
 # support merged into master on 2021-11-11: https://github.com/tensorflow/tensorflow/pull/52932
-TENSORRT_VERSION_MINOR=2.1.8
+TENSORRT_VERSION_MINOR=4.1.5
 #TENSORRT_VERSION_MINOR=0.0.3
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
-#TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
-# KGF: uncomment this once TF supports TRT 8.2
-TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+#TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-8.4.1.5
 
 
 # TensorFlow Config flags (for ./configure run)
@@ -140,7 +141,7 @@ mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 
 # Download and install conda for a base python installation
-CONDAVER='py38_4.10.3'
+CONDAVER='py38_4.12.0'
 # "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
 # CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
@@ -291,7 +292,7 @@ conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake c
 # CUDA only: Add LAPACK support for the GPU if needed
 # conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # No magma-cuda114: https://anaconda.org/pytorch/repo
-conda install -y -c pytorch magma-cuda113
+conda install -y -c pytorch magma-cuda116 #magma-cuda113
 
 conda install -y -c conda-forge mamba
 conda update -y pip
@@ -458,7 +459,8 @@ ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(pyt
 # DeepHyper stuff
 export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
 
-pip install 'tensorflow_probability==0.14.0'
+pip install 'tensorflow_probability==0.17.0'
+# KGF: 0.17.0 (2022-06-06) tested against TF 2.9.1
 # KGF: 0.14.0 (2021-09-15) only compatible with TF 2.6.0
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
@@ -481,8 +483,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
 else
     # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
     echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
-    pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November 2019
-    pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
+    pip install "deephyper[nas,popt,autodeuq,analytics,hvd]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
 
 

@@ -54,7 +54,7 @@ NCCL_VERSION_MAJOR=2
 NCCL_VERSION_MINOR=12.12-1
 NCCL_VERSION=$NCCL_VERSION_MAJOR.$NCCL_VERSION_MINOR
 #NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
-NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.12.12-1+cuda11.6_x86_64
+NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.12.12-1+cuda11.0_x86_64
 # KGF: no Extended Compatibility in NCCL --- use older NCCL version built with CUDA 11.0 until
 # GPU device kernel driver upgraded from 11.0 ---> 11.4 in November 2021
 #NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64

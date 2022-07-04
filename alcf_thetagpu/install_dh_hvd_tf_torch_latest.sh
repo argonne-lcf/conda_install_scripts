@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 
 # As of June 14 2021
 # This script will install (from scratch) DeepHyper, TensorFlow, PyTorch, and Horovod on ThetaGPU
@@ -29,6 +29,9 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 DH_INSTALL_SUBDIR='2022-07-01/'
 
 # MPI source on ThetaGPU
+module list
+module load openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0
+module list
 MPI=/lus/theta-fs0/software/thetagpu/openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0
 
 # KGF(2022-07-01): should probably upgrade CUDA runtime and driver to 11.6
@@ -57,15 +60,16 @@ NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.12.12-1+cuda11.6_x86_64
 #NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64
 
 TENSORRT_VERSION_MAJOR=8
-# TensorFlow 2.7.0 does not yet support TRT 8.2.x as of 2021-11-30
-# https://github.com/tensorflow/tensorflow/pull/52342
+# 8.4.1.5 not yet supported in TF 2.9.1
+# https://github.com/tensorflow/tensorflow/pull/56392
+TENSORRT_VERSION_MINOR=2.5.1
 
-# support merged into master on 2021-11-11: https://github.com/tensorflow/tensorflow/pull/52932
-TENSORRT_VERSION_MINOR=4.1.5
-#TENSORRT_VERSION_MINOR=0.0.3
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 #TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
-TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-8.4.1.5
+TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION
+# TensorFlow 2.7.0 does not yet support TRT 8.2.x as of 2021-11-30
+# https://github.com/tensorflow/tensorflow/pull/52342
+# support merged into master on 2021-11-11: https://github.com/tensorflow/tensorflow/pull/52932
 
 
 # TensorFlow Config flags (for ./configure run)
@@ -325,11 +329,13 @@ export PATH=$PATH:/$BAZEL_INSTALL_PATH/bin
 cd $DH_INSTALL_BASE_DIR
 
 echo Install TensorFlow Dependencies
+# KGF: ignore $HOME/.local/lib/python3.8/site-packages pip user site-packages
+export PYTHONNOUSERSITE=1
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
-pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker pydot
+pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker pydot packaging
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
@@ -379,8 +385,9 @@ else
     git checkout --recurse-submodules $PT_REPO_TAG
 fi
 
-echo Install PyTorch
+echo "Install PyTorch"
 
+# https://github.com/pytorch/pytorch/blob/master/setup.py
 export CUDA_TOOLKIT_ROOT_DIR=$CUDA_BASE
 export NCCL_ROOT_DIR=$NCCL_BASE
 export CUDNN_ROOT=$CUDNN_BASE
@@ -406,12 +413,20 @@ export TENSORRT_INCLUDE_DIR=$TENSORRT_BASE/include
 # ---> Could NOT find TENSORRT (missing: TENSORRT_INCLUDE_DIR TENSORRT_LIBRARY)
 # USE_TENSORRT: OFF in the Summary
 # but then later: cmake ... -DUSE_TENSORRT=ON
-python setup.py bdist_wheel
+
+# BUILD_CAFFE2=0
+#CFLAGS="-Wextra -DOMPI_SKIP_MPICXX"
+CFLAGS="-DOMPI_SKIP_MPICXX" CC=$MPI/bin/mpicc CXX=$MPI/bin/mpic++ python setup.py bdist_wheel
+# KGF: might need to unload the default openmpi/openmpi-4.0.5 module (didn't work)
+# and/or modify LD_LIBRARY_PATH
+# https://github.com/pytorch/pytorch#adjust-build-options-optional
+# https://discuss.pytorch.org/t/mpi-pytorch-backend/18988
+# https://github.com/pytorch/pytorch/blob/master/cmake/Summary.cmake
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
-echo copying pytorch wheel file $PT_WHEEL
+echo "Copying pytorch wheel file $PT_WHEEL"
 cp $PT_WHEEL $WHEEL_DIR/
 cd $WHEEL_DIR
-echo pip installing $(basename $PT_WHEEL)
+echo "pip installing $(basename $PT_WHEEL)"
 pip install $(basename $PT_WHEEL)
 
 
@@ -433,7 +448,7 @@ else
     git checkout --recurse-submodules $HOROVOD_REPO_TAG
 fi
 
-echo Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}
+echo "Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}"
 # https://horovod.readthedocs.io/en/stable/gpus_include.html
 # If you installed NCCL 2 using the nccl-<version>.txz package, you should specify the path to NCCL 2 using the HOROVOD_NCCL_HOME environment variable.
 # add the library path to LD_LIBRARY_PATH environment variable or register it in /etc/ld.so.conf.
@@ -447,13 +462,13 @@ HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
 echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall $HVD_WHEEL
 
-echo Pip install TensorBoard profiler plugin
+echo "Pip install TensorBoard profiler plugin"
 pip install tensorboard_plugin_profile tensorflow_addons
-echo Pip install other packages
+echo "Pip install other packages"
 pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
 
-echo Adding module snooper so we can tell what modules people are using
+echo "Adding module snooper so we can tell what modules people are using"
 ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py
 
 # DeepHyper stuff

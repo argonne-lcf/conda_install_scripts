@@ -530,6 +530,10 @@ pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torc
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install pytorch-lightning
 
+pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+#pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+
+
 env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir
 # conda install -c conda-forge cupy cudnn cutensor nccl
 # https://github.com/cupy/cupy/issues/4850

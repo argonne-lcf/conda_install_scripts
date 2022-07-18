@@ -40,7 +40,8 @@ fi
 
 # Using our own nvidia environment so swap to GNU env
 module switch PrgEnv-nvidia PrgEnv-gnu
-
+module load craype-accel-nvidia80
+export MPICH_GPU_SUPPORT_ENABLED=1
 
 # unset *_TAG variables to build latest master
 #DH_REPO_TAG="0.2.5"

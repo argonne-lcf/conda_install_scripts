@@ -46,9 +46,9 @@ module switch PrgEnv-nvidia PrgEnv-gnu
 #DH_REPO_TAG="0.2.5"
 #DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-TF_REPO_TAG="v2.8.0"
-PT_REPO_TAG="master" #"v1.11.0"
-HOROVOD_REPO_TAG="v0.24.3" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
+TF_REPO_TAG="v2.9.1"
+PT_REPO_TAG="v1.12.0" #"v1.11.0"
+HOROVOD_REPO_TAG="v0.25.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
@@ -135,7 +135,7 @@ mkdir -p $DOWNLOAD_PATH
 mkdir -p $WHEELS_PATH
 
 # Download and install conda for a base python installation
-CONDAVER='py38_4.10.3'
+CONDAVER='py38_4.12.0'
 # "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
 # CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
@@ -339,7 +339,7 @@ echo Install TensorFlow Dependencies
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
-pip install -U pip wheel mock gast portpicker pydot
+pip install -U pip wheel mock gast portpicker pydot packaging
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
@@ -439,7 +439,7 @@ echo Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}
 #export LD_LIBRARY_PATH=$CRAY_MPICH_PREFIX/lib-abi-mpich:$NCCL_BASE/lib:$LD_LIBRARY_PATH
 #export PATH=$CRAY_MPICH_PREFIX/bin:$PATH
 
-echo MPI from environment: $MPICH_DIR 
+echo MPI from environment: $MPICH_DIR
 MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEELS_PATH/
@@ -503,7 +503,8 @@ ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(pyt
 # DeepHyper stuff
 #export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
 
-pip install 'tensorflow_probability==0.14.0'
+pip install 'tensorflow_probability==0.17.0'
+# KGF: 0.17.0 (2022-06-06) tested against TF 2.9.1
 # KGF: 0.14.0 (2021-09-15) only compatible with TF 2.6.0
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
@@ -557,6 +558,9 @@ pip install transformers
 pip install scikit-image
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+
+pip install pytorch-lightning
+pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
 env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir
 # conda install -c conda-forge cupy cudnn cutensor nccl

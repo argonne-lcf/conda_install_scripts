@@ -462,7 +462,7 @@ HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEEL_DIR/
 HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
 echo Install Horovod $HVD_WHEEL
-pip install --force-reinstall $HVD_WHEEL
+pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 
 echo "Pip install TensorBoard profiler plugin"
 pip install tensorboard_plugin_profile tensorflow_addons
@@ -537,7 +537,7 @@ pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases
 #pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
 
-env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir
+env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
 # conda install -c conda-forge cupy cudnn cutensor nccl
 # https://github.com/cupy/cupy/issues/4850
 ## https://docs.cupy.dev/en/stable/install.html?highlight=cutensor#additional-cuda-libraries

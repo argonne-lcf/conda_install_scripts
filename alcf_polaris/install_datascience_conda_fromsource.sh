@@ -443,12 +443,15 @@ echo Build Horovod Wheel using MPI from $MPICH_DIR and NCCL from ${NCCL_BASE}
 #export PATH=$CRAY_MPICH_PREFIX/bin:$PATH
 
 # echo MPI from environment: $MPICH_DIR
-MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
+#MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
+MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 HOROVOD_CUDA_HOME=${CUDA_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
+# HOROVOD_GPU_ALLREDUCE=MPI, HOROVOD_GPU_OPERATIONS=MPI
+
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEELS_PATH/
 HVD_WHEEL=$(find $WHEELS_PATH/ -name "horovod*.whl" -type f)
 echo Install Horovod $HVD_WHEEL
-pip install --force-reinstall $HVD_WHEEL
+pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 
 echo Pip install TensorBoard profiler plugin
 pip install tensorboard_plugin_profile tensorflow_addons

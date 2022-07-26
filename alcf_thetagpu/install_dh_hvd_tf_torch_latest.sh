@@ -7,6 +7,8 @@
 # 3 - script installs everything down in $PWD/deephyper/...
 # 4 - wait for it to complete
 
+export PYTHONNOUSERSITE=1
+
 # unset *_TAG variables to build latest master
 DH_REPO_TAG="0.4.0"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git

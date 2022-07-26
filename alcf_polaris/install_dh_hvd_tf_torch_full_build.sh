@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 
 # As of May 2022
 # This script will install TensorFlow, PyTorch, and Horovod on Polaris
@@ -9,17 +9,7 @@
 
 BASE_PATH=$1
 
-echo Installing into $BASE_PATH
-read -p "Are you sure? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    echo Installing
-else
-   exit -1
-fi
-
-cd $BASE_PATH
+export PYTHONNOUSERSITE=1
 
 #########################################################
 # Check for outside communication on ThetaGPU
@@ -38,14 +28,21 @@ else
     export http_proxy=http://proxy.alcf.anl.gov:3128
 fi
 
+#set -e
+
 # Using our own nvidia environment so swap to GNU env
-module switch PrgEnv-nvidia PrgEnv-gnu
+module list
+#module switch PrgEnv-nvhpc PrgEnv-gnu
+#module switch PrgEnv-nvidia PrgEnv-gnu
+module load PrgEnv-nvhpc
+#module load PrgEnv-gnu
 module load craype-accel-nvidia80
 export MPICH_GPU_SUPPORT_ENABLED=1
-
+module list
+echo $MPICH_DIR
 # unset *_TAG variables to build latest master
-#DH_REPO_TAG="0.2.5"
-#DH_REPO_URL=https://github.com/deephyper/deephyper.git
+DH_REPO_TAG="0.4.2"
+DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 TF_REPO_TAG="v2.9.1"
 PT_REPO_TAG="v1.12.0" #"v1.11.0"
@@ -53,8 +50,9 @@ HOROVOD_REPO_TAG="v0.25.0" # v0.22.1 released on 2021-06-10 should be compatible
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
-MPI4PY_REPO_URL=https://github.com/mpi4py/mpi4py.git
-MPI4PY_REPO_TAG="3.1.3"
+
+# MPI4PY_REPO_URL=https://github.com/mpi4py/mpi4py.git
+# MPI4PY_REPO_TAG="3.1.3"
 
 
 ###########################################
@@ -134,7 +132,7 @@ WHEELS_PATH=$BASE_PATH/wheels
 mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 mkdir -p $WHEELS_PATH
-
+cd $BASE_PATH
 # Download and install conda for a base python installation
 CONDAVER='py38_4.12.0'
 # "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
@@ -155,7 +153,8 @@ cd $CONDA_PREFIX_PATH
 cat > setup.sh << EOF
 preferred_shell=\$(basename \$SHELL)
 
-module switch PrgEnv-nvidia PrgEnv-gnu
+module load PrgEnv-gnu
+#module load PrgEnv-nvhpc
 
 if [ -n "\$ZSH_EVAL_CONTEXT" ]; then
     DIR=\$( cd "\$( dirname "\$0" )" && pwd )
@@ -277,9 +276,11 @@ EOF
 
 # move to base install directory
 cd $BASE_PATH
+echo "cd $BASE_PATH"
 
 # setup conda environment
 source $CONDA_PREFIX_PATH/setup.sh
+echo "after sourcing conda"
 
 # install dependencies/tools from conda
 conda install -y cmake
@@ -392,6 +393,7 @@ else
 fi
 
 echo Install PyTorch
+module load PrgEnv-gnu
 
 export USE_CUDA=1
 export USE_CUDNN=1
@@ -433,14 +435,14 @@ else
     git checkout --recurse-submodules $HOROVOD_REPO_TAG
 fi
 
-echo Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}
+echo Build Horovod Wheel using MPI from $MPICH_DIR and NCCL from ${NCCL_BASE}
 # https://horovod.readthedocs.io/en/stable/gpus_include.html
 # If you installed NCCL 2 using the nccl-<version>.txz package, you should specify the path to NCCL 2 using the HOROVOD_NCCL_HOME environment variable.
 # add the library path to LD_LIBRARY_PATH environment variable or register it in /etc/ld.so.conf.
 #export LD_LIBRARY_PATH=$CRAY_MPICH_PREFIX/lib-abi-mpich:$NCCL_BASE/lib:$LD_LIBRARY_PATH
 #export PATH=$CRAY_MPICH_PREFIX/bin:$PATH
 
-echo MPI from environment: $MPICH_DIR
+# echo MPI from environment: $MPICH_DIR
 MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEELS_PATH/
@@ -454,55 +456,49 @@ echo Pip install other packages
 pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
 
-####################################################
-###### Install MPI4PY
-############
-
 cd $BASE_PATH
+MPICC="cc -shared" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
 
-echo Clone Mpi4py
-git clone $MPI4PY_REPO_URL
-cd mpi4py
+# echo Clone Mpi4py
+# git clone $MPI4PY_REPO_URL
+# cd mpi4py
 
-git checkout $MPI4PY_REPO_TAG
+# git checkout $MPI4PY_REPO_TAG
 
-LIBFAB_PATH=$(python -c "import os;x=os.environ['LD_LIBRARY_PATH'];x=x.split(':');x = [ i for i in x if 'libfabric' in i ];print(x[0])")
-echo $LD_LIBRARY_PATH
-echo $LIBFAB_PATH
-cat > mpi.cfg << EOF
-# MPI configuration for Polaris
-# ---------------------
-[mpi]
+# LIBFAB_PATH=$(python -c "import os;x=os.environ['LD_LIBRARY_PATH'];x=x.split(':');x = [ i for i in x if 'libfabric' in i ];print(x[0])")
+# echo $LD_LIBRARY_PATH
+# echo $LIBFAB_PATH
+# cat > mpi.cfg << EOF
+# # MPI configuration for Polaris
+# # ---------------------
+# [mpi]
 
-mpi_dir              = $MPICH_DIR
+# mpi_dir              = $MPICH_DIR
 
-mpicc                = %(mpi_dir)s/bin/mpicc
-mpicxx               = %(mpi_dir)s/bin/mpicxx
+# mpicc                = %(mpi_dir)s/bin/mpicc
+# mpicxx               = %(mpi_dir)s/bin/mpicxx
 
-include_dirs         = %(mpi_dir)s/include
-library_dirs         = %(mpi_dir)s/lib
+# include_dirs         = %(mpi_dir)s/include
+# library_dirs         = %(mpi_dir)s/lib
 
-## extra_compile_args   =
-extra_link_args      = -L$LIBFAB_PATH -lfabric
-## extra_objects        =
+# ## extra_compile_args   =
+# extra_link_args      = -L$LIBFAB_PATH -lfabric
+# ## extra_objects        =
 
-EOF
+# EOF
 
-python setup.py build
-python setup.py bdist_wheel
-MPI4PY_WHL=$(find dist/ -name "mpi4py*.whl" -type f)
-mv $MPI4PY_WHL $WHEELS_PATH/
-MPI4PY_WHL=$(find $WHEELS_PATH/ -name "mpi4py*.whl" -type f)
-echo Install mpi4py $MPI4PY_WHL
-python -m pip install --force-reinstall $MPI4PY_WHL
-
-exit 0
+# python setup.py build
+# python setup.py bdist_wheel
+# MPI4PY_WHL=$(find dist/ -name "mpi4py*.whl" -type f)
+# mv $MPI4PY_WHL $WHEELS_PATH/
+# MPI4PY_WHL=$(find $WHEELS_PATH/ -name "mpi4py*.whl" -type f)
+# echo Install mpi4py $MPI4PY_WHL
+# python -m pip install --force-reinstall $MPI4PY_WHL
 
 echo Adding module snooper so we can tell what modules people are using
 ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py
 
 # DeepHyper stuff
-#export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
 
 pip install 'tensorflow_probability==0.17.0'
 # KGF: 0.17.0 (2022-06-06) tested against TF 2.9.1
@@ -559,11 +555,10 @@ pip install transformers
 pip install scikit-image
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-
+pip install deepspeed
 pip install pytorch-lightning
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
-env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir
 # conda install -c conda-forge cupy cudnn cutensor nccl
 # https://github.com/cupy/cupy/issues/4850
 ## https://docs.cupy.dev/en/stable/install.html?highlight=cutensor#additional-cuda-libraries

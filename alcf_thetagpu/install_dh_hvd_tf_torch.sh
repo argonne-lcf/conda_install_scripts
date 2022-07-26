@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export CUDA_VISIBLE_DEVICES=4
+export PYTHONNOUSERSITE=1
 
 # As of June 14 2021
 # This script will install (from scratch) DeepHyper, TensorFlow, PyTorch, and Horovod on ThetaGPU

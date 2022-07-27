@@ -14,7 +14,31 @@ export PYTHONNOUSERSITE=1
 # dirs that were (2555/dr-xr-sr-x) on ThetaGPU became (2500/dr-x--S---)
 umask 0022
 
-# TODO: move conda packages directory away from ~/.conda
+# move primary conda packages directory/cache away from ~/.conda/pkgs (4.2 GB currently)
+export CONDA_PKGS_DIRS=/soft/datascience/
+
+# https://stackoverflow.com/questions/67610133/how-to-move-conda-from-one-folder-to-another-at-the-moment-of-creating-the-envi
+# > conda config --get
+# --add envs_dirs '/lus/theta-fs0/projects/fusiondl_aesp/conda/envs'
+# --set pip_interop_enabled False
+# --add pkgs_dirs '$HOME/.conda/pkgs'
+# --add pkgs_dirs '/lus/theta-fs0/projects/fusiondl_aesp/conda/pkgs'
+
+# > conda info --root
+# /soft/datascience/conda/2022-07-19-login/mconda3
+
+# If the pkgs_dirs key is not set, then envs/pkgs is used as the pkgs cache, except for
+# the standard envs directory in the root directory, for which the normal root_dir/pkgs is
+# used.
+# https://docs.conda.io/projects/conda/en/latest/user-guide/configuration/use-condarc.html#specify-package-directories-pkgs-dirs
+
+# https://docs.conda.io/projects/conda/en/latest/configuration.html
+# #   The list of directories where locally-available packages are linked
+# #   from at install time. Packages not locally available are downloaded
+# #   and extracted into the first writable directory.
+# #
+# pkgs_dirs: []
+
 
 # Note, /soft and /home currently (temporarily) share a filesystem as of July 2022
 # Default 100 GB quota will be exhauted quickly.

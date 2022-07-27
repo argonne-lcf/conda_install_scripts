@@ -14,6 +14,10 @@ export PYTHONNOUSERSITE=1
 # dirs that were (2555/dr-xr-sr-x) on ThetaGPU became (2500/dr-x--S---)
 umask 0022
 
+# TODO: move conda packages directory away from ~/.conda
+
+# Note, /soft and /home currently (temporarily) share a filesystem as of July 2022
+# Default 100 GB quota will be exhauted quickly.
 
 #########################################################
 # Check for outside communication on ThetaGPU
@@ -545,7 +549,21 @@ pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 # https://github.com/pytorch/vision/issues/2632
 pip install "pillow!=8.3.0,>=6.2.0"  # 8.3.1 seems to be fine with torchvision and dataloader
 # KGF: torchvision will try to install its own .whl for PyTorch 1.9.0 even if 1.9.0a0+gitd69c22d is installed, e.g
-pip install --no-deps torchvision
+#pip install --no-deps torchvision
+# KGF Polaris: need exact CUDA minor version match, and torch 1.12.0 needs vision 1.13.0
+# https://github.com/pytorch/vision#installation
+# PyTorch: you could check the linked CUDA version via print(torch.version.cuda)
+
+#pip install --no-dependencies torchvision==0.13.0+cu115 --extra-index-url https://download.pytorch.org/whl/
+# No 0.13.0+cu115 prebuilt binary, only cu116 and older ones. Must build from source
+# https://download.pytorch.org/whl/torch_stable.html
+
+cd $BASE_PATH
+echo "Install PyTorch Vision from source"
+git clone https://github.com/pytorch/vision.git
+git checkout v0.13.0
+python setup.py install
+
 pip install --no-deps timm
 pip install opencv-python-headless
 

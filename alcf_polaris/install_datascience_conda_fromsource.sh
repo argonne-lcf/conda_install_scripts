@@ -1,15 +1,19 @@
 #!/bin/bash -l
 
 # As of May 2022
-# This script will install TensorFlow, PyTorch, and Horovod on Polaris
+# This script will install TensorFlow, PyTorch, and Horovod on Polaris, all from source
 # 1 - Login to Polaris login-node
-# 2 - Run 'bash <this script> /path/to/install/base/'
-# 3 - script installs everything down in $PWD/deephyper/...
+# 2 - Run './<this script> /path/to/install/base/'
+# 3 - script installs everything down in /path/to/install/base/
 # 4 - wait for it to complete
 
 BASE_PATH=$1
 
 export PYTHONNOUSERSITE=1
+# KGF: PBS mucks with user umask, changing it to 0077 on compute node
+# dirs that were (2555/dr-xr-sr-x) on ThetaGPU became (2500/dr-x--S---)
+umask 0022
+
 
 #########################################################
 # Check for outside communication on ThetaGPU

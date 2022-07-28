@@ -62,13 +62,37 @@ fi
 
 #set -e
 
-# Using our own nvidia environment so swap to GNU env
+# PrgEnv-nvhpc is default PE on Perlmutter as of 2022-07-27
 module list
-#module switch PrgEnv-nvhpc PrgEnv-gnu
+# ----------------------
+# See Polaris module pre- vs. post-AT notes: https://github.com/felker/athenak-scaling/blob/main/README.md
+# Change for Prgenv-nvidia and Nvidia Module Files: As pre-announced with the CPE-HPCM
+# 22.02 release and starting with the CPE 22.03 release, the PrgEnv-nvidia and nvidia
+# module files are being deprecated in favor of PrgEnv-nvhpc and nvhpc, respectively, and
+# may be removed in a later release.
+
+# During AT, Lmod was not used. PrgEnv-nvidia was default.
+# Perlmutter only documents PrgEnv-nvidia, since PrgEnv-nvhpc came later
+# The Tcl modulefiles were very similar. Only differences, which made
+# the following error out:
+# module switch PrgEnv-nvidia/8.3.3 PrgEnv-nvhpc
+# nvidia/22.3(6):ERROR:150: Module 'nvidia/22.3' conflicts with the currently loaded module(s) 'nvhpc/22.3'
+
+# PrgEnv-nvidia
+# setenv           nvidia_already_loaded 1
+# module           swap nvidia/22.3
+
+# PrgEnv-nvhpc
+# setenv           nvhpc_already_loaded 0
+# module           load nvhpc
+# ----------------------------
 #module switch PrgEnv-nvidia PrgEnv-gnu
+# second module is the final module. First one is unloaded
+# note "switch" and "swap" are aliases in both Env Modules and Lmod
+
 module load PrgEnv-nvhpc
 #module load PrgEnv-gnu
-module load craype-accel-nvidia80
+module load craype-accel-nvidia80  # wont load for PrgEnv-gnu, I believe
 export MPICH_GPU_SUPPORT_ENABLED=1
 module list
 echo $MPICH_DIR
@@ -426,6 +450,7 @@ fi
 
 echo Install PyTorch
 module load PrgEnv-gnu
+module list
 
 export USE_CUDA=1
 export USE_CUDNN=1
@@ -585,8 +610,8 @@ pip install "pillow!=8.3.0,>=6.2.0"  # 8.3.1 seems to be fine with torchvision a
 cd $BASE_PATH
 echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
-git checkout v0.13.0
 cd vision
+git checkout v0.13.0
 python setup.py install
 cd $BASE_PATH
 

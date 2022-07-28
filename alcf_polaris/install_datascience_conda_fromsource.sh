@@ -634,6 +634,7 @@ pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torc
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install deepspeed
 pip install pytorch-lightning
+pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
 git clone https://github.com/argonne-lcf/mpi4jax.git

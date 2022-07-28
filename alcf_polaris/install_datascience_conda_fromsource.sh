@@ -586,7 +586,9 @@ cd $BASE_PATH
 echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
 git checkout v0.13.0
+cd vision
 python setup.py install
+cd $BASE_PATH
 
 pip install --no-deps timm
 pip install opencv-python-headless

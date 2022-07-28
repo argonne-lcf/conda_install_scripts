@@ -524,8 +524,10 @@ pip install "pillow!=8.3.0,>=6.2.0"  # 8.3.1 seems to be fine with torchvision a
 cd $BASE_PATH
 echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
+cd vision
 git checkout v0.13.0
 python setup.py install
+cd $BASE_PATH
 
 pip install --no-deps timm
 pip install opencv-python-headless

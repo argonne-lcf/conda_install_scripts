@@ -1,13 +1,10 @@
 help([[
 The Anaconda python environment.
 Includes build of TensorFlow, PyTorch, DeepHyper, Horovd from tagged versions or develop/master branch of the git repos
-DeepHyper version tag: 4717fbe4
-TensorFlow version tag: post-2.7.0 (58b34c6c)
-Horovod version tag: 0.23.0
-PyTorch version tag: 1.10.0a0+git36449ea
-- PyTorch DDP with NCCL should be fully functional
-- PyTorch with Magma, LAPACK support installed
-Mamba package manager installed
+DeepHyper version tag: 0.4.2
+TensorFlow version tag: 2.9.1
+Horovod version tag: 0.25.0
+PyTorch version tag: 1.12.0
 
 You can modify this environment as follows:
 
@@ -23,18 +20,16 @@ https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
 ]])
 
 whatis("Name: conda")
-whatis("Version: 4.11.0")
+whatis("Version: 4.13.0")
 whatis("Category: python conda")
 whatis("Keywords: python conda")
 whatis("Description: Base Anaconda python environment")
 whatis("URL: https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html")
 
 depends_on("openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0")
--- KGF: probably don't need this; using copy in /lus/theta-fs0/software/thetagpu/cuda/nccl_2.11.4-1+cuda11.4_x86_64
--- depends_on("nccl/nccl-v2.11.4-1_CUDA11.4")
 
 
-local conda_dir = "/lus/theta-fs0/software/thetagpu/conda/2021-11-30/mconda3"
+local conda_dir = "/lus/theta-fs0/software/thetagpu/conda/2022-07-01/mconda3"
 local funcs = "conda __conda_activate __conda_hashr __conda_reactivate __add_sys_prefix_to_path"
 local home = os.getenv("HOME")
 
@@ -49,10 +44,10 @@ setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
 prepend_path("LD_LIBRARY_PATH","/usr/local/cuda-11.4/lib64")
-prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/cudnn-11.4-linux-x64-v8.2.4.15/lib64")
-prepend_path("PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.11.4-1+cuda11.4_x86_64/include")
-prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.11.4-1+cuda11.4_x86_64/lib")
-prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/TensorRT-8.2.1.8.Linux.x86_64-gnu.cuda-11.4.cudnn8.2/lib")
+prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive/lib64")
+prepend_path("PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.12.12-1+cuda11.0_x86_64/include")
+prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.12.12-1+cuda11.6_x86_64/lib")
+prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/TensorRT-8.2.5.1/lib")
 
 setenv("https_proxy","http://proxy.tmi.alcf.anl.gov:3128")
 setenv("http_proxy","http://proxy.tmi.alcf.anl.gov:3128")

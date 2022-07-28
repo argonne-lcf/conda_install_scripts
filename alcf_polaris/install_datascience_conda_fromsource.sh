@@ -635,7 +635,12 @@ pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install deepspeed
 pip install pytorch-lightning
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-pip install mpi4jax --no-build-isolation
+
+git clone https://github.com/argonne-lcf/mpi4jax.git
+cd mpi4jax
+git checkout polaris
+pip install . --no-build-isolation
+cd $BASE_PATH
 
 # conda install -c conda-forge cupy cudnn cutensor nccl
 # https://github.com/cupy/cupy/issues/4850

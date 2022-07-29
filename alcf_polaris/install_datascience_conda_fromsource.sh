@@ -637,10 +637,13 @@ pip install pytorch-lightning
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
+# https://github.com/mpi4jax/mpi4jax/issues/153
+# CUDA_ROOT=/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux/ python setup.py --verbose build_ext --inplace
+# be sure to "rm -rfd build/" to force .so libraries to rebuild if you change the build options, etc.
 git clone https://github.com/argonne-lcf/mpi4jax.git
 cd mpi4jax
 git checkout polaris
-pip install . --no-build-isolation
+CUDA_ROOT=$CUDA_TOOLKIT_BASE pip install --no-build-isolation --no-cache-dir --no-binary=mpi4jax -v .
 cd $BASE_PATH
 
 # conda install -c conda-forge cupy cudnn cutensor nccl

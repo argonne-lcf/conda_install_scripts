@@ -52,7 +52,7 @@ prepend_path("LD_LIBRARY_PATH","/soft/datascience/cuda/TensorRT-8.2.5.1.Linux.x8
 
 local cuda_home = "/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux"
 setenv("CUDA_HOME",cuda_home)
-prepend_path("PATH",pathJoin(cuda_home,"bin/")
+prepend_path("PATH",pathJoin(cuda_home,"bin/"))
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))
 
 setenv("https_proxy","http://proxy.alcf.anl.gov:3128")

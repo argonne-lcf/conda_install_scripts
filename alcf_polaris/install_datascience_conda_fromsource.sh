@@ -512,7 +512,7 @@ echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 
 echo Pip install TensorBoard profiler plugin
-pip install tensorboard_plugin_profile tensorflow_addons
+pip install tensorboard_plugin_profile tensorflow_addons tensorflow-datasets
 echo Pip install other packages
 pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022

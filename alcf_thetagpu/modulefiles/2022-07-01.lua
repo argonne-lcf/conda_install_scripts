@@ -43,7 +43,13 @@ setenv("PYTHONUSERBASE",pathJoin(home,".local/",myModuleFullName()))
 setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
-prepend_path("LD_LIBRARY_PATH","/usr/local/cuda-11.4/lib64")
+local cuda_home = "/usr/local/cuda-11.4/lib64"
+setenv("CUDA_HOME",cuda_home)
+prepend_path("PATH",pathJoin(cuda_home,"bin/"))
+prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))
+-- CUPTI:
+prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"extras/CUPTI/lib64/"))
+
 prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive/lib64")
 prepend_path("PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.12.12-1+cuda11.0_x86_64/include")
 prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.12.12-1+cuda11.6_x86_64/lib")

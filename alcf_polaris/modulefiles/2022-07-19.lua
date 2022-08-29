@@ -50,10 +50,13 @@ prepend_path("PATH","/soft/datascience/cuda/nccl_2.12.10-1+cuda11.5_x86_64/inclu
 prepend_path("LD_LIBRARY_PATH","/soft/datascience/cuda/nccl_2.12.10-1+cuda11.5_x86_64/lib")
 prepend_path("LD_LIBRARY_PATH","/soft/datascience/cuda/TensorRT-8.2.5.1.Linux.x86_64-gnu.cuda-11.5.cudnn8.3/lib")
 
+
 local cuda_home = "/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux"
 setenv("CUDA_HOME",cuda_home)
 prepend_path("PATH",pathJoin(cuda_home,"bin/"))
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))
+-- CUPTI:
+prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"extras/CUPTI/lib64/"))
 
 setenv("https_proxy","http://proxy.alcf.anl.gov:3128")
 setenv("http_proxy","http://proxy.alcf.anl.gov:3128")

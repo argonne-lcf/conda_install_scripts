@@ -15,7 +15,7 @@ export PYTHONNOUSERSITE=1
 umask 0022
 
 # move primary conda packages directory/cache away from ~/.conda/pkgs (4.2 GB currently)
-export CONDA_PKGS_DIRS=/soft/datascience/
+export CONDA_PKGS_DIRS=/soft/datascience/conda/pkgs
 
 # https://stackoverflow.com/questions/67610133/how-to-move-conda-from-one-folder-to-another-at-the-moment-of-creating-the-envi
 # > conda config --get

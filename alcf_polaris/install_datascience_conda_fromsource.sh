@@ -598,7 +598,8 @@ VISION_WHEEL=$(find dist/ -name "torchvision*.whl" -type f)
 cp $VISION_WHEEL $WHEELS_PATH/
 cd $WHEELS_PATH
 echo pip installing $(basename $VISION_WHEEL)
-pip install $(basename $VISION_WHEEL)
+# KGF: unlike "python setup.py install", still tries to install PyTorch again by default, despite being a local wheel
+pip install --force-reinstall --no-deps $(basename $VISION_WHEEL)
 
 cd $BASE_PATH
 

@@ -43,7 +43,7 @@ setenv("PYTHONUSERBASE",pathJoin(home,".local/",myModuleFullName()))
 setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
-local cuda_home = "/usr/local/cuda-11.4/lib64"
+local cuda_home = "/usr/local/cuda-11.4"
 setenv("CUDA_HOME",cuda_home)
 prepend_path("PATH",pathJoin(cuda_home,"bin/"))
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))

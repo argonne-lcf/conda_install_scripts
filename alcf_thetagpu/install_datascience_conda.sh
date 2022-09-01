@@ -465,7 +465,7 @@ echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 
 echo "Pip install TensorBoard profiler plugin"
-pip install tensorboard_plugin_profile tensorflow_addons
+pip install tensorboard_plugin_profile tensorflow_addons tensorflow-datasets
 echo "Pip install other packages"
 pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
@@ -526,7 +526,21 @@ echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
 cd vision
 git checkout v0.13.0
-python setup.py install
+# KGF: this falls back to building a deprecated .egg format with easy_install, which puts an entry in
+# mconda3/lib/python3.8/site-packages/easy-install.pth, causing read-only premissions problems in cloned
+# environments.
+###python setup.py install
+# "We don't officially support building from source using pip, but if you do, you'll need to use the --no-build-isolation flag."
+
+# KGF: build our own wheel, like in PyTorch and TF builds:
+python setup.py bdist_wheel
+VISION_WHEEL=$(find dist/ -name "torchvision*.whl" -type f)
+cp $VISION_WHEEL $WHEELS_PATH/
+cd $WHEELS_PATH
+echo pip installing $(basename $VISION_WHEEL)
+# KGF: unlike "python setup.py install", still tries to install PyTorch again by default, despite being a local wheel
+pip install --force-reinstall --no-deps $(basename $VISION_WHEEL)
+
 cd $BASE_PATH
 
 pip install --no-deps timm

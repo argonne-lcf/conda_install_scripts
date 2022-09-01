@@ -15,7 +15,8 @@ export PYTHONNOUSERSITE=1
 umask 0022
 
 # move primary conda packages directory/cache away from ~/.conda/pkgs (4.2 GB currently)
-export CONDA_PKGS_DIRS=/soft/datascience/
+# hardlinks should be preserved even if these files are moved (not across filesystem boundaries)
+export CONDA_PKGS_DIRS=/soft/datascience/conda/pkgs
 
 # https://stackoverflow.com/questions/67610133/how-to-move-conda-from-one-folder-to-another-at-the-moment-of-creating-the-envi
 # > conda config --get
@@ -115,26 +116,26 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 # CUDA path and version information
 ############################
 
-CUDA_DEPS_BASE=/soft/datascience/cuda
-
 CUDA_VERSION_MAJOR=11
 CUDA_VERSION_MINOR=5
 CUDA_VERSION_MINI=2
 CUDA_VERSION_BUILD=495.29.05
 CUDA_VERSION=$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
 CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
-CUDA_TOOLKIT_BASE=$CUDA_DEPS_BASE/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
+CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
+
+CUDA_DEPS_BASE=/soft/libraries/
 
 CUDNN_VERSION_MAJOR=8
 CUDNN_VERSION_MINOR=3
 CUDNN_VERSION_EXTRA=3.40
 CUDNN_VERSION=$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR.$CUDNN_VERSION_EXTRA
-CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
+CUDNN_BASE=$CUDA_DEPS_BASE/cudnn/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
 
 NCCL_VERSION_MAJOR=2
 NCCL_VERSION_MINOR=12.10-1
 NCCL_VERSION=$NCCL_VERSION_MAJOR.$NCCL_VERSION_MINOR
-NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
+NCCL_BASE=$CUDA_DEPS_BASE/nccl/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
 # KGF: no Extended Compatibility in NCCL --- use older NCCL version built with CUDA 11.0 until
 # GPU device kernel driver upgraded from 11.0 ---> 11.4 in November 2021
 #NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64
@@ -143,7 +144,7 @@ TENSORRT_VERSION_MAJOR=8
 TENSORRT_VERSION_MINOR=2.5.1
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 #TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
-TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
 
 
 ###########################################
@@ -233,7 +234,6 @@ else
    export http_proxy=http://proxy.alcf.anl.gov:3128
 fi
 
-export CUDA_BASE=$CUDA_DEPS_BASE
 export CUDA_TOOLKIT_BASE=$CUDA_TOOLKIT_BASE
 export CUDNN_BASE=$CUDNN_BASE
 export NCCL_BASE=$NCCL_BASE
@@ -283,32 +283,6 @@ EOF
 
 PYTHON_VER=$(ls -d lib/python?.? | tail -c4)
 echo PYTHON_VER=$PYTHON_VER
-
-cat > modulefile << EOF
-#%Module2.0
-## miniconda$PYTHON_VERSION modulefile
-##
-proc ModulesHelp { } {
-   global CONDA_LEVEL PYTHON_LEVEL MINICONDA_LEVEL
-   puts stderr "This module will add Miniconda \$MINICONDA_LEVEL to your environment with conda version \$CONDA_LEVEL and python version \$PYTHON_LEVEL"
-}
-set _module_name  [module-info name]
-set is_module_rm  [module-info mode remove]
-set sys           [uname sysname]
-set os            [uname release]
-set HOME          $::env(HOME)
-set PYTHON_LEVEL                 $PYTHON_VER
-set CONDA_LEVEL                  $CONDAVER
-set MINICONDA_LEVEL              $PYTHON_VERSION
-set CONDA_PREFIX                 $CONDA_PREFIX_PATH
-setenv CONDA_PREFIX              \$CONDA_PREFIX
-setenv PYTHONUSERBASE            \$HOME/.local/\$_module_name
-setenv ENV_NAME                  \$_module_name
-setenv PYTHONSTARTUP             \$CONDA_PREFIX/etc/pythonstart
-puts stdout "source \$CONDA_PREFIX/setup.sh"
-module-whatis  "miniconda installation"
-EOF
-
 
 # KGF: $CONDA_ENV (e.g. conda/2021-11-30) is not an official conda var; set by us in modulefile
 # $CONDA_DEFAULT_ENV (short name of current env) and $CONDA_PREFIX (full path) are official,
@@ -512,7 +486,7 @@ echo Install Horovod $HVD_WHEEL
 pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 
 echo Pip install TensorBoard profiler plugin
-pip install tensorboard_plugin_profile tensorflow_addons
+pip install tensorboard_plugin_profile tensorflow_addons tensorflow-datasets
 echo Pip install other packages
 pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
@@ -612,7 +586,21 @@ echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
 cd vision
 git checkout v0.13.0
-python setup.py install
+# KGF: this falls back to building a deprecated .egg format with easy_install, which puts an entry in
+# mconda3/lib/python3.8/site-packages/easy-install.pth, causing read-only premissions problems in cloned
+# environments.
+###python setup.py install
+# "We don't officially support building from source using pip, but if you do, you'll need to use the --no-build-isolation flag."
+
+# KGF: build our own wheel, like in PyTorch and TF builds:
+python setup.py bdist_wheel
+VISION_WHEEL=$(find dist/ -name "torchvision*.whl" -type f)
+cp $VISION_WHEEL $WHEELS_PATH/
+cd $WHEELS_PATH
+echo pip installing $(basename $VISION_WHEEL)
+# KGF: unlike "python setup.py install", still tries to install PyTorch again by default, despite being a local wheel
+pip install --force-reinstall --no-deps $(basename $VISION_WHEEL)
+
 cd $BASE_PATH
 
 pip install --no-deps timm
@@ -634,12 +622,18 @@ pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torc
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install deepspeed
 pip install pytorch-lightning
+pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
-git clone https://github.com/argonne-lcf/mpi4jax.git
+# https://github.com/mpi4jax/mpi4jax/issues/153
+# CUDA_ROOT=/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux python setup.py --verbose build_ext --inplace
+# be sure to "rm -rfd build/" to force .so libraries to rebuild if you change the build options, etc.
+
+#git clone https://github.com/argonne-lcf/mpi4jax.git
+git clone https://github.com/mpi4jax/mpi4jax.git
 cd mpi4jax
-git checkout polaris
-pip install . --no-build-isolation
+#git checkout polaris
+CUDA_ROOT=$CUDA_TOOLKIT_BASE pip install --no-build-isolation --no-cache-dir --no-binary=mpi4jax -v .
 cd $BASE_PATH
 
 # conda install -c conda-forge cupy cudnn cutensor nccl

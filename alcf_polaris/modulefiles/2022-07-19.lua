@@ -45,14 +45,24 @@ setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
 -- prepend_path("LD_LIBRARY_PATH","/opt/nvidia/hpc_sdk/Linux_x86_64/21.9/cuda/lib64")
-prepend_path("LD_LIBRARY_PATH","/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux/lib64")
-prepend_path("LD_LIBRARY_PATH","/soft/datascience/cuda/cudnn-11.5-linux-x64-v8.3.3.40/lib")
-prepend_path("PATH","/soft/datascience/cuda/nccl_2.12.10-1+cuda11.5_x86_64/include")
-prepend_path("LD_LIBRARY_PATH","/soft/datascience/cuda/nccl_2.12.10-1+cuda11.5_x86_64/lib")
-prepend_path("LD_LIBRARY_PATH","/soft/datascience/cuda/TensorRT-8.2.5.1.Linux.x86_64-gnu.cuda-11.5.cudnn8.3/lib")
+prepend_path("LD_LIBRARY_PATH","/soft/libraries/cudnn/cudnn-11.5-linux-x64-v8.3.3.40/lib")
+prepend_path("PATH","/soft/libraries/nccl/nccl_2.12.10-1+cuda11.5_x86_64/include")
+prepend_path("LD_LIBRARY_PATH","/soft/libraries/nccl/nccl_2.12.10-1+cuda11.5_x86_64/lib")
+prepend_path("LD_LIBRARY_PATH","/soft/libraries/trt/TensorRT-8.2.5.1.Linux.x86_64-gnu.cuda-11.5.cudnn8.3/lib")
+
+
+local cuda_home = "/soft/compilers/cudatoolkit/cuda_11.5.2_495.29.05_linux"
+setenv("CUDA_HOME",cuda_home)
+prepend_path("PATH",pathJoin(cuda_home,"bin/"))
+prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))
+-- CUPTI:
+prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"extras/CUPTI/lib64/"))
 
 setenv("https_proxy","http://proxy.alcf.anl.gov:3128")
 setenv("http_proxy","http://proxy.alcf.anl.gov:3128")
+
+-- Enable CUDA-aware MPICH, by default
+setenv("MPICH_GPU_SUPPORT_ENABLED",1)
 
 -- Initialize conda
 execute{cmd="source " .. conda_dir .. "/etc/profile.d/conda.sh;", modeA={"load"}}

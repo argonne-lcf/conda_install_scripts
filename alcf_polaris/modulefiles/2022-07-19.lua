@@ -64,6 +64,16 @@ setenv("http_proxy","http://proxy.alcf.anl.gov:3128")
 -- Enable CUDA-aware MPICH, by default
 setenv("MPICH_GPU_SUPPORT_ENABLED",1)
 
+-- (mpi4)Jax/TensorFlow/XLA flags:
+setenv("MPI4JAX_USE_CUDA_MPI",1)
+-- setenv("XLA_FLAGS","--xla_gpu_force_compilation_parallelism=1 --xla_gpu_cuda_data_dir=/soft/compilers/cudatoolkit/cuda_11.5.2_495.29.05_linux")
+-- first flag is Jax workaround, second flag is TF workaround when CUDA Toolkit is moved after installation
+-- (XLA hardcodes location to CUDA https://github.com/tensorflow/tensorflow/issues/23783)
+setenv("XLA_FLAGS","--xla_gpu_force_compilation_parallelism=1 --xla_gpu_cuda_data_dir=" .. cuda_home)
+setenv("MPICH_GPU_SUPPORT_ENABLED",1)
+-- Corey: pretty sure the following flag isnt working for Jax
+setenv("XLA_PYTHON_CLIENT_PREALLOCATE","false")
+
 -- Initialize conda
 execute{cmd="source " .. conda_dir .. "/etc/profile.d/conda.sh;", modeA={"load"}}
 execute{cmd="[[ -z ${ZSH_EVAL_CONTEXT} ]] && export -f " .. funcs, modeA={"load"}}

@@ -70,7 +70,6 @@ setenv("MPI4JAX_USE_CUDA_MPI",1)
 -- first flag is Jax workaround, second flag is TF workaround when CUDA Toolkit is moved after installation
 -- (XLA hardcodes location to CUDA https://github.com/tensorflow/tensorflow/issues/23783)
 setenv("XLA_FLAGS","--xla_gpu_force_compilation_parallelism=1 --xla_gpu_cuda_data_dir=" .. cuda_home)
-setenv("MPICH_GPU_SUPPORT_ENABLED",1)
 -- Corey: pretty sure the following flag isnt working for Jax
 setenv("XLA_PYTHON_CLIENT_PREALLOCATE","false")
 

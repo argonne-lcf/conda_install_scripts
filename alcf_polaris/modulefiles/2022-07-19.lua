@@ -40,8 +40,8 @@ local home = os.getenv("HOME")
 -- setenv("CONDA_PKGS_DIRS", pathJoin(conda_dir,"pkgs"))
 -- set environment name for prompt tag
 setenv("ENV_NAME",myModuleFullName())
-setenv("PYTHONUSERBASE",pathJoin(home,".local/",myModuleFullName()))
-setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
+setenv("PYTHONUSERBASE",pathJoin(home,".local/","polaris/",myModuleFullName()))
+unsetenv("PYTHONSTARTUP") -- ,pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
 -- prepend_path("LD_LIBRARY_PATH","/opt/nvidia/hpc_sdk/Linux_x86_64/21.9/cuda/lib64")

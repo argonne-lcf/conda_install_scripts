@@ -39,8 +39,8 @@ local home = os.getenv("HOME")
 -- setenv("CONDA_PKGS_DIRS", pathJoin(conda_dir,"pkgs"))
 -- set environment name for prompt tag
 setenv("ENV_NAME",myModuleFullName())
-setenv("PYTHONUSERBASE",pathJoin(home,".local/",myModuleFullName()))
-setenv("PYTHONSTARTUP",pathJoin(conda_dir,"etc/pythonstart"))
+setenv("PYTHONUSERBASE",pathJoin(home,".local/","thetagpu",myModuleFullName()))
+unsetenv("PYTHONSTARTUP") -- ,pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
 local cuda_home = "/usr/local/cuda-11.4"

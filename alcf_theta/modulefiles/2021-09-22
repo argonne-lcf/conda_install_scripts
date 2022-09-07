@@ -17,9 +17,9 @@ set CONDA_LEVEL                  py38_4.10.3
 set MINICONDA_LEVEL              3
 set CONDA_PREFIX                 /lus/theta-fs0/software/datascience/conda/2021-09-22/mconda3
 setenv CONDA_PREFIX              $CONDA_PREFIX
-setenv PYTHONUSERBASE            $HOME/.local/$_module_name
+setenv PYTHONUSERBASE            $HOME/.local/theta/$_module_name
 setenv ENV_NAME                  $_module_name
-setenv PYTHONSTARTUP             $CONDA_PREFIX/etc/pythonstart
+#setenv PYTHONSTARTUP             $CONDA_PREFIX/etc/pythonstart
 puts stdout "source $CONDA_PREFIX/setup.sh"
 
 module-whatis  "miniconda installation"

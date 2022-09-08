@@ -40,8 +40,15 @@ local home = os.getenv("HOME")
 -- setenv("CONDA_PKGS_DIRS", pathJoin(conda_dir,"pkgs"))
 -- set environment name for prompt tag
 setenv("ENV_NAME",myModuleFullName())
-setenv("PYTHONUSERBASE",pathJoin(home,".local/","polaris/",myModuleFullName()))
+local pyuserbase = pathJoin(home,".local/","polaris/",myModuleFullName())
+
+setenv("PYTHONUSERBASE", pyuserbase)
 unsetenv("PYTHONSTARTUP") -- ,pathJoin(conda_dir,"etc/pythonstart"))
+
+-- KGF: could add this, but "conda activate" will put "/soft/datascience/conda/2022-07-19/mconda3/bin" ahead of it
+-- Alternative is to "export PATH=$PYTHONUSERBASE/bin:$PATH" in mconda3/etc/conda/activate.d/env_vars.sh (and undo in deactivate.d/)
+-- prepend_path("PATH",pathJoin(pyuserbase, "bin/"))
+
 
 -- add cuda libraries
 -- prepend_path("LD_LIBRARY_PATH","/opt/nvidia/hpc_sdk/Linux_x86_64/21.9/cuda/lib64")

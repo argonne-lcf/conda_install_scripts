@@ -335,8 +335,8 @@ echo Conda install some dependencies
 conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba conda-build
 
 # CUDA only: Add LAPACK support for the GPU if needed
-#conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-#conda install -y -c conda-forge mamba
+conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+conda install -y -c conda-forge mamba
 conda update -y pip
 
 echo Clone TensorFlow
@@ -620,7 +620,7 @@ pip install transformers
 pip install scikit-image
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-pip install deepspeed
+pip install 'deepspeed>=0.7.2'
 pip install pytorch-lightning
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html

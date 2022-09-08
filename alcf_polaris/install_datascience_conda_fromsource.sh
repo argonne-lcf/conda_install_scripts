@@ -101,8 +101,8 @@ echo $MPICH_DIR
 DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-TF_REPO_TAG="v2.9.1"
-PT_REPO_TAG="v1.12.0" #"v1.11.0"
+TF_REPO_TAG="v2.10.0"
+PT_REPO_TAG="v1.12.1" #"v1.11.0"
 HOROVOD_REPO_TAG="v0.25.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
@@ -117,12 +117,15 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 ############################
 
 CUDA_VERSION_MAJOR=11
-CUDA_VERSION_MINOR=5
+CUDA_VERSION_MINOR=6
 CUDA_VERSION_MINI=2
-CUDA_VERSION_BUILD=495.29.05
+#CUDA_VERSION_BUILD=495.29.05
 CUDA_VERSION=$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
 CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
-CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
+#CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
+
+# using short names on Polaris:
+CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda-${CUDA_VERSION_FULL}
 
 CUDA_DEPS_BASE=/soft/libraries/
 
@@ -504,7 +507,11 @@ pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
 
 cd $BASE_PATH
-MPICC="cc -shared" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
+MPICC="cc -shared-target -accel=nvidia80" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
+# KGF (2022-09-09): why did CUDA Aware mpi4py work for this install line, with PrgEnv-gnu but no craype-accel-nvidia80 module loaded, and no manual "CRAY_ACCEL_TARGET" exported ... but Horovod complains with:
+# "MPIDI_CRAY_init: GPU_SUPPORT_ENABLED is requested, but GTL library is not linked"
+# iff MPICH_GPU_SUPPORT_ENABLED=1 at runtime
+#MPICC="cc -shared" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
 
 # echo Clone Mpi4py
 # git clone $MPI4PY_REPO_URL
@@ -575,6 +582,10 @@ else
     pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
 
+# PyTorch Geometric--- Hardcoding 1.12.0 even though installing 1.12.1
+pip install torch-scatter -f https://data.pyg.org/whl/torch-1.12.0+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+pip install torch-sparse -f https://data.pyg.org/whl/torch-1.12.0++cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+pip install torch-geometric
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'

@@ -424,7 +424,19 @@ fi
 
 echo Install PyTorch
 module load PrgEnv-gnu
+
+# KGF: wont load due to modulefile: prereq_any(atleast("cudatoolkit","11.0"), "nvhpc", "PrgEnv-nvhpc")
+# need to relax this or change to prereq_any(atleast("cudatoolkit-standalone","11.0"), "nvhpc", "PrgEnv-nvhpc")
+# KGF: any way to "module load --force"???
+#module load craype-accel-nvidia80
+export CRAY_ACCEL_TARGET="nvidia80"
+export CRAY_TCMALLOC_MEMFS_FORCE="1"
+export CRAYPE_LINK_TYPE="dynamic"
+export CRAY_ACCEL_VENDOR="nvidia"
+
 module list
+echo "CRAY_ACCEL_TARGET= $CRAY_ACCEL_TARGET"
+echo "CRAYPE_LINK_TYPE = $CRAYPE_LINK_TYPE"
 
 export USE_CUDA=1
 export USE_CUDNN=1

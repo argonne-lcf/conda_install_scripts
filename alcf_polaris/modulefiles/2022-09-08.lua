@@ -58,7 +58,7 @@ prepend_path("LD_LIBRARY_PATH","/soft/libraries/nccl/nccl_2.14.3-1+cuda11.6_x86_
 prepend_path("LD_LIBRARY_PATH","/soft/libraries/trt/TensorRT-8.4.3.1.Linux.x86_64-gnu.cuda-11.6.cudnn8.4/lib")
 
 
-local cuda_home = "/soft/compilers/cudatoolkit/cuda_11.6.2"
+local cuda_home = "/soft/compilers/cudatoolkit/cuda-11.6.2"
 setenv("CUDA_HOME",cuda_home)
 prepend_path("PATH",pathJoin(cuda_home,"bin/"))
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))

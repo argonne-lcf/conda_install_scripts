@@ -21,7 +21,7 @@ https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
 
 whatis("Name: conda")
 -- note, miniconda installer often lags behind conda binary version, which is updated in the install script
-whatis("Version: 4.13.0")
+whatis("Version: 4.14.0")
 whatis("Category: python conda")
 whatis("Keywords: python conda")
 whatis("Description: Base Anaconda python environment")

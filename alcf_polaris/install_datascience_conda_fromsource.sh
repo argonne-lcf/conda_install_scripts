@@ -93,6 +93,7 @@ module list
 
 module load PrgEnv-nvhpc
 #module load PrgEnv-gnu
+module load gcc-mixed # get 11.2.0 (2021) instead of /usr/bin/gcc 7.5 (2019)
 module load craype-accel-nvidia80  # wont load for PrgEnv-gnu, I believe
 export MPICH_GPU_SUPPORT_ENABLED=1
 module list
@@ -142,11 +143,13 @@ NCCL_BASE=$CUDA_DEPS_BASE/nccl/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
 # KGF: no Extended Compatibility in NCCL --- use older NCCL version built with earlier CUDA version until
 # GPU device kernel driver is upgraded
 
-
+# https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_VERSION_MAJOR=8
 TENSORRT_VERSION_MINOR=4.3.1
+# TENSORRT_VERSION_MAJOR=8
+# TENSORRT_VERSION_MINOR=4.3.1
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
-#TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+# https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
 
 
@@ -172,11 +175,10 @@ export TF_NEED_CUDA=1
 # KGF: TensorRT 8.x only supported in TensorFlow as of 2021-06-24 (f8e2aa0db)
 # https://github.com/tensorflow/tensorflow/issues/49150
 # https://github.com/tensorflow/tensorflow/pull/48917
-# and TRT 7.x is incompatible with CUDA 11.3 (requires 10.2, 11.0, 11.1, 11.2)
-# Disable TF+TensorRT for now
 export TF_NEED_TENSORRT=1
 export TF_CUDA_PATHS=$CUDA_TOOLKIT_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
-export GCC_HOST_COMPILER_PATH=$(which gcc)
+#export GCC_HOST_COMPILER_PATH=$(which gcc)
+export GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/snos/bin/gcc
 export CC_OPT_FLAGS="-march=native -Wno-sign-compare"
 export TF_SET_ANDROID_WORKSPACE=0
 
@@ -395,13 +397,13 @@ export TMP=/tmp
 # However, the tensorflow build environment saw that `gcc` was  symlink and dereferenced it to set:
 # GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/bin/redirect
 # at compile time, which fails. So we instead fix the gcc to use this:
-export GCC_HOST_COMPILER_PATH=$(which gcc)
+# KGF: see above, around L180
 
 echo Bazel Build TensorFlow
 # KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores)
 # Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max
 # even if --jobs=500
-HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" //tensorflow/tools/pip_package:build_pip_package
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEELS_PATH
 echo Install TensorFlow
@@ -426,6 +428,7 @@ else
 fi
 
 echo Install PyTorch
+module unload gcc-mixed
 module load PrgEnv-gnu
 
 # KGF: wont load due to modulefile: prereq_any(atleast("cudatoolkit","11.0"), "nvhpc", "PrgEnv-nvhpc")
@@ -507,7 +510,9 @@ pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
 
 cd $BASE_PATH
-MPICC="cc -shared-target -accel=nvidia80" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
+# KGF (2022-09-09):
+MPICC="cc -shared -target-accel=nvidia80" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
+
 # KGF (2022-09-09): why did CUDA Aware mpi4py work for this install line, with PrgEnv-gnu but no craype-accel-nvidia80 module loaded, and no manual "CRAY_ACCEL_TARGET" exported ... but Horovod complains with:
 # "MPIDI_CRAY_init: GPU_SUPPORT_ENABLED is requested, but GTL library is not linked"
 # iff MPICH_GPU_SUPPORT_ENABLED=1 at runtime

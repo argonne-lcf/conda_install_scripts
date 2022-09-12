@@ -10,7 +10,7 @@
 BASE_PATH=$1
 
 export PYTHONNOUSERSITE=1
-# KGF: PBS mucks with user umask, changing it to 0077 on compute node
+# KGF: PBS used to mess with user umask, changing it to 0077 on compute node
 # dirs that were (2555/dr-xr-sr-x) on ThetaGPU became (2500/dr-x--S---)
 umask 0022
 
@@ -650,7 +650,7 @@ pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torc
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install 'deepspeed>=0.7.2'
 pip install pytorch-lightning
-pip install gpytorch
+pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 

@@ -304,6 +304,10 @@ echo PYTHON_VER=$PYTHON_VER
 # #   holds the value of '{prefix}'. Templating uses python's str.format()
 # #   method.
 cat > .condarc << EOF
+channels:
+   - defaults
+   - pytorch
+   - conda-forge
 env_prompt: "(${BASE_PATH}/{default_env}) "
 pkgs_dirs:
    - \$HOME/.conda/pkgs
@@ -341,7 +345,14 @@ conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include s
 
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+# KGF(2022-09-13): explicitly specifying conda-forge channel here but not in the .condarc list of channels set
+# will cause issues with cloned environments being unable to download the package
 conda install -y -c conda-forge mamba
+# KGF: mamba is not on "defaults" channel, and no easy way to build from source via pip since it is a full
+# package manager, not just a Python module, etc.
+
+# - might not need to explicitly pass "-c conda-forge" now that .condarc
+# - should I "conda install -y -c defaults -c conda-forge mamba" so that dep packages follow same channel precedence as .condarc? doesnt seem to matter--- all ~4x deps get pulled from conda-forge
 conda update -y pip
 
 echo Clone TensorFlow

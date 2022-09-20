@@ -5,12 +5,41 @@
 - [x] Re-check NCCL performnace with Denis once the GPUDirect issues are resolved: https://cels-anl.slack.com/archives/C03G5PHHF7V/p1658946362840349
 - [x] Get copies of old, pre-AT Tcl Cray PE modulefiles for reference. Not possible, since they are not cached in `/lus/swift/pAT/soft/modulefiles`, but are part of the compute image in `/opt/cray/pe/lmod/modulefiles/core/PrgEnv-nvidia` e.g. 
   - [x] Understand `nvidia_already_loaded` etc. from https://cels-anl.slack.com/archives/GN23NRCHM/p1653506105162759?thread_ts=1653504764.783399&cid=GN23NRCHM (set to 0 in deprecated `PrgEnv-nvidia` and 1 in `PrgEnv-nvhpc` in AT Tcl modulefiles; **removed after AT**)
-- [] Get longer-term fix for `PrgEnv-gnu` failure building TF from source:
+- [x] Get longer-term fix for `PrgEnv-gnu` failure building TF from source:
 ```
 /opt/cray/pe/gcc/11.2.0/bin/redirect: line 5: /opt/cray/pe/gcc/11.2.0/bin/../snos/bin/redirect: No such file or directory
 ```
-**Workaround:** `export GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/snos/bin/gcc`
+**Workaround:** `export GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/snos/bin/gcc`. See 9ce52ceb1f0397822c9f1f177c5154aeb852a962. TensorFlow was never actually using `PrgEnv-nvhpc`; it was always pulling `export GCC_HOST_COMPILER_PATH=$(which gcc)` which is by default `/usr/bin/gcc` 7.5.0. 
 
+**Is it a bug or unintended/unsupported use by TensorFlow installer?** Probably the latter. TF installer automatically "dereferences" the soft link. See https://stackoverflow.com/questions/7665/how-to-resolve-symbolic-links-in-a-shell-script (`realpath`, `pwd -P`) Should never call the `redirect` shell script directly, only via `gcc` name. The directory from which you call that `gcc` soft link or `redirect` script doesnt matter:
+
+
+```
+❯ /opt/cray/pe/gcc/11.2.0/bin/gcc
+gcc: fatal error: no input files
+compilation terminated.
+
+❯ /opt/cray/pe/gcc/11.2.0/bin/redirect
+/opt/cray/pe/gcc/11.2.0/bin/redirect: line 5: /opt/cray/pe/gcc/11.2.0/bin/../snos/bin/redirect: No such file or
+directory
+
+❯ cd /opt/cray/pe/gcc/11.2.0/bin/
+
+❯ ./redirect
+./redirect: line 5: ./../snos/bin/redirect: No such file or directory
+
+❯ ll /opt/cray/pe/gcc/11.2.0/bin/gcc
+lrwxrwxrwx 1 root root 8 Aug 14  2021 /opt/cray/pe/gcc/11.2.0/bin/gcc -> redirect*
+
+❯ ls /opt/cray/pe/gcc/11.2.0/bin/redirect
+#! /bin/sh
+
+eval ${XTPE_SET-"set -ue"}
+
+$(dirname $0)/../snos/bin/$(basename $0) "$@"
+```
+
+- [ ] No clue what `XTPE_SET` is. Probably Cray-specific but not set in `PrgEnv-gnu`.
 - [ ] Add MXNet, Horovod support?
 - [ ] Fix and validate PyTorch+Hvd script with >1 nodes https://github.com/argonne-lcf/dlSoftwareTests/blob/main/pytorch/horovod_mnist.qsub.polaris.sh on Polaris. Works fine on ThetaGPU 2 nodes
 - [ ] Suggest and monitor potential changes to new post-AT `cudatoolkit-standalone/11.4.4` etc. Lua modulefiles (Ye Luo wrote them) whereby `#include <cuda_runtime.h>` is not found by the compiler. https://cels-anl.slack.com/archives/GN23NRCHM/p1658958235623699

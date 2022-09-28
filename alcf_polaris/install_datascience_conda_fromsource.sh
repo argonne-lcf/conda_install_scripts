@@ -91,10 +91,10 @@ module list
 # second module is the final module. First one is unloaded
 # note "switch" and "swap" are aliases in both Env Modules and Lmod
 
-module load PrgEnv-nvhpc
+module load PrgEnv-nvhpc  # not actually using NVHPC compilers to build TF
 #module load PrgEnv-gnu
 module load gcc-mixed # get 11.2.0 (2021) instead of /usr/bin/gcc 7.5 (2019)
-module load craype-accel-nvidia80  # wont load for PrgEnv-gnu, I believe
+module load craype-accel-nvidia80  # wont load for PrgEnv-gnu; see HPE Case 5367752190
 export MPICH_GPU_SUPPORT_ENABLED=1
 module list
 echo $MPICH_DIR
@@ -272,6 +272,7 @@ channels:
    - conda-forge
 env_prompt: "(${BASE_PATH}/{default_env}) "
 pkgs_dirs:
+   - ${CONDA_PKGS_DIRS}
    - \$HOME/.conda/pkgs
 EOF
 

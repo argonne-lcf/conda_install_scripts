@@ -9,6 +9,10 @@
 
 export PYTHONNOUSERSITE=1
 
+# move primary conda packages directory/cache away from ~/.conda/pkgs (4.2 GB currently)
+# hardlinks should be preserved even if these files are moved (not across filesystem boundaries)
+export CONDA_PKGS_DIRS=/lus/theta-fs0/software/thetagpu/conda/pkgs
+
 # unset *_TAG variables to build latest master
 DH_REPO_TAG="0.4.0"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
@@ -204,8 +208,13 @@ EOF
 # #   holds the value of '{prefix}'. Templating uses python's str.format()
 # #   method.
 cat > .condarc << EOF
+channels:
+   - defaults
+   - pytorch
+   - conda-forge
 env_prompt: "(${DH_INSTALL_SUBDIR}/{default_env}) "
 pkgs_dirs:
+   - ${CONDA_PKGS_DIRS}
    - \$HOME/.conda/pkgs
 EOF
 

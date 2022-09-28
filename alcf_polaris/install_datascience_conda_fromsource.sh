@@ -247,44 +247,6 @@ export LD_LIBRARY_PATH=\$CUDA_TOOLKIT_BASE/lib64:\$CUDNN_BASE/lib:\$NCCL_BASE/li
 export PATH=\$CUDA_TOOLKIT_BASE/bin:\$PATH
 EOF
 
-#######
-# create custom pythonstart in local area to deal with python readlines error
-cat > etc/pythonstart << EOF
-# startup script for python to enable saving of interpreter history and
-# enabling name completion
-
-# import needed modules
-import atexit
-import os
-#import readline
-import rlcompleter
-
-# where is history saved
-historyPath = os.path.expanduser("~/.pyhistory")
-
-# handler for saving history
-def save_history(historyPath=historyPath):
-    #import readline
-    #try:
-    #    readline.write_history_file(historyPath)
-    #except:
-    pass
-
-# read history, if it exists
-#if os.path.exists(historyPath):
-#    readline.set_history_length(10000)
-#    readline.read_history_file(historyPath)
-
-# register saving handler
-atexit.register(save_history)
-
-# enable completion
-#readline.parse_and_bind('tab: complete')
-
-# cleanup
-del os, atexit, rlcompleter, save_history, historyPath
-EOF
-
 
 PYTHON_VER=$(ls -d lib/python?.? | tail -c4)
 echo PYTHON_VER=$PYTHON_VER

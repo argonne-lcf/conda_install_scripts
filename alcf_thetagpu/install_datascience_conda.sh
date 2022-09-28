@@ -189,43 +189,6 @@ export LD_LIBRARY_PATH=$MPI/lib:$CUDA_BASE/lib64:$CUDNN_BASE/lib64:$NCCL_BASE/li
 export PATH=$MPI/bin:\$PATH
 EOF
 
-# create custom pythonstart in local area to deal with python readlines error
-cat > etc/pythonstart << EOF
-# startup script for python to enable saving of interpreter history and
-# enabling name completion
-
-# import needed modules
-import atexit
-import os
-#import readline
-import rlcompleter
-
-# where is history saved
-historyPath = os.path.expanduser("~/.pyhistory")
-
-# handler for saving history
-def save_history(historyPath=historyPath):
-    #import readline
-    #try:
-    #    readline.write_history_file(historyPath)
-    #except:
-    pass
-
-# read history, if it exists
-#if os.path.exists(historyPath):
-#    readline.set_history_length(10000)
-#    readline.read_history_file(historyPath)
-
-# register saving handler
-atexit.register(save_history)
-
-# enable completion
-#readline.parse_and_bind('tab: complete')
-
-# cleanup
-del os, atexit, rlcompleter, save_history, historyPath
-EOF
-
 # KGF: $CONDA_ENV (e.g. conda/2021-11-30) is not an official conda var; set by us in modulefile
 # $CONDA_DEFAULT_ENV (short name of current env) and $CONDA_PREFIX (full path) are official,
 # but barely documented. powerlevel10k wont parse env variables when outputting the prompt,
@@ -259,31 +222,6 @@ source $CONDA_PREFIX_PATH/setup.sh
 echo CONDA BINARY: $(which conda)
 echo CONDA VERSION: $(conda --version)
 echo PYTHON VERSION: $(python --version)
-
-cat > modulefile << EOF
-#%Module2.0
-## miniconda modulefile
-##
-proc ModulesHelp { } {
-   puts stderr "This module will add Miniconda to your environment"
-}
-
-set _module_name  [module-info name]
-set is_module_rm  [module-info mode remove]
-set sys           [uname sysname]
-set os            [uname release]
-set HOME          $::env(HOME)
-
-set CONDA_PREFIX                 $CONDA_PREFIX_PATH
-
-setenv CONDA_PREFIX              \$CONDA_PREFIX
-setenv PYTHONUSERBASE            \$HOME/.local/\${_module_name}
-setenv ENV_NAME                  \$_module_name
-setenv PYTHONSTARTUP             \$CONDA_PREFIX/etc/pythonstart
-
-puts stdout "source \$CONDA_PREFIX/setup.sh"
-module-whatis  "miniconda installation"
-EOF
 
 set -e
 

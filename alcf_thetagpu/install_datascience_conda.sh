@@ -513,7 +513,7 @@ pip install deepspeed
 
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-
+pip install pymongo optax flax
 
 env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
 # conda install -c conda-forge cupy cudnn cutensor nccl

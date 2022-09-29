@@ -626,7 +626,7 @@ pip install pytorch-lightning
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-
+pip install pymongo optax flax
 # https://github.com/mpi4jax/mpi4jax/issues/153
 # CUDA_ROOT=/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux python setup.py --verbose build_ext --inplace
 # be sure to "rm -rfd build/" to force .so libraries to rebuild if you change the build options, etc.

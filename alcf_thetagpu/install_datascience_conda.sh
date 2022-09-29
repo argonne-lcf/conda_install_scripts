@@ -9,6 +9,10 @@
 
 export PYTHONNOUSERSITE=1
 
+# move primary conda packages directory/cache away from ~/.conda/pkgs (4.2 GB currently)
+# hardlinks should be preserved even if these files are moved (not across filesystem boundaries)
+export CONDA_PKGS_DIRS=/lus/theta-fs0/software/thetagpu/conda/pkgs
+
 # unset *_TAG variables to build latest master
 DH_REPO_TAG="0.4.0"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
@@ -189,43 +193,6 @@ export LD_LIBRARY_PATH=$MPI/lib:$CUDA_BASE/lib64:$CUDNN_BASE/lib64:$NCCL_BASE/li
 export PATH=$MPI/bin:\$PATH
 EOF
 
-# create custom pythonstart in local area to deal with python readlines error
-cat > etc/pythonstart << EOF
-# startup script for python to enable saving of interpreter history and
-# enabling name completion
-
-# import needed modules
-import atexit
-import os
-#import readline
-import rlcompleter
-
-# where is history saved
-historyPath = os.path.expanduser("~/.pyhistory")
-
-# handler for saving history
-def save_history(historyPath=historyPath):
-    #import readline
-    #try:
-    #    readline.write_history_file(historyPath)
-    #except:
-    pass
-
-# read history, if it exists
-#if os.path.exists(historyPath):
-#    readline.set_history_length(10000)
-#    readline.read_history_file(historyPath)
-
-# register saving handler
-atexit.register(save_history)
-
-# enable completion
-#readline.parse_and_bind('tab: complete')
-
-# cleanup
-del os, atexit, rlcompleter, save_history, historyPath
-EOF
-
 # KGF: $CONDA_ENV (e.g. conda/2021-11-30) is not an official conda var; set by us in modulefile
 # $CONDA_DEFAULT_ENV (short name of current env) and $CONDA_PREFIX (full path) are official,
 # but barely documented. powerlevel10k wont parse env variables when outputting the prompt,
@@ -241,8 +208,13 @@ EOF
 # #   holds the value of '{prefix}'. Templating uses python's str.format()
 # #   method.
 cat > .condarc << EOF
+channels:
+   - defaults
+   - pytorch
+   - conda-forge
 env_prompt: "(${DH_INSTALL_SUBDIR}/{default_env}) "
 pkgs_dirs:
+   - ${CONDA_PKGS_DIRS}
    - \$HOME/.conda/pkgs
 EOF
 
@@ -260,31 +232,6 @@ echo CONDA BINARY: $(which conda)
 echo CONDA VERSION: $(conda --version)
 echo PYTHON VERSION: $(python --version)
 
-cat > modulefile << EOF
-#%Module2.0
-## miniconda modulefile
-##
-proc ModulesHelp { } {
-   puts stderr "This module will add Miniconda to your environment"
-}
-
-set _module_name  [module-info name]
-set is_module_rm  [module-info mode remove]
-set sys           [uname sysname]
-set os            [uname release]
-set HOME          $::env(HOME)
-
-set CONDA_PREFIX                 $CONDA_PREFIX_PATH
-
-setenv CONDA_PREFIX              \$CONDA_PREFIX
-setenv PYTHONUSERBASE            \$HOME/.local/\${_module_name}
-setenv ENV_NAME                  \$_module_name
-setenv PYTHONSTARTUP             \$CONDA_PREFIX/etc/pythonstart
-
-puts stdout "source \$CONDA_PREFIX/setup.sh"
-module-whatis  "miniconda installation"
-EOF
-
 set -e
 
 ########
@@ -293,7 +240,7 @@ set -e
 
 echo Conda install some dependencies
 
-conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba pymongo
+conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba pymongo conda-build
 
 # CUDA only: Add LAPACK support for the GPU if needed
 # conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
@@ -561,11 +508,12 @@ pip install scikit-image
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install pytorch-lightning
+pip install gpytorch
 pip install deepspeed
 
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-
+pip install pymongo optax flax
 
 env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
 # conda install -c conda-forge cupy cudnn cutensor nccl

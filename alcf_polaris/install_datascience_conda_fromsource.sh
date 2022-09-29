@@ -10,7 +10,7 @@
 BASE_PATH=$1
 
 export PYTHONNOUSERSITE=1
-# KGF: PBS mucks with user umask, changing it to 0077 on compute node
+# KGF: PBS used to mess with user umask, changing it to 0077 on compute node
 # dirs that were (2555/dr-xr-sr-x) on ThetaGPU became (2500/dr-x--S---)
 umask 0022
 
@@ -91,9 +91,10 @@ module list
 # second module is the final module. First one is unloaded
 # note "switch" and "swap" are aliases in both Env Modules and Lmod
 
-module load PrgEnv-nvhpc
+module load PrgEnv-nvhpc  # not actually using NVHPC compilers to build TF
 #module load PrgEnv-gnu
-module load craype-accel-nvidia80  # wont load for PrgEnv-gnu, I believe
+module load gcc-mixed # get 11.2.0 (2021) instead of /usr/bin/gcc 7.5 (2019)
+module load craype-accel-nvidia80  # wont load for PrgEnv-gnu; see HPE Case 5367752190
 export MPICH_GPU_SUPPORT_ENABLED=1
 module list
 echo $MPICH_DIR
@@ -101,8 +102,8 @@ echo $MPICH_DIR
 DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-TF_REPO_TAG="v2.9.1"
-PT_REPO_TAG="v1.12.0" #"v1.11.0"
+TF_REPO_TAG="v2.10.0"
+PT_REPO_TAG="v1.12.1" #"v1.11.0"
 HOROVOD_REPO_TAG="v0.25.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
@@ -117,33 +118,38 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 ############################
 
 CUDA_VERSION_MAJOR=11
-CUDA_VERSION_MINOR=5
+CUDA_VERSION_MINOR=6
 CUDA_VERSION_MINI=2
-CUDA_VERSION_BUILD=495.29.05
+#CUDA_VERSION_BUILD=495.29.05
 CUDA_VERSION=$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
 CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
-CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
+#CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda_${CUDA_VERSION_FULL}_${CUDA_VERSION_BUILD}_linux
+
+# using short names on Polaris:
+CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda-${CUDA_VERSION_FULL}
 
 CUDA_DEPS_BASE=/soft/libraries/
 
 CUDNN_VERSION_MAJOR=8
-CUDNN_VERSION_MINOR=3
-CUDNN_VERSION_EXTRA=3.40
+CUDNN_VERSION_MINOR=4
+CUDNN_VERSION_EXTRA=1.50
 CUDNN_VERSION=$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR.$CUDNN_VERSION_EXTRA
 CUDNN_BASE=$CUDA_DEPS_BASE/cudnn/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
 
 NCCL_VERSION_MAJOR=2
-NCCL_VERSION_MINOR=12.10-1
+NCCL_VERSION_MINOR=14.3-1
 NCCL_VERSION=$NCCL_VERSION_MAJOR.$NCCL_VERSION_MINOR
 NCCL_BASE=$CUDA_DEPS_BASE/nccl/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
-# KGF: no Extended Compatibility in NCCL --- use older NCCL version built with CUDA 11.0 until
-# GPU device kernel driver upgraded from 11.0 ---> 11.4 in November 2021
-#NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64
+# KGF: no Extended Compatibility in NCCL --- use older NCCL version built with earlier CUDA version until
+# GPU device kernel driver is upgraded
 
+# https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_VERSION_MAJOR=8
-TENSORRT_VERSION_MINOR=2.5.1
+TENSORRT_VERSION_MINOR=4.3.1
+# TENSORRT_VERSION_MAJOR=8
+# TENSORRT_VERSION_MINOR=4.3.1
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
-#TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+# https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
 
 
@@ -169,11 +175,10 @@ export TF_NEED_CUDA=1
 # KGF: TensorRT 8.x only supported in TensorFlow as of 2021-06-24 (f8e2aa0db)
 # https://github.com/tensorflow/tensorflow/issues/49150
 # https://github.com/tensorflow/tensorflow/pull/48917
-# and TRT 7.x is incompatible with CUDA 11.3 (requires 10.2, 11.0, 11.1, 11.2)
-# Disable TF+TensorRT for now
 export TF_NEED_TENSORRT=1
 export TF_CUDA_PATHS=$CUDA_TOOLKIT_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
-export GCC_HOST_COMPILER_PATH=$(which gcc)
+#export GCC_HOST_COMPILER_PATH=$(which gcc)
+export GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/snos/bin/gcc
 export CC_OPT_FLAGS="-march=native -Wno-sign-compare"
 export TF_SET_ANDROID_WORKSPACE=0
 
@@ -242,44 +247,6 @@ export LD_LIBRARY_PATH=\$CUDA_TOOLKIT_BASE/lib64:\$CUDNN_BASE/lib:\$NCCL_BASE/li
 export PATH=\$CUDA_TOOLKIT_BASE/bin:\$PATH
 EOF
 
-#######
-# create custom pythonstart in local area to deal with python readlines error
-cat > etc/pythonstart << EOF
-# startup script for python to enable saving of interpreter history and
-# enabling name completion
-
-# import needed modules
-import atexit
-import os
-#import readline
-import rlcompleter
-
-# where is history saved
-historyPath = os.path.expanduser("~/.pyhistory")
-
-# handler for saving history
-def save_history(historyPath=historyPath):
-    #import readline
-    #try:
-    #    readline.write_history_file(historyPath)
-    #except:
-    pass
-
-# read history, if it exists
-#if os.path.exists(historyPath):
-#    readline.set_history_length(10000)
-#    readline.read_history_file(historyPath)
-
-# register saving handler
-atexit.register(save_history)
-
-# enable completion
-#readline.parse_and_bind('tab: complete')
-
-# cleanup
-del os, atexit, rlcompleter, save_history, historyPath
-EOF
-
 
 PYTHON_VER=$(ls -d lib/python?.? | tail -c4)
 echo PYTHON_VER=$PYTHON_VER
@@ -299,8 +266,13 @@ echo PYTHON_VER=$PYTHON_VER
 # #   holds the value of '{prefix}'. Templating uses python's str.format()
 # #   method.
 cat > .condarc << EOF
+channels:
+   - defaults
+   - pytorch
+   - conda-forge
 env_prompt: "(${BASE_PATH}/{default_env}) "
 pkgs_dirs:
+   - ${CONDA_PKGS_DIRS}
    - \$HOME/.conda/pkgs
 EOF
 
@@ -332,11 +304,18 @@ set -e
 
 echo Conda install some dependencies
 
-conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba
+conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba conda-build
 
 # CUDA only: Add LAPACK support for the GPU if needed
-#conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-#conda install -y -c conda-forge mamba
+conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+# KGF(2022-09-13): explicitly specifying conda-forge channel here but not in the .condarc list of channels set
+# will cause issues with cloned environments being unable to download the package
+conda install -y -c conda-forge mamba
+# KGF: mamba is not on "defaults" channel, and no easy way to build from source via pip since it is a full
+# package manager, not just a Python module, etc.
+
+# - might not need to explicitly pass "-c conda-forge" now that .condarc
+# - should I "conda install -y -c defaults -c conda-forge mamba" so that dep packages follow same channel precedence as .condarc? doesnt seem to matter--- all ~4x deps get pulled from conda-forge
 conda update -y pip
 
 echo Clone TensorFlow
@@ -392,13 +371,13 @@ export TMP=/tmp
 # However, the tensorflow build environment saw that `gcc` was  symlink and dereferenced it to set:
 # GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/bin/redirect
 # at compile time, which fails. So we instead fix the gcc to use this:
-export GCC_HOST_COMPILER_PATH=$(which gcc)
+# KGF: see above, around L180
 
 echo Bazel Build TensorFlow
 # KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores)
 # Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max
 # even if --jobs=500
-HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
+HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" //tensorflow/tools/pip_package:build_pip_package
 echo Run wheel building
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEELS_PATH
 echo Install TensorFlow
@@ -423,8 +402,21 @@ else
 fi
 
 echo Install PyTorch
+module unload gcc-mixed
 module load PrgEnv-gnu
+
+# KGF: wont load due to modulefile: prereq_any(atleast("cudatoolkit","11.0"), "nvhpc", "PrgEnv-nvhpc")
+# need to relax this or change to prereq_any(atleast("cudatoolkit-standalone","11.0"), "nvhpc", "PrgEnv-nvhpc")
+# KGF: any way to "module load --force"???
+#module load craype-accel-nvidia80
+export CRAY_ACCEL_TARGET="nvidia80"
+export CRAY_TCMALLOC_MEMFS_FORCE="1"
+export CRAYPE_LINK_TYPE="dynamic"
+export CRAY_ACCEL_VENDOR="nvidia"
+
 module list
+echo "CRAY_ACCEL_TARGET= $CRAY_ACCEL_TARGET"
+echo "CRAYPE_LINK_TYPE = $CRAYPE_LINK_TYPE"
 
 export USE_CUDA=1
 export USE_CUDNN=1
@@ -473,10 +465,9 @@ echo Build Horovod Wheel using MPI from $MPICH_DIR and NCCL from ${NCCL_BASE}
 #export LD_LIBRARY_PATH=$CRAY_MPICH_PREFIX/lib-abi-mpich:$NCCL_BASE/lib:$LD_LIBRARY_PATH
 #export PATH=$CRAY_MPICH_PREFIX/bin:$PATH
 
-# echo MPI from environment: $MPICH_DIR
-#MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 python setup.py bdist_wheel
-echo "MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 HOROVOD_CUDA_HOME=${CUDA_TOOLKIT_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel"
-MPI_ROOT=$MPICH_DIR HOROVOD_WITH_MPI=1 HOROVOD_CUDA_HOME=${CUDA_TOOLKIT_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
+# https://github.com/horovod/horovod/issues/3696#issuecomment-1248921736
+echo "HOROVOD_WITH_MPI=1 HOROVOD_CUDA_HOME=${CUDA_TOOLKIT_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel"
+HOROVOD_WITH_MPI=1 HOROVOD_CUDA_HOME=${CUDA_TOOLKIT_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
 # HOROVOD_GPU_ALLREDUCE=MPI, HOROVOD_GPU_OPERATIONS=MPI
 
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
@@ -492,7 +483,13 @@ pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
 
 cd $BASE_PATH
-MPICC="cc -shared" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
+# KGF (2022-09-09):
+MPICC="cc -shared -target-accel=nvidia80" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
+
+# KGF (2022-09-09): why did CUDA Aware mpi4py work for this install line, with PrgEnv-gnu but no craype-accel-nvidia80 module loaded, and no manual "CRAY_ACCEL_TARGET" exported ... but Horovod complains with:
+# "MPIDI_CRAY_init: GPU_SUPPORT_ENABLED is requested, but GTL library is not linked"
+# iff MPICH_GPU_SUPPORT_ENABLED=1 at runtime
+#MPICC="cc -shared" pip install --force-reinstall --no-cache-dir --no-binary=mpi4py mpi4py
 
 # echo Clone Mpi4py
 # git clone $MPI4PY_REPO_URL
@@ -563,6 +560,10 @@ else
     pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
 
+# PyTorch Geometric--- Hardcoding 1.12.0 even though installing 1.12.1
+pip install torch-scatter -f https://data.pyg.org/whl/torch-1.12.0+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+pip install torch-sparse -f https://data.pyg.org/whl/torch-1.12.0++cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+pip install torch-geometric
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
@@ -620,11 +621,12 @@ pip install transformers
 pip install scikit-image
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-pip install deepspeed
+pip install 'deepspeed>=0.7.2'
 pip install pytorch-lightning
+pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-
+pip install pymongo optax flax
 # https://github.com/mpi4jax/mpi4jax/issues/153
 # CUDA_ROOT=/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux python setup.py --verbose build_ext --inplace
 # be sure to "rm -rfd build/" to force .so libraries to rebuild if you change the build options, etc.

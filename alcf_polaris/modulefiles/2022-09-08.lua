@@ -2,9 +2,9 @@ help([[
 The Anaconda python environment.
 Includes build of TensorFlow, PyTorch, DeepHyper, Horovd from tagged versions or develop/master branch of the git repos
 DeepHyper version tag: 0.4.2
-TensorFlow version tag: 2.9.1
+TensorFlow version tag: 2.10.0
 Horovod version tag: 0.25.0
-PyTorch version tag: 1.12.0
+PyTorch version tag: 1.12.1
 
 You can modify this environment as follows:
 
@@ -21,7 +21,7 @@ https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
 
 whatis("Name: conda")
 -- note, miniconda installer often lags behind conda binary version, which is updated in the install script
-whatis("Version: 4.13.0")
+whatis("Version: 4.14.0")
 whatis("Category: python conda")
 whatis("Keywords: python conda")
 whatis("Description: Base Anaconda python environment")
@@ -30,7 +30,7 @@ whatis("URL: https://docs.conda.io/projects/conda/en/latest/user-guide/getting-s
 depends_on("PrgEnv-gnu")
 
 
-local conda_dir = "/soft/datascience/conda/2022-07-19/mconda3"
+local conda_dir = "/soft/datascience/conda/2022-09-08/mconda3"
 local funcs = "conda __conda_activate __conda_hashr __conda_reactivate __add_sys_prefix_to_path"
 local home = os.getenv("HOME")
 
@@ -52,13 +52,13 @@ unsetenv("PYTHONSTARTUP") -- ,pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
 -- prepend_path("LD_LIBRARY_PATH","/opt/nvidia/hpc_sdk/Linux_x86_64/21.9/cuda/lib64")
-prepend_path("LD_LIBRARY_PATH","/soft/libraries/cudnn/cudnn-11.5-linux-x64-v8.3.3.40/lib")
-prepend_path("PATH","/soft/libraries/nccl/nccl_2.12.10-1+cuda11.5_x86_64/include")
-prepend_path("LD_LIBRARY_PATH","/soft/libraries/nccl/nccl_2.12.10-1+cuda11.5_x86_64/lib")
-prepend_path("LD_LIBRARY_PATH","/soft/libraries/trt/TensorRT-8.2.5.1.Linux.x86_64-gnu.cuda-11.5.cudnn8.3/lib")
+prepend_path("LD_LIBRARY_PATH","/soft/libraries/cudnn/cudnn-11.6-linux-x64-v8.4.1.50/lib")
+prepend_path("PATH","/soft/libraries/nccl/nccl_2.14.3-1+cuda11.6_x86_64/include")
+prepend_path("LD_LIBRARY_PATH","/soft/libraries/nccl/nccl_2.14.3-1+cuda11.6_x86_64/lib")
+prepend_path("LD_LIBRARY_PATH","/soft/libraries/trt/TensorRT-8.4.3.1.Linux.x86_64-gnu.cuda-11.6.cudnn8.4/lib")
 
 
-local cuda_home = "/soft/compilers/cudatoolkit/cuda_11.5.2_495.29.05_linux"
+local cuda_home = "/soft/compilers/cudatoolkit/cuda-11.6.2"
 setenv("CUDA_HOME",cuda_home)
 prepend_path("PATH",pathJoin(cuda_home,"bin/"))
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))

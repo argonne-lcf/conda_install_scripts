@@ -619,6 +619,7 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/onnx-tensorflow/issues/422
 pip install transformers
 pip install scikit-image
+pip install line_profiler
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install 'deepspeed>=0.7.2'

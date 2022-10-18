@@ -418,6 +418,8 @@ pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
 
 echo "Adding module snooper so we can tell what modules people are using"
+# KGF: TODO, modify this path at the top of the script somehow; pick correct sitecustomize_polaris.py, etc.
+# wont error out if first path does not exist; will just make a broken symbolic link
 ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py
 
 # DeepHyper stuff
@@ -506,6 +508,7 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 pip install transformers
 pip install scikit-image
 pip install line_profiler
+pip install torch-tb-profiler
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install pytorch-lightning

@@ -505,7 +505,7 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/onnx-tensorflow/issues/1010
 # https://github.com/onnx/tensorflow-onnx/issues/1793
 # https://github.com/onnx/onnx-tensorflow/issues/422
-pip install transformers
+pip install transformers evaluate datasets
 pip install scikit-image
 pip install line_profiler
 pip install torch-tb-profiler

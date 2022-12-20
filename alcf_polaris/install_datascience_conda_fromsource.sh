@@ -562,6 +562,25 @@ else
     pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
 
+pip install 'libensemble'
+
+#pip install 'libensemble[extras]'
+# KGF: currently fails when building petsc4py wheel:
+#          petsc: this package cannot be built as a wheel (???)
+#     ...
+#      error: PETSc not found
+# No one is maintaining a PETSc module on Polaris right now; also don't really want to add a cross-module dep,
+# nor build PETSc from source myself
+
+# https://libensemble.readthedocs.io/en/main/introduction.html#dependencies
+# - PETSc/TAO - Can optionally be installed by pip along with petsc4py (KGF: true??)
+# PETSc and NLopt must be built with shared libraries enabled and be present in sys.path (e.g., via setting the PYTHONPATH environment variable).
+
+# KGF: told to hold off on adding these as of 2022-12-20. Continue to advise user-local installs of fast-moving development branches
+# pip install --pre balsam
+# pip install parsl==1.3.0.dev0
+
+
 # PyTorch Geometric--- Hardcoding 1.12.0 even though installing 1.12.1
 pip install torch-scatter -f https://data.pyg.org/whl/torch-1.12.0+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
 pip install torch-sparse -f https://data.pyg.org/whl/torch-1.12.0++cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html

@@ -99,7 +99,7 @@ export MPICH_GPU_SUPPORT_ENABLED=1
 module list
 echo $MPICH_DIR
 # unset *_TAG variables to build latest master
-DH_REPO_TAG="0.4.2"
+#DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 TF_REPO_TAG="v2.11.0"
@@ -554,7 +554,7 @@ ln -s /soft/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import sit
 
 # DeepHyper stuff
 
-pip install 'tensorflow_probability==0.17.0'
+pip install 'tensorflow_probability==0.19.0'
 # KGF: 0.17.0 (2022-06-06) tested against TF 2.9.1
 # KGF: 0.14.0 (2021-09-15) only compatible with TF 2.6.0
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
@@ -572,7 +572,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
-    pip install ".[analytics,hvd]"  # deepspace extra preseent in v0.3.3 but removed in develop branch
+    pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"  # deepspace extra preseent in v0.3.3 but removed in develop branch
     cd ..
     cd $BASE_PATH
 else
@@ -627,7 +627,7 @@ cd $BASE_PATH
 echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
 cd vision
-git checkout v0.13.0
+git checkout v0.14.1
 # KGF: this falls back to building a deprecated .egg format with easy_install, which puts an entry in
 # mconda3/lib/python3.8/site-packages/easy-install.pth, causing read-only premissions problems in cloned
 # environments.

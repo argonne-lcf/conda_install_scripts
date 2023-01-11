@@ -112,6 +112,16 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 # MPI4PY_REPO_URL=https://github.com/mpi4py/mpi4py.git
 # MPI4PY_REPO_TAG="3.1.3"
 
+############################
+# Manual version checks/changes below that must be made compatible with TF/Torch/CUDA versions above:
+# - pytorch vision
+# - magma-cuda
+# - tensorflow_probability
+# - torch-geometric, torch-sparse, torch-scatter, pyg-lib
+# - cupy
+# - jax
+###########################
+
 
 ###########################################
 # CUDA path and version information
@@ -314,13 +324,11 @@ conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include s
 
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-# KGF(2022-09-13): explicitly specifying conda-forge channel here but not in the .condarc list of channels set
-# will cause issues with cloned environments being unable to download the package
+# KGF(2022-09-13): note, if you were to explicitly specifying conda-forge channel here but not in the global or local .condarc list of channels set, it would cause issues with cloned environments being unable to download the package
 conda install -y -c conda-forge mamba
 # KGF: mamba is not on "defaults" channel, and no easy way to build from source via pip since it is a full
 # package manager, not just a Python module, etc.
-
-# - might not need to explicitly pass "-c conda-forge" now that .condarc
+# - might not need to explicitly pass "-c conda-forge" now that .condarc is updated
 # - should I "conda install -y -c defaults -c conda-forge mamba" so that dep packages follow same channel precedence as .condarc? doesnt seem to matter--- all ~4x deps get pulled from conda-forge
 conda update -y pip
 
@@ -601,9 +609,9 @@ pip install 'libensemble'
 # pip install parsl==1.3.0.dev0
 
 
-# PyTorch Geometric--- Hardcoding 1.12.0 even though installing 1.12.1
-pip install torch-scatter -f https://data.pyg.org/whl/torch-1.12.0+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
-pip install torch-sparse -f https://data.pyg.org/whl/torch-1.12.0++cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+# PyTorch Geometric--- Hardcoding PyTorch 1.13.0, CUDA 11.7  even though installing Pytorch 1.13.1, CUDA 11.8 above
+pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
+#pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.0+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
 pip install torch-geometric
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
@@ -648,8 +656,10 @@ cd $BASE_PATH
 pip install --no-deps timm
 pip install opencv-python-headless
 
-pip install onnx
-pip install onnxruntime-gpu  # onnxruntime is CPU-only. onnxruntime-gpu includes most CPU abilities
+# onnx 1.13.0 pushes protobuf to >3.20.2 and "tensorflow 2.11.0 requires protobuf<3.20,>=3.9.2, but you have protobuf 3.20.3 which is incompatible."
+#  onnx runtime 1.13.1 pushes numpy>=1.21.6, which installs 1.24.x for some reason, breaking <1.22 compat with numba
+pip install 'onnx==1.12.0' 'onnxruntime-gpu==1.12.1'
+# onnxruntime is CPU-only. onnxruntime-gpu includes most CPU abilities
 # https://github.com/microsoft/onnxruntime/issues/10685
 # onnxruntime probably wont work on ThetaGPU single-gpu queue with CPU thread affinity
 # https://github.com/microsoft/onnxruntime/issues/8313
@@ -658,18 +668,22 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/onnx-tensorflow/issues/1010
 # https://github.com/onnx/tensorflow-onnx/issues/1793
 # https://github.com/onnx/onnx-tensorflow/issues/422
+pip install huggingface-hub
 pip install transformers evaluate datasets
 pip install scikit-image
 pip install line_profiler
 pip install torch-tb-profiler
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
-pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+# https://docs.cupy.dev/en/stable/install.html
+#pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+pip install cupy-cuda${CUDA_VERSION_MAJOR}x
 pip install 'deepspeed>=0.7.2'
 pip install pytorch-lightning
 pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+#pip install "jax[cuda11_cudnn86]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install pymongo optax flax
 # https://github.com/mpi4jax/mpi4jax/issues/153
 # CUDA_ROOT=/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux python setup.py --verbose build_ext --inplace

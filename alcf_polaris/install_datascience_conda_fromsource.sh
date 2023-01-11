@@ -201,11 +201,11 @@ CONDAVER='py38_4.12.0'
 # CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
 CONDA_INSTALL_SH=Miniconda3-$CONDAVER-Linux-x86_64.sh
-echo Downloading miniconda installer
+echo "Downloading miniconda installer"
 wget $CONDA_DOWNLOAD_URL/$CONDA_INSTALL_SH -P $DOWNLOAD_PATH
 chmod +x $DOWNLOAD_PATH/$CONDA_INSTALL_SH
 
-echo Installing Miniconda
+echo "Installing Miniconda"
 $DOWNLOAD_PATH/$CONDA_INSTALL_SH -b -p $CONDA_PREFIX_PATH -u
 
 cd $CONDA_PREFIX_PATH
@@ -291,9 +291,9 @@ conda install -y cmake
 # and/or first network check. Make sure "set+e" during above sourced setup.sh since the network check "wget" might
 # return nonzero code if network is offline
 
-echo CONDA BINARY: $(which conda)
-echo CONDA VERSION: $(conda --version)
-echo PYTHON VERSION: $(python --version)
+echo "CONDA BINARY: $(which conda)"
+echo "CONDA VERSION: $(conda --version)"
+echo "PYTHON VERSION: $(python --version)"
 
 set -e
 
@@ -302,7 +302,7 @@ set -e
 ########
 
 
-echo Conda install some dependencies
+echo "Conda install some dependencies"
 
 conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba conda-build
 
@@ -318,34 +318,34 @@ conda install -y -c conda-forge mamba
 # - should I "conda install -y -c defaults -c conda-forge mamba" so that dep packages follow same channel precedence as .condarc? doesnt seem to matter--- all ~4x deps get pulled from conda-forge
 conda update -y pip
 
-echo Clone TensorFlow
+echo "Clone TensorFlow"
 cd $BASE_PATH
 git clone $TF_REPO_URL
 cd tensorflow
 
 if [[ -z "$TF_REPO_TAG" ]]; then
-    echo Checkout TensorFlow master
+    echo "Checkout TensorFlow master"
 else
-    echo Checkout TensorFlow tag $TF_REPO_TAG
+    echo "Checkout TensorFlow tag $TF_REPO_TAG"
     git checkout --recurse-submodules $TF_REPO_TAG
 fi
 BAZEL_VERSION=$(cat .bazelversion)
-echo Found TensorFlow depends on Bazel version $BAZEL_VERSION
+echo "Found TensorFlow depends on Bazel version $BAZEL_VERSION"
 
 cd $BASE_PATH
-echo Download Bazel binaries
+echo "Download Bazel binaries"
 BAZEL_DOWNLOAD_URL=https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION
 BAZEL_INSTALL_SH=bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
 BAZEL_INSTALL_PATH=$BASE_PATH/bazel-$BAZEL_VERSION
 wget $BAZEL_DOWNLOAD_URL/$BAZEL_INSTALL_SH -P $DOWNLOAD_PATH
 chmod +x $DOWNLOAD_PATH/$BAZEL_INSTALL_SH
-echo Intall Bazel in $BAZEL_INSTALL_PATH
+echo "Install Bazel in $BAZEL_INSTALL_PATH"
 bash $DOWNLOAD_PATH/$BAZEL_INSTALL_SH --prefix=$BAZEL_INSTALL_PATH
 export PATH=$PATH:/$BAZEL_INSTALL_PATH/bin
 
 cd $BASE_PATH
 
-echo Install TensorFlow Dependencies
+echo "Install TensorFlow Dependencies"
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
@@ -354,7 +354,7 @@ pip install -U pip wheel mock gast portpicker pydot packaging
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
-echo Configure TensorFlow
+echo "Configure TensorFlow"
 cd tensorflow
 export PYTHON_BIN_PATH=$(which python)
 export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0])')
@@ -373,14 +373,14 @@ export TMP=/tmp
 # at compile time, which fails. So we instead fix the gcc to use this:
 # KGF: see above, around L180
 
-echo Bazel Build TensorFlow
+echo "Bazel Build TensorFlow"
 # KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores)
 # Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max
 # even if --jobs=500
 HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" //tensorflow/tools/pip_package:build_pip_package
-echo Run wheel building
+echo "Run wheel building"
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEELS_PATH
-echo Install TensorFlow
+echo "Install TensorFlow"
 pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
 
 
@@ -390,18 +390,18 @@ pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
 
 
 cd $BASE_PATH
-echo Clone PyTorch
+echo "Clone PyTorch"
 
 git clone --recursive $PT_REPO_URL
 cd pytorch
 if [[ -z "$PT_REPO_TAG" ]]; then
-    echo Checkout PyTorch master
+    echo "Checkout PyTorch master"
 else
-    echo Checkout PyTorch tag $PT_REPO_TAG
+    echo "Checkout PyTorch tag $PT_REPO_TAG"
     git checkout --recurse-submodules $PT_REPO_TAG
 fi
 
-echo Install PyTorch
+echo "Install PyTorch"
 module unload gcc-mixed
 module load PrgEnv-gnu
 
@@ -434,10 +434,10 @@ export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
 #export TENSORRT_INCLUDE_DIR=$TENSORRT_BASE/include
 CC=$(which cc) CXX=$(which CC) python setup.py bdist_wheel
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
-echo copying pytorch wheel file $PT_WHEEL
+echo "copying pytorch wheel file $PT_WHEEL"
 cp $PT_WHEEL $WHEELS_PATH/
 cd $WHEELS_PATH
-echo pip installing $(basename $PT_WHEEL)
+echo "pip installing $(basename $PT_WHEEL)"
 pip install $(basename $PT_WHEEL)
 
 ################################################
@@ -446,19 +446,19 @@ pip install $(basename $PT_WHEEL)
 
 cd $BASE_PATH
 
-echo Clone Horovod
+echo "Clone Horovod"
 
 git clone --recursive $HOROVOD_REPO_URL
 cd horovod
 
 if [[ -z "$HOROVOD_REPO_TAG" ]]; then
-    echo Checkout Horovod master
+    echo "Checkout Horovod master"
 else
-    echo Checkout Horovod tag $HOROVOD_REPO_TAG
+    echo "Checkout Horovod tag $HOROVOD_REPO_TAG"
     git checkout --recurse-submodules $HOROVOD_REPO_TAG
 fi
 
-echo Build Horovod Wheel using MPI from $MPICH_DIR and NCCL from ${NCCL_BASE}
+echo "Build Horovod Wheel using MPI from $MPICH_DIR and NCCL from ${NCCL_BASE}"
 # https://horovod.readthedocs.io/en/stable/gpus_include.html
 # If you installed NCCL 2 using the nccl-<version>.txz package, you should specify the path to NCCL 2 using the HOROVOD_NCCL_HOME environment variable.
 # add the library path to LD_LIBRARY_PATH environment variable or register it in /etc/ld.so.conf.
@@ -473,14 +473,11 @@ HOROVOD_WITH_MPI=1 HOROVOD_CUDA_HOME=${CUDA_TOOLKIT_BASE} HOROVOD_NCCL_HOME=$NCC
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEELS_PATH/
 HVD_WHEEL=$(find $WHEELS_PATH/ -name "horovod*.whl" -type f)
-echo Install Horovod $HVD_WHEEL
+echo "Install Horovod $HVD_WHEEL"
 pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 
-echo Pip install TensorBoard profiler plugin
+echo "Pip install TensorBoard profiler plugin"
 pip install tensorboard_plugin_profile tensorflow_addons tensorflow-datasets
-echo Pip install other packages
-pip install pandas h5py matplotlib scikit-learn scipy pytest
-pip install sacred wandb # Denis requests, April 2022
 
 cd $BASE_PATH
 # KGF (2022-09-09):
@@ -526,8 +523,25 @@ MPICC="cc -shared -target-accel=nvidia80" pip install --force-reinstall --no-cac
 # MPI4PY_WHL=$(find $WHEELS_PATH/ -name "mpi4py*.whl" -type f)
 # echo Install mpi4py $MPI4PY_WHL
 # python -m pip install --force-reinstall $MPI4PY_WHL
+echo "Pip install parallel h5py"
+cd $BASE_PATH
+git clone https://github.com/h5py/h5py.git
+cd h5py
+module load cray-hdf5-parallel
+# corey used "CC=/opt/cray/pe/hdf5-parallel/1.12.1.3/bin/h5pcc"
+# ❯ h5pcc -show
+# cc -DpgiFortran -Wl,-rpath -Wl,/opt/cray/pe/hdf5-parallel/1.12.1.3/gnu/9.1/lib
+export CC=cc
+export HDF5_MPI="ON"
+##export HDF5_DIR="/path/to/parallel/hdf5"  # If this isn't found by default
+pip install .
 
-echo Adding module snooper so we can tell what modules people are using
+echo "Pip install other packages"
+pip install pandas matplotlib scikit-learn scipy pytest
+pip install sacred wandb # Denis requests, April 2022
+
+
+echo "Adding module snooper so we can tell what modules people are using"
 # KGF: TODO, modify this path at the top of the script somehow; pick correct sitecustomize_polaris.py, etc.
 # wont error out if first path does not exist; will just make a broken symbolic link
 ln -s /soft/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py
@@ -540,7 +554,7 @@ pip install 'tensorflow_probability==0.17.0'
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
 if [[ -z "$DH_REPO_TAG" ]]; then
-    echo Clone and checkout DeepHyper develop branch from git
+    echo "Clone and checkout DeepHyper develop branch from git"
     cd $BASE_PATH
     git clone $DH_REPO_URL
     cd deephyper
@@ -557,7 +571,7 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd $BASE_PATH
 else
     # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
-    echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
+    echo "Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI"
     pip install 'balsam-flow==0.3.8'  # balsam feature pinned to 0.3.8 from November 2019
     pip install "deephyper[analytics,balsam,deepspace]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
@@ -619,7 +633,7 @@ python setup.py bdist_wheel
 VISION_WHEEL=$(find dist/ -name "torchvision*.whl" -type f)
 cp $VISION_WHEEL $WHEELS_PATH/
 cd $WHEELS_PATH
-echo pip installing $(basename $VISION_WHEEL)
+echo "pip installing $(basename $VISION_WHEEL)"
 # KGF: unlike "python setup.py install", still tries to install PyTorch again by default, despite being a local wheel
 pip install --force-reinstall --no-deps $(basename $VISION_WHEEL)
 
@@ -696,7 +710,7 @@ cd $BASE_PATH
 # ANSWER: https://github.com/tensorflow/tensorflow/commit/e457b3604ac31e7e0e38eaae8622509302f8c7d6#diff-f526feeafa1000c4773410bdc5417c4022cb2c7b686ae658b629beb541ae9112
 # They were temporarily using keras-nightly for the dep; switched away from that on 2021-08-09.
 
-echo Cleaning up
+echo "Cleaning up"
 chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 

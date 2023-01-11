@@ -102,9 +102,9 @@ echo $MPICH_DIR
 DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
-TF_REPO_TAG="v2.10.0"
-PT_REPO_TAG="v1.12.1" #"v1.11.0"
-HOROVOD_REPO_TAG="v0.25.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
+TF_REPO_TAG="v2.11.0"
+PT_REPO_TAG="v1.13.1"
+HOROVOD_REPO_TAG="v0.26.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
@@ -118,8 +118,8 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 ############################
 
 CUDA_VERSION_MAJOR=11
-CUDA_VERSION_MINOR=6
-CUDA_VERSION_MINI=2
+CUDA_VERSION_MINOR=8
+CUDA_VERSION_MINI=0
 #CUDA_VERSION_BUILD=495.29.05
 CUDA_VERSION=$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
 CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
@@ -131,13 +131,18 @@ CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda-${CUDA_VERSION_FULL}
 CUDA_DEPS_BASE=/soft/libraries/
 
 CUDNN_VERSION_MAJOR=8
-CUDNN_VERSION_MINOR=4
-CUDNN_VERSION_EXTRA=1.50
+CUDNN_VERSION_MINOR=6
+CUDNN_VERSION_EXTRA=0.163
+# KGF: try this next; not clear if compatible with below trt
+# CUDNN_VERSION_MAJOR=8
+# CUDNN_VERSION_MINOR=7
+# CUDNN_VERSION_EXTRA=0.84
 CUDNN_VERSION=$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR.$CUDNN_VERSION_EXTRA
-CUDNN_BASE=$CUDA_DEPS_BASE/cudnn/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
+#CUDNN_BASE=$CUDA_DEPS_BASE/cudnn/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
+CUDNN_BASE=$CUDA_DEPS_BASE/cudnn/cudnn-$CUDA_VERSION_MAJOR-linux-x64-v$CUDNN_VERSION
 
 NCCL_VERSION_MAJOR=2
-NCCL_VERSION_MINOR=14.3-1
+NCCL_VERSION_MINOR=16.2-1
 NCCL_VERSION=$NCCL_VERSION_MAJOR.$NCCL_VERSION_MINOR
 NCCL_BASE=$CUDA_DEPS_BASE/nccl/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
 # KGF: no Extended Compatibility in NCCL --- use older NCCL version built with earlier CUDA version until
@@ -145,12 +150,13 @@ NCCL_BASE=$CUDA_DEPS_BASE/nccl/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
 
 # https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_VERSION_MAJOR=8
-TENSORRT_VERSION_MINOR=4.3.1
-# TENSORRT_VERSION_MAJOR=8
-# TENSORRT_VERSION_MINOR=4.3.1
+TENSORRT_VERSION_MINOR=5.2.2
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 # https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+
+# is the following trt compatible with cuDNN 8.7 too?
+# TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.6
 
 
 ###########################################

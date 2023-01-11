@@ -52,7 +52,7 @@ unsetenv("PYTHONSTARTUP") -- ,pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
 -- prepend_path("LD_LIBRARY_PATH","/opt/nvidia/hpc_sdk/Linux_x86_64/21.9/cuda/lib64")
-prepend_path("LD_LIBRARY_PATH","/soft/libraries/cudnn/cudnn-11.8-linux-x64-v8.6.0.163/lib")
+prepend_path("LD_LIBRARY_PATH","/soft/libraries/cudnn/cudnn-11-linux-x64-v8.6.0.163/lib")
 prepend_path("PATH","/soft/libraries/nccl/nccl_2.16.2-1+cuda11.8_x86_64/include")
 prepend_path("LD_LIBRARY_PATH","/soft/libraries/nccl/nccl_2.16.2-1+cuda11.8_x86_64/lib")
 prepend_path("LD_LIBRARY_PATH","/soft/libraries/trt/TensorRT-8.5.2.2.Linux.x86_64-gnu.cuda-11.8.cudnn8.6/lib")

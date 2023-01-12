@@ -10,3 +10,6 @@ cd /soft/compilers/cudatoolkit
 wget https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_linux.run
 sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11.7.1
 ```
+## To-do
+
+- [ ] ThetaGPU script is not installing parallel h5py like in Polaris script

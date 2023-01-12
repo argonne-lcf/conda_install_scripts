@@ -44,14 +44,14 @@ unsetenv("PYTHONSTARTUP") -- ,pathJoin(conda_dir,"etc/pythonstart"))
 
 -- add cuda libraries
 -- local cuda_home = "/usr/local/cuda-11.4"
-local cuda_home = "/lus/theta-fs0/software/thetagpu/cuda/cuda-11.8"
+local cuda_home = "/lus/theta-fs0/software/thetagpu/cuda/cuda-11.8.0"
 setenv("CUDA_HOME",cuda_home)
 prepend_path("PATH",pathJoin(cuda_home,"bin/"))
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))
 -- CUPTI:
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"extras/CUPTI/lib64/"))
 
-prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/cudnn-linux-x86_64-8.6.0.163_cuda11-archive/lib64")
+prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/cudnn-linux-x86_64-8.6.0.163_cuda11-archive/lib")
 prepend_path("PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.16.2-1+cuda11.8_x86_64/include")
 prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/nccl_2.16.2-1+cuda11.8_x86_64/lib")
 prepend_path("LD_LIBRARY_PATH","/lus/theta-fs0/software/thetagpu/cuda/TensorRT-8.5.2.2/lib")

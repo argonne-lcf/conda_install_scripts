@@ -227,9 +227,6 @@ echo "cd $BASE_PATH"
 source $CONDA_PREFIX_PATH/setup.sh
 echo "after sourcing conda"
 
-# install dependencies/tools from conda
-conda install -y cmake
-
 # KGF: probably dont need a third (removed) network check--- proxy env vars inherited from either sourced setup.sh
 # and/or first network check. Make sure "set+e" during above sourced setup.sh since the network check "wget" might
 # return nonzero code if network is offline
@@ -254,8 +251,9 @@ conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 conda install -y -c conda-forge mamba
 conda update -y pip
 
-conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba pymongo conda-build
-
+conda install -y cmake zip unzip ninja  setuptools future six requests dataclasses graphviz numba pymongo conda-build
+conda install -y mkl mkl-include
+# conda install -y cffi typing_extensions pyyaml
 
 
 echo "Clone TensorFlow"
@@ -292,7 +290,7 @@ export PYTHONNOUSERSITE=1
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
-pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker pydot packaging
+pip install -U pip pyyaml six numpy wheel setuptools mock future gast typing_extensions portpicker pydot packaging
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 

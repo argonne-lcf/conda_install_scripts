@@ -214,7 +214,7 @@ channels:
    - defaults
    - pytorch
    - conda-forge
-env_prompt: "(${DH_INSTALL_SUBDIR}/{default_env}) "
+env_prompt: "(${BASE_PATH}/{default_env}) "
 pkgs_dirs:
    - ${CONDA_PKGS_DIRS}
    - \$HOME/.conda/pkgs

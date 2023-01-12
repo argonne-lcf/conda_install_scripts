@@ -1,7 +1,7 @@
 help([[
 The Anaconda python environment.
 Includes build of TensorFlow, PyTorch, DeepHyper, Horovd from tagged versions or develop/master branch of the git repos
-DeepHyper version tag: 0.4.2
+DeepHyper version: 901eb2d478 (Dec 2022) [analytics,hvd,nas,popt,autodeuq]
 TensorFlow version tag: 2.11.0
 Horovod version tag: 0.26.1
 PyTorch version tag: 1.13.1

@@ -318,9 +318,14 @@ set -e
 
 echo "Conda install some dependencies"
 
-conda install -y cmake zip unzip astunparse numpy ninja pyyaml setuptools future six requests dataclasses graphviz numba conda-build
+# note, numba pulls in numpy here too
+conda install -y cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip
 conda install -y mkl mkl-include
 # conda install -y cffi typing_extensions pyyaml
+
+# KGF: note, ordering of the above "defaults" channel install relative to "conda install -y -c conda-forge mamba; conda install -y pip"
+# (used to leave the pip re-install on a separate line) may affect what version of numpy you end up with
+# E.g. Jan 2023, Polaris ordering (defaults, then mamba then pip) got numpy 1.23.5 and ThetaGPU (mamba, pip, then defaults) got numpy 1.21.5
 
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
@@ -330,7 +335,6 @@ conda install -y -c conda-forge mamba
 # package manager, not just a Python module, etc.
 # - might not need to explicitly pass "-c conda-forge" now that .condarc is updated
 # - should I "conda install -y -c defaults -c conda-forge mamba" so that dep packages follow same channel precedence as .condarc? doesnt seem to matter--- all ~4x deps get pulled from conda-forge
-conda update -y pip
 
 echo "Clone TensorFlow"
 cd $BASE_PATH
@@ -364,6 +368,10 @@ echo "Install TensorFlow Dependencies"
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
+pip install -U numpy
+# the above line can be very important or very bad, to get have pip control the numpy dependency chain right before TF build
+# Check https://github.com/numpy/numpy/blob/main/numpy/core/setup_common.py
+# for C_API_VERSION, and track everytime numpy is reinstalled in the build log 
 pip install -U pip wheel mock gast portpicker pydot packaging pyyaml
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps

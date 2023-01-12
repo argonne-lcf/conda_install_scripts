@@ -221,9 +221,14 @@ EOF
 
 # move to base install directory
 cd $BASE_PATH
+echo "cd $BASE_PATH"
 
 # setup conda environment
 source $CONDA_PREFIX_PATH/setup.sh
+echo "after sourcing conda"
+
+# install dependencies/tools from conda
+conda install -y cmake
 
 # KGF: probably dont need a third (removed) network check--- proxy env vars inherited from either sourced setup.sh
 # and/or first network check. Make sure "set+e" during above sourced setup.sh since the network check "wget" might
@@ -241,8 +246,6 @@ set -e
 
 echo "Conda install some dependencies"
 
-conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba pymongo conda-build
-
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # No magma-cuda114: https://anaconda.org/pytorch/repo
@@ -250,6 +253,10 @@ conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 
 conda install -y -c conda-forge mamba
 conda update -y pip
+
+conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba pymongo conda-build
+
+
 
 echo "Clone TensorFlow"
 cd $BASE_PATH

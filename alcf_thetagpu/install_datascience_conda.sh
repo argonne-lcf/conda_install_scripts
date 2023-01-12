@@ -143,7 +143,7 @@ echo "Installing module into $BASE_PATH"
 # set Conda installation folder and where downloaded content will stay
 CONDA_PREFIX_PATH=$BASE_PATH/mconda3
 DOWNLOAD_PATH=$BASE_PATH/DOWNLOADS
-WHEEL_DIR=$BASE_PATH/wheels
+WHEELS_PATH=$BASE_PATH/wheels
 
 mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
@@ -317,10 +317,10 @@ echo "Bazel Build TensorFlow"
 HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
 
 echo "Build TensorFlow wheel"
-./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
+./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEELS_PATH
 
 echo "Install TensorFlow"
-pip install $(find $WHEEL_DIR/ -name "tensorflow*.whl" -type f)
+pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
 # KGF(2021-09-27): This installs Keras 2.6.0
 
 
@@ -379,8 +379,8 @@ CFLAGS="-DOMPI_SKIP_MPICXX" CC=$MPI/bin/mpicc CXX=$MPI/bin/mpic++ python setup.p
 # https://github.com/pytorch/pytorch/blob/master/cmake/Summary.cmake
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
 echo "Copying pytorch wheel file $PT_WHEEL"
-cp $PT_WHEEL $WHEEL_DIR/
-cd $WHEEL_DIR
+cp $PT_WHEEL $WHEELS_PATH/
+cd $WHEELS_PATH
 echo "pip installing $(basename $PT_WHEEL)"
 pip install $(basename $PT_WHEEL)
 
@@ -412,8 +412,8 @@ export PATH=$MPI/bin:$PATH
 
 HOROVOD_CUDA_HOME=${CUDA_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
-cp $HVD_WHL $WHEEL_DIR/
-HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
+cp $HVD_WHL $WHEELS_PATH/
+HVD_WHEEL=$(find $WHEELS_PATH/ -name "horovod*.whl" -type f)
 echo "Install Horovod $HVD_WHEEL"
 pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 

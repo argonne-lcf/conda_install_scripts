@@ -7,7 +7,9 @@
 # 3 - script installs everything down in /path/to/install/base/
 # 4 - wait for it to complete
 
+# e.g. /lus/theta-fs0/software/thetagpu/conda/2023-01-11 on ThetaGPU, /soft/datascience/conda/2023-01-10 on Polaris
 BASE_PATH=$1
+DATE_PATH="$(basename $BASE_PATH)"
 
 export PYTHONNOUSERSITE=1
 # KGF: PBS used to mess with user umask, changing it to 0077 on compute node
@@ -287,7 +289,7 @@ channels:
    - defaults
    - pytorch
    - conda-forge
-env_prompt: "(${BASE_PATH}/{default_env}) "
+env_prompt: "(${DATE_PATH}/{default_env}) "
 pkgs_dirs:
    - ${CONDA_PKGS_DIRS}
    - \$HOME/.conda/pkgs

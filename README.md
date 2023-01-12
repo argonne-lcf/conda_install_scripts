@@ -13,3 +13,4 @@ sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11
 ## To-do
 
 - [ ] ThetaGPU script is not installing parallel h5py like in Polaris script
+- [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.)

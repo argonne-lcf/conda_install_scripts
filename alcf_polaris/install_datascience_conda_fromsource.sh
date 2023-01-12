@@ -300,9 +300,6 @@ echo "cd $BASE_PATH"
 source $CONDA_PREFIX_PATH/setup.sh
 echo "after sourcing conda"
 
-# install dependencies/tools from conda
-conda install -y cmake
-
 # KGF: probably dont need a third (removed) network check--- proxy env vars inherited from either sourced setup.sh
 # and/or first network check. Make sure "set+e" during above sourced setup.sh since the network check "wget" might
 # return nonzero code if network is offline

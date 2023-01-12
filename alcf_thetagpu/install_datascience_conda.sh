@@ -459,14 +459,16 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
-    pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"  # deepspace extra preseent in v0.3.3 but removed in develop branch
+    pip install ".[analytics,hvd,nas,popt,autodeuq]"
+    # sdv on Polaris force re-installed numpy-1.22.4 and torch-13.1, and nvidia-cuda-nvrtc-cu1 + many deps
+    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]" 
     cd ..
     cd $BASE_PATH
 else
     # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
     echo "Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI"
+    #pip install "deephyper[analytics,hvd,nas,popt,autodeuq]==${DH_REPO_TAG}"
     pip install "deephyper[analytics,hvd,nas,popt,autodeuq,sdv]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
-    #pip install "deephyper[nas,popt,autodeuq,analytics,hvd]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
 
 pip install 'libensemble'

@@ -317,7 +317,9 @@ set -e
 
 echo "Conda install some dependencies"
 
-conda install -y cmake zip unzip astunparse numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba conda-build
+conda install -y cmake zip unzip astunparse numpy ninja pyyaml setuptools future six requests dataclasses graphviz numba conda-build
+conda install -y mkl mkl-include
+# conda install -y cffi typing_extensions pyyaml
 
 # CUDA only: Add LAPACK support for the GPU if needed
 conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
@@ -361,7 +363,7 @@ echo "Install TensorFlow Dependencies"
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
-pip install -U pip wheel mock gast portpicker pydot packaging
+pip install -U pip wheel mock gast portpicker pydot packaging pyyaml
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 

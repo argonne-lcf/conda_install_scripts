@@ -240,14 +240,14 @@ echo "PYTHON VERSION: $(python --version)"
 
 set -e
 
-########
+################################################
 ### Install TensorFlow
-########
+################################################
 
 echo "Conda install some dependencies"
 
 # note, numba pulls in numpy here too
-conda install -y cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip
+conda install -y cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
 conda install -y mkl mkl-include
 # conda install -y cffi typing_extensions pyyaml
 
@@ -256,11 +256,11 @@ conda install -y mkl mkl-include
 # E.g. Jan 2023, Polaris ordering (defaults, then mamba then pip) got numpy 1.23.5 and ThetaGPU (mamba, pip, then defaults) got numpy 1.21.5
 
 # CUDA only: Add LAPACK support for the GPU if needed
-conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+conda install -y -c defaults -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # No magma-cuda114: https://anaconda.org/pytorch/repo
 #conda install -y -c pytorch magma-cuda116 #magma-cuda113
 
-conda install -y -c conda-forge mamba
+conda install -y -c defaults -c conda-forge mamba
 
 echo "Clone TensorFlow"
 cd $BASE_PATH
@@ -336,9 +336,9 @@ pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
 # KGF(2021-09-27): This installs Keras 2.6.0
 
 
-########
+#################################################
 ### Install PyTorch
-########
+#################################################
 
 cd $BASE_PATH
 echo "Clone PyTorch"
@@ -536,7 +536,7 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/tensorflow-onnx/issues/1793
 # https://github.com/onnx/onnx-tensorflow/issues/422
 pip install huggingface-hub
-pip install transformers evaluate datasets
+pip install transformers evaluate datasets accelerate
 pip install scikit-image
 pip install line_profiler
 pip install torch-tb-profiler
@@ -544,9 +544,21 @@ pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torc
 pip install cupy-cuda${CUDA_VERSION_MAJOR}x
 pip install pytorch-lightning
 pip install ml-collections
-pip install deepspeed
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
+
+pip install "triton==1.0.0"
+#pip install deepspeed
+
+cd $BASE_PATH
+echo "Install DeepSpeed from source"
+git clone https://github.com/microsoft/DeepSpeed.git
+cd deepspeed
+export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
+export CFLAGS="-I${CONDA_PREFIX}/include/"
+export LDFLAGS="-L${CONDA_PREFIX}/lib/" 
+DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
+cd $BASE_PATH
 
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html

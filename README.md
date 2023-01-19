@@ -27,7 +27,7 @@ sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11
 - [ ] ThetaGPU script is not installing parallel h5py like in Polaris script
 - [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.)
 - [ ] `conda-forge` just has `numpy`, non-metapackage? No `numpy-base`, unlike `defaults`? https://stackoverflow.com/questions/50699252/anaconda-environment-installing-packages-numpy-base
-- [ ] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages
+- [ ] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages. **Edit:** now trying `conda install -c defaults -c conda-forge ...` on teh one line
 
 https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html
 
@@ -55,5 +55,7 @@ $ conda install "mpich=x.y.z=external_*"
 $ conda install "openmpi=x.y.z=external_*"
 ```
 
-- When did I start adding things from `conda-forge`? `python-libaio` is an example of a package not on `defaults`
+- When did I start adding things from `conda-forge`? 
+  - **Answer**: `mamba` might be the only package actually needed that is not on main `anaconda/defaults` channel. 
 - When did I retroactively add `python-libaio` to existing environments? https://github.com/vpelletier/python-libaio
+  - **Answer**: `python-libaio` is also example of a package not on `defaults`, that is on `conda-forge`. But for DeepSpeed built from source, we might only need `libaio`, which is on defaults. Sam requested `python-libaio` on 2022-11-09, but I dont think it was ever installed via these scripts or retroactively in existing conda environments (he was experimenting in a clone).

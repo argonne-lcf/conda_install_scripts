@@ -25,6 +25,7 @@ sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11
 ## To-do
 - [ ] Create bash scripts for testing environments based on https://anl.app.box.com/notes/1001252052445
 - [ ] ThetaGPU script is not installing parallel h5py like in Polaris script
+- [ ] Add Mxnet
 - [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.)
 - [ ] `conda-forge` just has `numpy`, non-metapackage? No `numpy-base`, unlike `defaults`? https://stackoverflow.com/questions/50699252/anaconda-environment-installing-packages-numpy-base
 - [ ] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages. **Edit:** now trying `conda install -c defaults -c conda-forge ...` on teh one line

@@ -125,9 +125,9 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 ###########################
 
 
-###########################################
+#################################################
 # CUDA path and version information
-############################
+#################################################
 
 CUDA_VERSION_MAJOR=11
 CUDA_VERSION_MINOR=8
@@ -171,9 +171,9 @@ TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cu
 # TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.6
 
 
-###########################################
+#################################################
 # TensorFlow Config flags (for ./configure run)
-############################
+#################################################
 export TF_CUDA_COMPUTE_CAPABILITIES=8.0
 export TF_CUDA_VERSION=$CUDA_VERSION_MAJOR
 export TF_CUDNN_VERSION=$CUDNN_VERSION_MAJOR
@@ -200,9 +200,9 @@ export GCC_HOST_COMPILER_PATH=/opt/cray/pe/gcc/11.2.0/snos/bin/gcc
 export CC_OPT_FLAGS="-march=native -Wno-sign-compare"
 export TF_SET_ANDROID_WORKSPACE=0
 
-#############################################
-## INSTALLING MiniConda
-###########
+#################################################
+## Installing Miniconda
+#################################################
 
 # set Conda installation folder and where downloaded content will stay
 CONDA_PREFIX_PATH=$BASE_PATH/mconda3
@@ -465,7 +465,7 @@ pip install $(basename $PT_WHEEL)
 
 ################################################
 ### Install Horovod
-########
+#################################################
 
 cd $BASE_PATH
 

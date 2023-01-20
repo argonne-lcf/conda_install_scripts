@@ -699,11 +699,16 @@ cd $BASE_PATH
 echo "Install DeepSpeed from source"
 git clone https://github.com/microsoft/DeepSpeed.git
 cd DeepSpeed
-export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 export CFLAGS="-I${CONDA_PREFIX}/include/"
-export LDFLAGS="-L${CONDA_PREFIX}/lib/" 
+#export LDFLAGS="-L${CONDA_PREFIX}/lib/" 
+export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib" 
 #DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
+# if no rpath, add this to Lmod modulefile:
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
+# Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed. 
+# e.g. if you put "export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}", it overrides many system libraries
+# breaking "module list", "emacs", etc. 
 cd $BASE_PATH
 
 

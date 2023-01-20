@@ -52,10 +52,10 @@ CUDA_VERSION_MINOR=8
 CUDA_VERSION_MINI=0
 CUDA_VERSION=$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
 CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
-#CUDA_BASE=/usr/local/cuda-$CUDA_VERSION
+#CUDA_TOOLKIT_BASE=/usr/local/cuda-$CUDA_VERSION
 
 CUDA_DEPS_BASE=/lus/theta-fs0/software/thetagpu/cuda
-CUDA_BASE=$CUDA_DEPS_BASE/cuda-$CUDA_VERSION_FULL
+CUDA_TOOLKIT_BASE=$CUDA_DEPS_BASE/cuda-$CUDA_VERSION_FULL
 
 CUDNN_VERSION_MAJOR=8
 CUDNN_VERSION_MINOR=6
@@ -92,7 +92,7 @@ export TF_CUDA_VERSION=$CUDA_VERSION_MAJOR
 export TF_CUDNN_VERSION=$CUDNN_VERSION_MAJOR
 export TF_TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR
 export TF_NCCL_VERSION=$NCCL_VERSION_MAJOR
-export CUDA_TOOLKIT_PATH=$CUDA_BASE
+export CUDA_TOOLKIT_PATH=$CUDA_TOOLKIT_BASE
 export CUDNN_INSTALL_PATH=$CUDNN_BASE
 export NCCL_INSTALL_PATH=$NCCL_BASE
 export TENSORRT_INSTALL_PATH=$TENSORRT_BASE
@@ -104,7 +104,7 @@ export TF_NEED_MPI=0
 export TF_NEED_ROCM=0
 export TF_NEED_CUDA=1
 export TF_NEED_TENSORRT=1
-export TF_CUDA_PATHS=$CUDA_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
+export TF_CUDA_PATHS=$CUDA_TOOLKIT_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
 export GCC_HOST_COMPILER_PATH=$(which gcc)
 export CC_OPT_FLAGS="-march=native -Wno-sign-compare"
 export TF_SET_ANDROID_WORKSPACE=0
@@ -141,6 +141,9 @@ fi
 echo "On ThetaGPU $HOSTNAME"
 echo "Installing module into $BASE_PATH"
 
+#################################################
+## Installing Miniconda
+#################################################
 
 # set Conda installation folder and where downloaded content will stay
 CONDA_PREFIX_PATH=$BASE_PATH/mconda3
@@ -193,8 +196,15 @@ else
    export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
 fi
 
-export LD_LIBRARY_PATH=$MPI/lib:$CUDA_BASE/lib64:$CUDNN_BASE/lib64:$NCCL_BASE/lib:$TENSORRT_BASE/lib
-export PATH=$MPI/bin:\$PATH
+export CUDA_TOOLKIT_BASE=$CUDA_TOOLKIT_BASE
+export CUDNN_BASE=$CUDNN_BASE
+export NCCL_BASE=$NCCL_BASE
+export TENSORRT_BASE=$TENSORRT_BASE
+
+# original thetagpu script adds MPI, not in Polaris script
+export LD_LIBRARY_PATH=$MPI/lib:\$CUDA_TOOLKIT_BASE/lib64:\$CUDNN_BASE/lib:\$NCCL_BASE/lib:\$TENSORRT_BASE/lib:\$LD_LIBRARY_PATH:
+export PATH=$MPI/lib:\$CUDA_TOOLKIT_BASE/bin:\$PATH
+
 EOF
 
 # KGF: $CONDA_ENV (e.g. conda/2021-11-30) is not an official conda var; set by us in modulefile
@@ -355,7 +365,7 @@ fi
 echo "Install PyTorch"
 
 # https://github.com/pytorch/pytorch/blob/master/setup.py
-export CUDA_TOOLKIT_ROOT_DIR=$CUDA_BASE
+export CUDA_TOOLKIT_ROOT_DIR=$CUDA_TOOLKIT_BASE
 export NCCL_ROOT_DIR=$NCCL_BASE
 export CUDNN_ROOT=$CUDNN_BASE
 export USE_TENSORRT=ON
@@ -397,9 +407,9 @@ echo "pip installing $(basename $PT_WHEEL)"
 pip install $(basename $PT_WHEEL)
 
 
-########
+#################################################
 ### Install Horovod
-########
+#################################################
 
 cd $BASE_PATH
 
@@ -422,7 +432,7 @@ echo "Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}"
 export LD_LIBRARY_PATH=$MPI/lib:$NCCL_BASE/lib:$LD_LIBRARY_PATH
 export PATH=$MPI/bin:$PATH
 
-HOROVOD_CUDA_HOME=${CUDA_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
+HOROVOD_CUDA_HOME=${CUDA_TOOLKIT_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
 cp $HVD_WHL $WHEELS_PATH/
 HVD_WHEEL=$(find $WHEELS_PATH/ -name "horovod*.whl" -type f)
@@ -554,11 +564,17 @@ cd $BASE_PATH
 echo "Install DeepSpeed from source"
 git clone https://github.com/microsoft/DeepSpeed.git
 cd DeepSpeed
-export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 export CFLAGS="-I${CONDA_PREFIX}/include/"
-export LDFLAGS="-L${CONDA_PREFIX}/lib/" 
+#export LDFLAGS="-L${CONDA_PREFIX}/lib/" 
+export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib" 
 #DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
+# if no rpath, add this to Lmod modulefile:
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
+# Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed. 
+# e.g. if you put "export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}", it overrides many system libraries
+# breaking "module list", "emacs", etc. 
+
 cd $BASE_PATH
 
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html

@@ -17,8 +17,8 @@ export PYTHONNOUSERSITE=1
 # hardlinks should be preserved even if these files are moved (not across filesystem boundaries)
 export CONDA_PKGS_DIRS=/lus/theta-fs0/software/thetagpu/conda/pkgs
 
-# unset *_TAG variables to build latest master
-DH_REPO_TAG="0.4.2"
+# unset *_TAG variables to build latest master/main branch (or "develop" in the case of DeepHyper)
+#DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 #TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
@@ -259,16 +259,16 @@ set -e
 echo "Conda install some dependencies"
 
 # note, numba pulls in numpy here too
-conda install -y cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
-conda install -y mkl mkl-include
-# conda install -y cffi typing_extensions pyyaml
+conda install -y -c defaults -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
+conda install -y -c defaults -c conda-forge mkl mkl-include
+##### conda install -y cffi typing_extensions pyyaml
 
 # KGF: note, ordering of the above "defaults" channel install relative to "conda install -y -c conda-forge mamba; conda install -y pip"
 # (used to leave the pip re-install on a separate line) may affect what version of numpy you end up with
 # E.g. Jan 2023, Polaris ordering (defaults, then mamba then pip) got numpy 1.23.5 and ThetaGPU (mamba, pip, then defaults) got numpy 1.21.5
 
 # CUDA only: Add LAPACK support for the GPU if needed
-conda install -y -c defaults -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+conda install -y -c defaults -c pytorch -c conda-forge magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # No magma-cuda114: https://anaconda.org/pytorch/repo
 #conda install -y -c pytorch magma-cuda116 #magma-cuda113
 

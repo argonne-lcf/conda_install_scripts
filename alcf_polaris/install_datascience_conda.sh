@@ -100,7 +100,7 @@ module load craype-accel-nvidia80  # wont load for PrgEnv-gnu; see HPE Case 5367
 export MPICH_GPU_SUPPORT_ENABLED=1
 module list
 echo $MPICH_DIR
-# unset *_TAG variables to build latest master
+# unset *_TAG variables to build latest master/main branch (or "develop" in the case of DeepHyper)
 #DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
@@ -321,8 +321,8 @@ set -e
 echo "Conda install some dependencies"
 
 # note, numba pulls in numpy here too
-conda install -y cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
-conda install -y mkl mkl-include
+conda install -y -c defaults -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
+conda install -y -c defaults -c conda-forge  mkl mkl-include
 # conda install -y cffi typing_extensions pyyaml
 
 # KGF: note, ordering of the above "defaults" channel install relative to "conda install -y -c conda-forge mamba; conda install -y pip"
@@ -330,7 +330,7 @@ conda install -y mkl mkl-include
 # E.g. Jan 2023, Polaris ordering (defaults, then mamba then pip) got numpy 1.23.5 and ThetaGPU (mamba, pip, then defaults) got numpy 1.21.5
 
 # CUDA only: Add LAPACK support for the GPU if needed
-conda install -y -c defaults -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+conda install -y -c defaults -c pytorch -c conda-forge magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # KGF(2022-09-13): note, if you were to explicitly specifying conda-forge channel here but not in the global or local .condarc list of channels set, it would cause issues with cloned environments being unable to download the package
 conda install -y -c defaults -c conda-forge mamba
 # KGF: mamba is not on "defaults" channel, and no easy way to build from source via pip since it is a full

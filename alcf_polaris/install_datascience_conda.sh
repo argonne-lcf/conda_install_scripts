@@ -583,15 +583,17 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     cd deephyper
     # KGF: use of GitFlow means that master branch might be too old for us:
     git checkout develop
-    pip --version
-    pip index versions deepspace
-    pip install dh-scikit-optimize==0.9.0
+    #     pip --version
+    #     pip index versions deepspace
+    #     pip install dh-scikit-optimize==0.9.0
+    
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
     pip install ".[analytics,hvd,nas,popt,autodeuq]"
     # sdv on Polaris force re-installed numpy-1.22.4 and torch-13.1, and nvidia-cuda-nvrtc-cu1 + many deps
-    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"  # deepspace extra preseent in v0.3.3 but removed in develop branch
+    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]" 
+    # Try "pip install 'sdv>=0.17.1' 'scikit-learn==1.1.2' "
     cd ..
     cd $BASE_PATH
 else

@@ -28,7 +28,19 @@ sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11
 - [ ] Add Mxnet
 - [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.)
 - [ ] `conda-forge` just has `numpy`, non-metapackage? No `numpy-base`, unlike `defaults`? https://stackoverflow.com/questions/50699252/anaconda-environment-installing-packages-numpy-base
-- [ ] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages. **Edit:** now trying `conda install -c defaults -c conda-forge ...` on teh one line
+- [ ] Why does ThetaGPU seem to demand an OpenMPI/UCX module built against CUDA 11.8 and not 11.4 when TF/Torch/etc. built with 11.8, yet Cray MPICH on Polaris doesnt seem to care about the minor version of CUDA loaded at runtime and used to build the deep learning libraries?
+- [ ] Double check that `rpath` solution to DeepSpeed dynamic linking to `libaio` is working
+- [ ] Why does `pip install sdv>=0.17.1` reinstall numpy everywhere, and also breaks torch, installs other junk on Polaris? numpy 1.24.1 ---> 1.22.4 on ThetaGPU, even though the existing version seems to match???
+```
+Collecting numpy<2,>=1.20.0
+  Downloading numpy-1.22.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.9 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 228.4 MB/s eta 0:00:00
+       Attempting uninstall: numpy
+    Found existing installation: numpy 1.24.1
+    Uninstalling numpy-1.24.1:
+      Successfully uninstalled numpy-1.24.1
+```      
+- [ ] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages. **Edit:** now trying `conda install -c defaults -c conda-forge ...` on the one line
 
 https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html
 

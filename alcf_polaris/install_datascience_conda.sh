@@ -370,8 +370,9 @@ echo "Install TensorFlow Dependencies"
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
-pip install -U numpy
+pip install -U numpy numba
 # the above line can be very important or very bad, to get have pip control the numpy dependency chain right before TF build
+# Start including numba here too in order to ensure mutual compat; numba 0.56.4 req numpy <1.24.0, e.g.
 # Check https://github.com/numpy/numpy/blob/main/numpy/core/setup_common.py
 # for C_API_VERSION, and track everytime numpy is reinstalled in the build log 
 pip install -U pip wheel mock gast portpicker pydot packaging pyyaml

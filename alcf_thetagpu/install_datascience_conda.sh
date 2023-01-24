@@ -159,7 +159,7 @@ mkdir -p $WHEELS_PATH
 cd $BASE_PATH
 
 # Download and install conda for a base python installation
-CONDAVER='py38_22.11.1-1'
+CONDAVER='py310_22.11.1-1'
 # "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
 # CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda

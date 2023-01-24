@@ -22,11 +22,11 @@ cd /soft/compilers/cudatoolkit
 wget https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_linux.run
 sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11.7.1
 ```
-## To-do
+## To-do and notes, 2023
 - [ ] Create bash scripts for testing environments based on https://anl.app.box.com/notes/1001252052445
 - [ ] ThetaGPU script is not installing parallel h5py like in Polaris script
 - [ ] Add Mxnet
-- [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.)
+- [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.), or 3.10 for better Python error messages
 - [ ] `conda-forge` just has `numpy`, non-metapackage? No `numpy-base`, unlike `defaults`? https://stackoverflow.com/questions/50699252/anaconda-environment-installing-packages-numpy-base
 - [ ] Why does ThetaGPU seem to demand an OpenMPI/UCX module built against CUDA 11.8 and not 11.4 when TF/Torch/etc. built with 11.8, yet Cray MPICH on Polaris doesnt seem to care about the minor version of CUDA loaded at runtime and used to build the deep learning libraries?
 - [ ] Double check that `rpath` solution to DeepSpeed dynamic linking to `libaio` is working

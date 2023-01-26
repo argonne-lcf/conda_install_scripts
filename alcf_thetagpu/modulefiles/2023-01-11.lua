@@ -26,7 +26,7 @@ whatis("Keywords: python conda")
 whatis("Description: Base Anaconda python environment")
 whatis("URL: https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html")
 
-depends_on("openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0")
+depends_on("openmpi/openmpi-4.1.4_ucx-1.14.0_gcc-9.4.0_cuda-11.8")
 
 
 local conda_dir = "/lus/theta-fs0/software/thetagpu/conda/2023-01-11/mconda3"

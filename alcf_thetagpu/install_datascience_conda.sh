@@ -41,9 +41,9 @@ PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # MPI source on ThetaGPU
 module list
-module load openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0
+module load openmpi/openmpi-4.1.4_ucx-1.14.0_gcc-9.4.0_cuda-11.8
 module list
-MPI=/lus/theta-fs0/software/thetagpu/openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0
+MPI=/lus/theta-fs0/software/thetagpu/openmpi/openmpi-4.1.4_ucx-1.14.0_gcc-9.4.0_cuda-11.8
 
 # KGF(2022-07-01): should probably upgrade CUDA runtime and driver to 11.6
 # CUDA path and version information
@@ -311,7 +311,7 @@ pip install -U numpy numba
 # the above line can be very important or very bad, to get have pip control the numpy dependency chain right before TF build
 # Start including numba here too in order to ensure mutual compat; numba 0.56.4 req numpy <1.24.0, e.g.
 # Check https://github.com/numpy/numpy/blob/main/numpy/core/setup_common.py
-# for C_API_VERSION, and track everytime numpy is reinstalled in the build log 
+# for C_API_VERSION, and track everytime numpy is reinstalled in the build log
 
 # consistent with polaris:
 pip install -U pip wheel mock gast portpicker pydot packaging pyyaml
@@ -471,13 +471,13 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     #     pip --version
     #     pip index versions deepspace
     #     pip install dh-scikit-optimize==0.9.0
-    
+
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
     pip install ".[analytics,hvd,nas,popt,autodeuq]"
     # sdv on Polaris force re-installed numpy-1.22.4 and torch-13.1, and nvidia-cuda-nvrtc-cu1 + many deps
-    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]" 
+    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"
     # Try "pip install 'sdv>=0.17.1' 'scikit-learn==1.1.2' "
     cd ..
     cd $BASE_PATH
@@ -570,15 +570,15 @@ echo "Install DeepSpeed from source"
 git clone https://github.com/microsoft/DeepSpeed.git
 cd DeepSpeed
 export CFLAGS="-I${CONDA_PREFIX}/include/"
-#export LDFLAGS="-L${CONDA_PREFIX}/lib/" 
-export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib" 
+#export LDFLAGS="-L${CONDA_PREFIX}/lib/"
+export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
 #DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
 # if no rpath, add this to Lmod modulefile:
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
-# Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed. 
+# Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed.
 # e.g. if you put "export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}", it overrides many system libraries
-# breaking "module list", "emacs", etc. 
+# breaking "module list", "emacs", etc.
 
 cd $BASE_PATH
 

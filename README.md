@@ -11,7 +11,7 @@ qsub -A datascience -q preemptable -l select=1:ncpus=64:ngpus=4,filesystems=swif
 qsub -t 170 -n 1 -q full-node -A datascience -M <email> -o build.out -e build.out ./install_datascience_conda.sh /lus/theta-fs0/software/thetagpu/conda/2023-01-11
 ```
 
-## Dependencies 
+## Dependencies
 **How to download the CUDA Toolkit from NVIDIA and extract just the toolkit, not installing the driver, etc. without `sudo` permissions:**
 
 E.g. on Polaris, download from NVIDIA, selecting Target Platform:
@@ -23,14 +23,15 @@ wget https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/
 sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11.7.1
 ```
 ## To-do and notes, 2023
-- [ ] Create bash scripts for testing environments based on https://anl.app.box.com/notes/1001252052445
-- [ ] ThetaGPU script is not installing parallel h5py like in Polaris script
+- [ ] Create bash scripts for testing environments based on notes in https://anl.app.box.com/notes/1001252052445 (WIP: https://anl.app.box.com/notes/1124584874420)
+- [ ] Revisit potential cloning issues from 2023-01-13, namely Romit vs. Taylor's error logs
+- [ ] ThetaGPU script is not setup to install parallel h5py like in Polaris script
 - [ ] Add Mxnet
-- [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.), or 3.10 for better Python error messages
+- [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.), or even 3.10 for better Python error messages
 - [ ] `conda-forge` just has `numpy`, non-metapackage? No `numpy-base`, unlike `defaults`? https://stackoverflow.com/questions/50699252/anaconda-environment-installing-packages-numpy-base
 - [ ] Why does ThetaGPU seem to demand an OpenMPI/UCX module built against CUDA 11.8 and not 11.4 when TF/Torch/etc. built with 11.8, yet Cray MPICH on Polaris doesnt seem to care about the minor version of CUDA loaded at runtime and used to build the deep learning libraries?
-- [ ] Double check that `rpath` solution to DeepSpeed dynamic linking to `libaio` is working
-- [ ] Why does `pip install sdv>=0.17.1` reinstall numpy everywhere, and also breaks torch, installs other junk on Polaris? numpy 1.24.1 ---> 1.22.4 on ThetaGPU, even though the existing version seems to match???
+- [ ] Double check that `rpath` solution to DeepSpeed dynamic linking to `libaio` is working. **Kinda**. Still need to do this at runtime: `CFLAGS="-I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/" ds_report`, presumably because of the JITing? How will this work for users in practice?
+- [ ] Why does `pip install sdv>=0.17.1` reinstall numpy everywhere, and also breaks torch, installs other junk on Polaris? numpy 1.24.1 ---> 1.22.4 on ThetaGPU, even though the existing version seems to match??? Still skipping installing sdv
 ```
 Collecting numpy<2,>=1.20.0
   Downloading numpy-1.22.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.9 MB)
@@ -39,8 +40,10 @@ Collecting numpy<2,>=1.20.0
     Found existing installation: numpy 1.24.1
     Uninstalling numpy-1.24.1:
       Successfully uninstalled numpy-1.24.1
-```      
-- [ ] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages. **Edit:** now trying `conda install -c defaults -c conda-forge ...` on the one line
+```
+https://github.com/sdv-dev/SDV/blob/master/setup.py
+- [x] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages. **Edit:** now trying `conda install -c defaults -c conda-forge ...` on the one line.
+  - [ ] Check that "conda install" after the environment is made doesnt return a bunch of inconsistent pkg warnings
 
 https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html
 
@@ -68,7 +71,7 @@ $ conda install "mpich=x.y.z=external_*"
 $ conda install "openmpi=x.y.z=external_*"
 ```
 
-- When did I start adding things from `conda-forge`? 
-  - **Answer**: `mamba` might be the only package actually needed that is not on main `anaconda/defaults` channel. 
+- When did I start adding things from `conda-forge`?
+  - **Answer**: `mamba` might be the only package actually needed that is not on main `anaconda/defaults` channel.
 - When did I retroactively add `python-libaio` to existing environments? https://github.com/vpelletier/python-libaio
   - **Answer**: `python-libaio` is also example of a package not on `defaults`, that is on `conda-forge`. But for DeepSpeed built from source, we might only need `libaio`, which is on defaults. Sam requested `python-libaio` on 2022-11-09, but I dont think it was ever installed via these scripts or retroactively in existing conda environments (he was experimenting in a clone).

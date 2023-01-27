@@ -258,21 +258,23 @@ set -e
 
 echo "Conda install some dependencies"
 
+# polaris has /usr/bin/git-lfs, thetagpu does not
+conda install -y -c defaults -c pytorch -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio mkl mkl-include onednn mkl-dnn git-lfs magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+
 # note, numba pulls in numpy here too
-conda install -y -c defaults -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
-conda install -y -c defaults -c conda-forge mkl mkl-include
-##### conda install -y cffi typing_extensions pyyaml
+#####conda install -y -c defaults -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio git-lfs
+#####conda install -y -c defaults -c conda-forge mkl mkl-include onednn mkl-dnn
+##### conda install -y cffi typing_extensions pyyaml # KGF: stopped using
 
 # KGF: note, ordering of the above "defaults" channel install relative to "conda install -y -c conda-forge mamba; conda install -y pip"
 # (used to leave the pip re-install on a separate line) may affect what version of numpy you end up with
 # E.g. Jan 2023, Polaris ordering (defaults, then mamba then pip) got numpy 1.23.5 and ThetaGPU (mamba, pip, then defaults) got numpy 1.21.5
 
 # CUDA only: Add LAPACK support for the GPU if needed
-conda install -y -c defaults -c pytorch -c conda-forge magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-# No magma-cuda114: https://anaconda.org/pytorch/repo
-#conda install -y -c pytorch magma-cuda116 #magma-cuda113
+#####conda install -y -c defaults -c pytorch -c conda-forge magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+# No magma-cuda114: https://anaconda.org/pytorch/repo ; but magma-cuda116 #magma-cuda113
 
-conda install -y -c defaults -c conda-forge mamba
+#####conda install -y -c defaults -c conda-forge mamba
 
 echo "Clone TensorFlow"
 cd $BASE_PATH
@@ -363,6 +365,8 @@ if [[ -z "$PT_REPO_TAG" ]]; then
 else
     echo "Checkout PyTorch tag $PT_REPO_TAG"
     git checkout --recurse-submodules $PT_REPO_TAG
+    git submodule sync
+    git submodule update --init --recursive
 fi
 
 echo "Install PyTorch"
@@ -562,7 +566,9 @@ pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 
-pip install "triton==1.0.0"
+# binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
+# pip install "triton==1.0.0"
+pip install 'triton==2.0.0.dev20221202' || true
 #pip install deepspeed
 
 cd $BASE_PATH

@@ -707,7 +707,17 @@ echo "Install triton v1.0 from source"
 git clone https://github.com/openai/triton.git
 cd triton/python
 git checkout v1.0
-pip install .
+
+# Polaris-only issue:
+# CXX identified as CC or equiv. /opt/cray/pe/gcc/11.2.0/bin/g++ causes issues:
+# /opt/cray/pe/gcc/11.2.0/snos/include/g++/x86_64-suse-linux/bits/c++config.h:280:33: note: 'std::size_t' declared here
+# /soft/datascience/conda/2023-01-10/triton/include/triton/tools/graph.h:18:20: error: 'size_t' was not declared i n this scope; did you mean 'std::size_t'?
+CXX=/usr/bin/g++ pip install . -v
+# https://github.com/openai/triton/issues/808
+
+# this works for triton on ThetaGPU, even with Python 3.10
+###pip install .
+
 #pip install deepspeed
 
 cd $BASE_PATH

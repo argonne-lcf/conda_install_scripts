@@ -566,9 +566,17 @@ pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 
-# binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
-# pip install "triton==1.0.0"
-pip install 'triton==2.0.0.dev20221202' || true
+# PyPI binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
+#pip install "triton==1.0.0"
+#pip install 'triton==2.0.0.dev20221202' || true
+
+# But, DeepSpeed sparse support only supports triton v1.0
+cd $BASE_PATH
+echo "Install triton v1.0 from source"
+git clone https://github.com/openai/triton.git
+cd triton/python
+git checkout v1.0
+pip install .
 #pip install deepspeed
 
 cd $BASE_PATH
@@ -592,7 +600,8 @@ pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases
 #pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install pymongo optax flax
 
-env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
+# note, polaris script installs mpi4py after Horovod, before DeepHyper, PyTorch vision, ...
+env MPICC=$MPI/bin/mpicc pip install mpi4py --force-reinstall --no-cache-dir --no-binary=mpi4py
 # conda install -c conda-forge cupy cudnn cutensor nccl
 # https://github.com/cupy/cupy/issues/4850
 ## https://docs.cupy.dev/en/stable/install.html?highlight=cutensor#additional-cuda-libraries
@@ -611,6 +620,11 @@ env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
 # https://docs.cupy.dev/en/stable/upgrade.html?highlight=cutensor#compatibility-matrix
 # https://docs.cupy.dev/en/stable/reference/environment.html?highlight=cutensor#envvar-CUTENSOR_PATH
 
+pip install cython
+git clone https://github.com/mpi4jax/mpi4jax.git
+cd mpi4jax
+CUDA_ROOT=$CUDA_TOOLKIT_BASE pip install --no-build-isolation --no-cache-dir --no-binary=mpi4jax -v .
+cd $BASE_PATH
 
 # ------------------------------------------------
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation

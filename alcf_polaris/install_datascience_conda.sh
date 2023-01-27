@@ -697,18 +697,24 @@ pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 
+# PyPI binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
 #pip install "triton==1.0.0"
-#pip install 'deepspeed>=0.7.2'
+#pip install 'triton==2.0.0.dev20221202' || true
 
-# binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
-pip install 'triton==2.0.0.dev20221202' || true
+# But, DeepSpeed sparse support only supports triton v1.0
+cd $BASE_PATH
+echo "Install triton v1.0 from source"
+git clone https://github.com/openai/triton.git
+cd triton/python
+git checkout v1.0
+pip install .
+#pip install deepspeed
 
 cd $BASE_PATH
 echo "Install DeepSpeed from source"
 git clone https://github.com/microsoft/DeepSpeed.git
 cd DeepSpeed
 export CFLAGS="-I${CONDA_PREFIX}/include/"
-#export LDFLAGS="-L${CONDA_PREFIX}/lib/"
 export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
 #DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
@@ -728,6 +734,7 @@ pip install pymongo optax flax
 # be sure to "rm -rfd build/" to force .so libraries to rebuild if you change the build options, etc.
 
 #git clone https://github.com/argonne-lcf/mpi4jax.git
+pip install cython
 git clone https://github.com/mpi4jax/mpi4jax.git
 cd mpi4jax
 #git checkout polaris

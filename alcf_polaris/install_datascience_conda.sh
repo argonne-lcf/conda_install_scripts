@@ -322,7 +322,7 @@ echo "Conda install some dependencies"
 
 # note, numba pulls in numpy here too
 conda install -y -c defaults -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
-conda install -y -c defaults -c conda-forge  mkl mkl-include
+conda install -y -c defaults -c conda-forge mkl mkl-include  # onednn mkl-dnn git-lfs ### on ThetaGPU
 # conda install -y cffi typing_extensions pyyaml
 
 # KGF: note, ordering of the above "defaults" channel install relative to "conda install -y -c conda-forge mamba; conda install -y pip"
@@ -374,7 +374,7 @@ pip install -U numpy numba
 # the above line can be very important or very bad, to get have pip control the numpy dependency chain right before TF build
 # Start including numba here too in order to ensure mutual compat; numba 0.56.4 req numpy <1.24.0, e.g.
 # Check https://github.com/numpy/numpy/blob/main/numpy/core/setup_common.py
-# for C_API_VERSION, and track everytime numpy is reinstalled in the build log 
+# for C_API_VERSION, and track everytime numpy is reinstalled in the build log
 pip install -U pip wheel mock gast portpicker pydot packaging pyyaml
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
@@ -423,6 +423,8 @@ if [[ -z "$PT_REPO_TAG" ]]; then
 else
     echo "Checkout PyTorch tag $PT_REPO_TAG"
     git checkout --recurse-submodules $PT_REPO_TAG
+    git submodule sync
+    git submodule update --init --recursive
 fi
 
 echo "Install PyTorch"
@@ -587,13 +589,13 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     #     pip --version
     #     pip index versions deepspace
     #     pip install dh-scikit-optimize==0.9.0
-    
+
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
     pip install ".[analytics,hvd,nas,popt,autodeuq]"
     # sdv on Polaris force re-installed numpy-1.22.4 and torch-13.1, and nvidia-cuda-nvrtc-cu1 + many deps
-    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]" 
+    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"
     # Try "pip install 'sdv>=0.17.1' 'scikit-learn==1.1.2' "
     cd ..
     cd $BASE_PATH
@@ -695,23 +697,26 @@ pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
 
-pip install "triton==1.0.0"
+#pip install "triton==1.0.0"
 #pip install 'deepspeed>=0.7.2'
+
+# binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
+pip install 'triton==2.0.0.dev20221202' || true
 
 cd $BASE_PATH
 echo "Install DeepSpeed from source"
 git clone https://github.com/microsoft/DeepSpeed.git
 cd DeepSpeed
 export CFLAGS="-I${CONDA_PREFIX}/include/"
-#export LDFLAGS="-L${CONDA_PREFIX}/lib/" 
-export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib" 
+#export LDFLAGS="-L${CONDA_PREFIX}/lib/"
+export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
 #DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
 # if no rpath, add this to Lmod modulefile:
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
-# Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed. 
+# Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed.
 # e.g. if you put "export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}", it overrides many system libraries
-# breaking "module list", "emacs", etc. 
+# breaking "module list", "emacs", etc.
 cd $BASE_PATH
 
 

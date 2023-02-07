@@ -106,7 +106,7 @@ DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 TF_REPO_TAG="v2.11.0"
 PT_REPO_TAG="v1.13.1"
-HOROVOD_REPO_TAG="v0.26.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
+HOROVOD_REPO_TAG="v0.27.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git

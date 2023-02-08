@@ -24,14 +24,19 @@ sh cuda_11.7.1_515.65.01_linux.run --silent --toolkit --toolkitpath=$PWD/cuda-11
 ```
 ## To-do and notes, 2023
 - [ ] Create bash scripts for testing environments based on notes in https://anl.app.box.com/notes/1001252052445 (WIP: https://anl.app.box.com/notes/1124584874420)
-- [ ] Revisit potential cloning issues from 2023-01-13, namely Romit vs. Taylor's error logs
+- [ ] Revisit potential cloning issues from around 2023-01-13, namely Romit vs. Taylor's error logs
 - [ ] ThetaGPU script is not setup to install parallel h5py like in Polaris script
 - [ ] Add Mxnet
-- [ ] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.), or even 3.10 for better Python error messages
+- [x] Move future conda environments from Python 3.8 to 3.9 (requirement for HPE Dragon e.g.), or even 3.10 for better Python error messages. **Done**. Switched to 3.10 starting in January 2023
 - [ ] `conda-forge` just has `numpy`, non-metapackage? No `numpy-base`, unlike `defaults`? https://stackoverflow.com/questions/50699252/anaconda-environment-installing-packages-numpy-base
 - [ ] Why does ThetaGPU seem to demand an OpenMPI/UCX module built against CUDA 11.8 and not 11.4 when TF/Torch/etc. built with 11.8, yet Cray MPICH on Polaris doesnt seem to care about the minor version of CUDA loaded at runtime and used to build the deep learning libraries?
 - [ ] Double check that `rpath` solution to DeepSpeed dynamic linking to `libaio` is working. **Kinda**. Still need to do this at runtime: `CFLAGS="-I${CONDA_PREFIX}/include/" LDFLAGS="-L${CONDA_PREFIX}/lib/" ds_report`, presumably because of the JITing? How will this work for users in practice?
-- [ ] Why does `pip install sdv>=0.17.1` reinstall numpy everywhere, and also breaks torch, installs other junk on Polaris? numpy 1.24.1 ---> 1.22.4 on ThetaGPU, even though the existing version seems to match??? Still skipping installing sdv
+- [ ] Why does `pip install sdv>=0.17.1` reinstall numpy everywhere, and also breaks torch, installs other junk on Polaris? numpy 1.24.1 ---> 1.22.4 on ThetaGPU, even though the existing version seems to match??? I was skipping installing sdv, **but switching from Python 3.8 to 3.10 somehow avoided the problems on Polaris.** Doesn't make much sense, as even the conditional `python_version<'3.10'` requirements seemed sufficiently loose to not cause problems. Maybe it was the CTGAN dependency, since it is the only one which direclty lists `torch` in `setup.py`? But those version requirements are also loose; working theory was that some dep was picky about numpy version, which forced a re-install of PyTorch
+  - https://github.com/sdv-dev/SDV/blob/master/setup.py
+  - https://github.com/sdv-dev/CTGAN/blob/master/setup.py
+  - `cd /soft/datascience/conda/2023-01-10/deephyper pip install --dry-run ".[analytics,hvd,nas,popt,autodeuq,sdv]"`
+  - Binary search the deps of `sdv` in the future if it causes problems again.
+
 ```
 Collecting numpy<2,>=1.20.0
   Downloading numpy-1.22.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.9 MB)
@@ -41,7 +46,9 @@ Collecting numpy<2,>=1.20.0
     Uninstalling numpy-1.24.1:
       Successfully uninstalled numpy-1.24.1
 ```
-https://github.com/sdv-dev/SDV/blob/master/setup.py
+
+
+
 - [x] Consider fixes for problems arising from mixing `conda-forge` and `defaults` packages. **Edit:** now trying `conda install -c defaults -c conda-forge ...` on the one line.
   - [ ] Check that "conda install" after the environment is made doesnt return a bunch of inconsistent pkg warnings
 

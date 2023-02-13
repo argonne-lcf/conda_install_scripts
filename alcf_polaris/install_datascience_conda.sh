@@ -594,9 +594,11 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
     pip install ".[analytics,hvd,nas,popt,autodeuq]"
-    # sdv on Polaris force re-installed numpy-1.22.4 and torch-13.1, and nvidia-cuda-nvrtc-cu1 + many deps
-    #pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"
-    # Try "pip install 'sdv>=0.17.1' 'scikit-learn==1.1.2' "
+    # Adding "sdv" optional requirement on Polaris with Python 3.8 force re-installed:
+    # numpy-1.22.4, torch-1.13.1, which requires nvidia-cuda-nvrtc-cu11 + many other deps
+    # No problem on ThetaGPU. Switching to Python 3.10 apparently avoids everything
+    # TODO: if problems start again, test installing each of the sdv deps one-by-one (esp. ctgan)
+    pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"
     cd ..
     cd $BASE_PATH
 else

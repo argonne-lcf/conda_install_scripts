@@ -694,6 +694,7 @@ pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torc
 # https://docs.cupy.dev/en/stable/install.html
 #pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 pip install cupy-cuda${CUDA_VERSION_MAJOR}x
+pip install pycuda
 pip install pytorch-lightning
 pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
@@ -741,6 +742,7 @@ cd $BASE_PATH
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn86]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install pymongo optax flax
+pip install "numpyro[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 # https://github.com/mpi4jax/mpi4jax/issues/153
 # CUDA_ROOT=/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux python setup.py --verbose build_ext --inplace
 # be sure to "rm -rfd build/" to force .so libraries to rebuild if you change the build options, etc.

@@ -564,6 +564,7 @@ pip install line_profiler
 pip install torch-tb-profiler
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 pip install cupy-cuda${CUDA_VERSION_MAJOR}x
+pip install pycuda
 pip install pytorch-lightning
 pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
@@ -602,6 +603,7 @@ cd $BASE_PATH
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install pymongo optax flax
+pip install "numpyro[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
 # note, polaris script installs mpi4py after Horovod, before DeepHyper, PyTorch vision, ...
 env MPICC=$MPI/bin/mpicc pip install mpi4py --force-reinstall --no-cache-dir --no-binary=mpi4py

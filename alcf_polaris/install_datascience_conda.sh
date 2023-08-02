@@ -687,6 +687,8 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/onnx-tensorflow/issues/422
 pip install huggingface-hub
 pip install transformers evaluate datasets accelerate
+pip install -U xformers   # requires PyTorch 2.0.0
+#pip install -v -U 'git+https://github.com/facebookresearch/xformers.git@main#egg=xformers'
 pip install scikit-image
 pip install line_profiler
 pip install torch-tb-profiler

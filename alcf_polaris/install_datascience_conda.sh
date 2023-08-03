@@ -7,6 +7,8 @@
 # 3 - script installs everything down in /path/to/install/base/
 # 4 - wait for it to complete
 
+# KGF: check HARDCODE points for lines that potentially require manual edits to pinned package versions
+
 # e.g. /lus/theta-fs0/software/thetagpu/conda/2023-01-11 on ThetaGPU, /soft/datascience/conda/2023-01-10 on Polaris
 BASE_PATH=$1
 DATE_PATH="$(basename $BASE_PATH)"
@@ -100,19 +102,22 @@ module load craype-accel-nvidia80  # wont load for PrgEnv-gnu; see HPE Case 5367
 export MPICH_GPU_SUPPORT_ENABLED=1
 module list
 echo $MPICH_DIR
+
+# -------------------- begin HARDCODE of major built-from-source frameworks etc.
 # unset *_TAG variables to build latest master/main branch (or "develop" in the case of DeepHyper)
 #DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 TF_REPO_TAG="v2.13.0"
 PT_REPO_TAG="v2.0.1"
-HOROVOD_REPO_TAG="v0.28.1" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
+HOROVOD_REPO_TAG="v0.28.1" # e.g. v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
 # MPI4PY_REPO_URL=https://github.com/mpi4py/mpi4py.git
 # MPI4PY_REPO_TAG="3.1.3"
+# -------------------- end HARDCODE of major built-from-source frameworks etc.
 
 ############################
 # Manual version checks/changes below that must be made compatible with TF/Torch/CUDA versions above:
@@ -213,8 +218,9 @@ mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
 mkdir -p $WHEELS_PATH
 cd $BASE_PATH
+# HARDCODE
 # Download and install conda for a base python installation
-CONDAVER='py310_22.11.1-1'
+CONDAVER='py310_23.5.2-0'
 # "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
 # CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
@@ -330,6 +336,7 @@ conda install -y -c defaults -c conda-forge mkl mkl-include  # onednn mkl-dnn gi
 # E.g. Jan 2023, Polaris ordering (defaults, then mamba then pip) got numpy 1.23.5 and ThetaGPU (mamba, pip, then defaults) got numpy 1.21.5
 
 # CUDA only: Add LAPACK support for the GPU if needed
+# HARDCODE
 conda install -y -c defaults -c pytorch -c conda-forge magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
 # KGF(2022-09-13): note, if you were to explicitly specifying conda-forge channel here but not in the global or local .condarc list of channels set, it would cause issues with cloned environments being unable to download the package
 conda install -y -c defaults -c conda-forge mamba
@@ -573,8 +580,10 @@ echo "Adding module snooper so we can tell what modules people are using"
 ln -s /soft/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py
 
 # DeepHyper stuff
-
-pip install 'tensorflow_probability==0.19.0'
+# HARDCODE
+pip install 'tensorflow_probability==0.20.0'
+# KGF: 0.20.0 (2023-05-08) tested against TF 2.12.x
+# KGF: 0.19.0 (2022-12-06) tested against TF 2.11.x
 # KGF: 0.17.0 (2022-06-06) tested against TF 2.9.1
 # KGF: 0.14.0 (2021-09-15) only compatible with TF 2.6.0
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
@@ -632,6 +641,7 @@ pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch
 pip install torch-geometric
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
+# HARDCODE
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
 # https://github.com/tensorflow/tensorflow/issues/46840#issuecomment-872946341
 # https://github.com/pytorch/vision/issues/4146
@@ -652,7 +662,8 @@ cd $BASE_PATH
 echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
 cd vision
-git checkout v0.14.1
+# HARDCODE
+git checkout v0.15.2
 # KGF: this falls back to building a deprecated .egg format with easy_install, which puts an entry in
 # mconda3/lib/python3.8/site-packages/easy-install.pth, causing read-only premissions problems in cloned
 # environments.
@@ -675,7 +686,8 @@ pip install opencv-python-headless
 
 # onnx 1.13.0 pushes protobuf to >3.20.2 and "tensorflow 2.11.0 requires protobuf<3.20,>=3.9.2, but you have protobuf 3.20.3 which is incompatible."
 #  onnx runtime 1.13.1 pushes numpy>=1.21.6, which installs 1.24.x for some reason, breaking <1.22 compat with numba
-pip install 'onnx==1.12.0' 'onnxruntime-gpu==1.12.1'
+# HARDCODE
+pip install 'onnx==1.14.0' 'onnxruntime-gpu==1.15.1'
 # onnxruntime is CPU-only. onnxruntime-gpu includes most CPU abilities
 # https://github.com/microsoft/onnxruntime/issues/10685
 # onnxruntime probably wont work on ThetaGPU single-gpu queue with CPU thread affinity
@@ -687,7 +699,7 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/onnx-tensorflow/issues/422
 pip install huggingface-hub
 pip install transformers evaluate datasets accelerate
-pip install -U xformers   # requires PyTorch 2.0.0
+pip install -U xformers   # requires PyTorch 2.0.0; optional but recommended to have triton 2.0.0 instead of 1.0.0
 #pip install -v -U 'git+https://github.com/facebookresearch/xformers.git@main#egg=xformers'
 pip install scikit-image
 pip install line_profiler
@@ -695,6 +707,7 @@ pip install torch-tb-profiler
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
 # https://docs.cupy.dev/en/stable/install.html
 #pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+# HARDCODE
 pip install cupy-cuda${CUDA_VERSION_MAJOR}x
 pip install pycuda
 pip install pytorch-lightning
@@ -706,12 +719,13 @@ pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn 
 #pip install "triton==1.0.0"
 #pip install 'triton==2.0.0.dev20221202' || true
 
-# But, DeepSpeed sparse support only supports triton v1.0
+# But, DeepSpeed sparse support only supports triton v1.0 (??? KGF: check if this is still true as of Aug 2023)
+# HARDCODE
 cd $BASE_PATH
-echo "Install triton v1.0 from source"
+echo "Install triton v2.0 from source"
 git clone https://github.com/openai/triton.git
 cd triton/python
-git checkout v1.0
+git checkout v2.0
 
 # Polaris-only issue:
 # CXX identified as CC or equiv. /opt/cray/pe/gcc/11.2.0/bin/g++ causes issues:
@@ -740,7 +754,7 @@ DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
 # breaking "module list", "emacs", etc.
 cd $BASE_PATH
 
-
+# HARDCODE
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn86]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install pymongo optax flax

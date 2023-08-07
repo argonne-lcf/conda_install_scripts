@@ -356,7 +356,7 @@ else
     echo "Checkout TensorFlow tag $TF_REPO_TAG"
     git checkout --recurse-submodules $TF_REPO_TAG
 fi
-BAZEL_VERSION=$(cat .bazelversion)
+BAZEL_VERSION=$(head -n1 .bazelversion)
 echo "Found TensorFlow depends on Bazel version $BAZEL_VERSION"
 
 cd $BASE_PATH
@@ -364,6 +364,7 @@ echo "Download Bazel binaries"
 BAZEL_DOWNLOAD_URL=https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION
 BAZEL_INSTALL_SH=bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
 BAZEL_INSTALL_PATH=$BASE_PATH/bazel-$BAZEL_VERSION
+echo "wget $BAZEL_DOWNLOAD_URL/$BAZEL_INSTALL_SH -P $DOWNLOAD_PATH"
 wget $BAZEL_DOWNLOAD_URL/$BAZEL_INSTALL_SH -P $DOWNLOAD_PATH
 chmod +x $DOWNLOAD_PATH/$BAZEL_INSTALL_SH
 echo "Install Bazel in $BAZEL_INSTALL_PATH"

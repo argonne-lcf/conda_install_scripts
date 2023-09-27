@@ -144,13 +144,14 @@ CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
 
 # using short names on Polaris:
 CUDA_TOOLKIT_BASE=/soft/compilers/cudatoolkit/cuda-${CUDA_VERSION_FULL}
+CUDA_HOME=${CUDA_TOOLKIT_BASE}
 
 CUDA_DEPS_BASE=/soft/libraries/
 
 CUDNN_VERSION_MAJOR=8
 CUDNN_VERSION_MINOR=6
 CUDNN_VERSION_EXTRA=0.163
-# KGF: try this next; not clear if compatible with below trt
+# KGF: try this next; not clear if compatible with below TensorRT-8.5.3.1.Linux.x86_64-gnu.cuda-11.8.cudnn8.6/
 # CUDNN_VERSION_MAJOR=8
 # CUDNN_VERSION_MINOR=7
 # CUDNN_VERSION_EXTRA=0.84
@@ -168,9 +169,19 @@ NCCL_BASE=$CUDA_DEPS_BASE/nccl/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
 # https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_VERSION_MAJOR=8
 TENSORRT_VERSION_MINOR=5.3.1
+#TENSORRT_VERSION_MINOR=6.1.6
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 # https://github.com/tensorflow/tensorflow/pull/55634
 TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
+# TensorRT-8.6.1.6.Linux.x86_64-gnu.cuda-11.8.cudnn8.9/
+#TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.9
+
+# TensorRT-8.5.3.1.Linux.x86_64-gnu.cuda-11.8.cudnn8.6/
+TENSORRT_BASE=$CUDA_DEPS_BASE/trt/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.6
+
+# TensorRT-8.6.1.6.Linux.x86_64-gnu.cuda-11.8.cudnn8.9/ and cuDNN 8.7.0.84: fails TensorFlow building
+# bazel-out/k8-opt-exec-50AE0418/bin/external/local_config_tensorrt/_virtual_includes/tensorrt_headers/third_party/tensorrt/NvInferRuntimeCommon.h:26:10: fatal error: NvInferRuntimeBase.h: No such file or directory
+
 echo "TENSORRT_BASE=${TENSORRT_BASE}"
 
 # is the following trt compatible with cuDNN 8.7 too?
@@ -425,16 +436,27 @@ pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
 cd $BASE_PATH
 echo "Clone PyTorch"
 
-git clone --recursive $PT_REPO_URL
+# KGF: 2023-09, --recursive clone caused issues in subsequent "git checkout --recurse-submodules" or "git submodule sync" within script on Polaris (but couldnt reproduce on login node interactively, nor on my macOS system:
+# "fatal: not a git repository: ../../.git/modules/third_party/python-enum"
+
+# git clone --recursive $PT_REPO_URL
+git clone $PT_REPO_URL
 cd pytorch
 if [[ -z "$PT_REPO_TAG" ]]; then
     echo "Checkout PyTorch master"
 else
     echo "Checkout PyTorch tag $PT_REPO_TAG"
     git checkout --recurse-submodules $PT_REPO_TAG
+    echo "git submodule sync"
     git submodule sync
+    echo "git submodule update"
     git submodule update --init --recursive
 fi
+# v2.0.1 (redundant) 2x fixes: https://github.com/pytorch/pytorch/issues/107389
+echo "git apply patch for v2.0.1"
+git apply ~/hardcode_aten_cudnn.patch
+export CUDNN_INCLUDE_DIR=$CUDNN_BASE/include
+export CPATH="$CPATH:$CUDNN_INCLUDE_DIR"
 
 echo "Install PyTorch"
 module unload gcc-mixed
@@ -460,6 +482,11 @@ export TORCH_CUDA_ARCH_LIST=8.0
 #export CUDA_HOME=$CUDA_TOOLKIT_BASE
 #export NCCL_ROOT_DIR=$NCCL_BASE
 export CUDNN_ROOT=$CUDNN_BASE
+echo "CUDNN_ROOT=$CUDNN_BASE"
+export CUDNN_ROOT_DIR=$CUDNN_BASE
+export CUDNN_INCLUDE_DIR=$CUDNN_BASE/include
+
+
 export USE_TENSORRT=ON
 export TENSORRT_ROOT=$TENSORRT_BASE
 export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
@@ -583,7 +610,8 @@ ln -s /soft/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import sit
 
 # DeepHyper stuff
 # HARDCODE
-pip install 'tensorflow_probability==0.20.0'
+pip install 'tensorflow_probability==0.21.0'
+# KGF: 0.21.0 (2023-08-04) tested against TF 2.13.x
 # KGF: 0.20.0 (2023-05-08) tested against TF 2.12.x
 # KGF: 0.19.0 (2022-12-06) tested against TF 2.11.x
 # KGF: 0.17.0 (2022-06-06) tested against TF 2.9.1
@@ -604,12 +632,12 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
-    pip install ".[analytics,hvd,nas,popt,autodeuq]"
+    pip install ".[analytics,hvd,nas,autodeuq]"
     # Adding "sdv" optional requirement on Polaris with Python 3.8 force re-installed:
     # numpy-1.22.4, torch-1.13.1, which requires nvidia-cuda-nvrtc-cu11 + many other deps
     # No problem on ThetaGPU. Switching to Python 3.10 apparently avoids everything
     # TODO: if problems start again, test installing each of the sdv deps one-by-one (esp. ctgan)
-    pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"
+    pip install ".[analytics,hvd,nas,hps-tl,autodeuq]"
     cd ..
     cd $BASE_PATH
 else
@@ -636,10 +664,23 @@ pip install 'libensemble'
 # pip install --pre balsam
 # pip install parsl==1.3.0.dev0
 
+# ---------------------------------------
+# HARDCODE
+# PyTorch Geometric Dependencies (2.3.x)
+# torch 2.0.1 wheels just redirect to 2.0.0 wheels: https://data.pyg.org/whl/torch-2.0.1%2Bcu118.html
+pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+# KGF: first 3x wheels still not working against torch 2.0.1 built from source
 
-# PyTorch Geometric--- Hardcoding PyTorch 1.13.0, CUDA 11.7  even though installing Pytorch 1.13.1, CUDA 11.8 above
-pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
-#pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.0+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+# pyg-lib, torch-scatter, torch-sparse were required deps for pytorch_geometric 2.2.x and earlier, rest were optional. As of pytorch_geometric 2.3.x, the latter 2x pkgs were upstreamed to PyTorch. The 5x optional dependencies were kept around to offer minimal tweaks/use-cases: https://github.com/pyg-team/pytorch_geometric/releases/tag/2.3.0
+
+# -------------------
+# PyTorch Geometric Dependencies (2.2.x)
+# --- For conda/2023-01-10: was hardcoding versions for dep binaries to PyTorch 1.13.1, CUDA 11.7 even though installing CUDA 11.8 above since CUDA 11.8 binaries werent provided until PyTorch Geometric with PyTorch 2.0. However, did not seem to work; import errors with pyg_lib, torch_scatter, torch_sparse pointing to compiled CUDA kernel minor version incompat. At a minimum, the latter 2x pkgs can be built from source against CUDA 11.8 (need to try pyg-lib)
+
+#pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.1+cu117.html
+
+#pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+# ---------------------------------------
 pip install torch-geometric
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
@@ -701,7 +742,12 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/onnx-tensorflow/issues/422
 pip install huggingface-hub
 pip install transformers evaluate datasets accelerate
-pip install -U xformers   # requires PyTorch 2.0.0; optional but recommended to have triton 2.0.0 instead of 1.0.0
+# HARDCODE: warning, xformers will often pull in a newer version of torch wheel from PyPI, undoing source install
+# and installing 11x nvidia-*-cu11 pkgs:
+# nvidia-cublas-cu11 nvidia-cuda-cupti-cu11 nvidia-cuda-nvrtc-cu11 nvidia-cuda-runtime-cu11 nvidia-cudnn-cu11 nvidia-cufft-cu11 nvidia-curand-cu11 nvidia-cusolver-cu11 nvidia-cusparse-cu11 nvidia-nccl-cu11 nvidia-nvtx-cu11    # (but not nvidia-cuda-nvcc-cu11--- that comes from "jax[cuda11_pip]", which also overrides many of the above deps)
+pip install --no-deps xformers
+#pip install -U xformers   # requires PyTorch 2.0.1; at one point, it req 2.0.0 and it was optional but recommended to have triton 2.0.0 instead of 1.0.0
+#pip install ninja
 #pip install -v -U 'git+https://github.com/facebookresearch/xformers.git@main#egg=xformers'
 pip install scikit-image
 pip install line_profiler
@@ -721,25 +767,38 @@ pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn 
 #pip install "triton==1.0.0"
 #pip install 'triton==2.0.0.dev20221202' || true
 
-# But, DeepSpeed sparse support only supports triton v1.0 (??? KGF: check if this is still true as of Aug 2023)
+# But, DeepSpeed sparse support only supported triton v1.0 for a long time (??? KGF: check if this is still true as of Aug 2023)
+# --- may work with triton v2.1.0 as of late September 2023: https://github.com/microsoft/DeepSpeed/pull/4278
+# but must build DeepSpeed from source for that. Latest wheel, DS 0.10.3, supports triton >=2.0.0, <2.1.0 https://github.com/microsoft/DeepSpeed/pull/4251
+# ----------------
 # HARDCODE
-cd $BASE_PATH
-echo "Install triton v2.0 from source"
-git clone https://github.com/openai/triton.git
-cd triton/python
-git checkout v2.0
+# cd $BASE_PATH
+# echo "Install triton v2.0.1 from source"
+# git clone https://github.com/openai/triton.git
+# cd triton/python
+# # git checkout v2.0.1
+# ## did they change the tag numbering in summer 2023? No longer "v2.0", only "v2.0.0" (2023-03-02). Also no tag matching 2.1.0 wheel on PyPI
+# v2.1.0 on 2023-09-01 (PyPI only)
+# v2.0.0 on 2023-03-02 (PyPI and GitHub)
 
-# Polaris-only issue:
-# CXX identified as CC or equiv. /opt/cray/pe/gcc/11.2.0/bin/g++ causes issues:
-# /opt/cray/pe/gcc/11.2.0/snos/include/g++/x86_64-suse-linux/bits/c++config.h:280:33: note: 'std::size_t' declared here
-# /soft/datascience/conda/2023-01-10/triton/include/triton/tools/graph.h:18:20: error: 'size_t' was not declared i n this scope; did you mean 'std::size_t'?
-CXX=/usr/bin/g++ pip install . -v
-# https://github.com/openai/triton/issues/808
+# # Polaris-only issue:
+# # CXX identified as CC or equiv. /opt/cray/pe/gcc/11.2.0/bin/g++ causes issues:
+# # /opt/cray/pe/gcc/11.2.0/snos/include/g++/x86_64-suse-linux/bits/c++config.h:280:33: note: 'std::size_t' declared here
+# # /soft/datascience/conda/2023-01-10/triton/include/triton/tools/graph.h:18:20: error: 'size_t' was not declared i n this scope; did you mean 'std::size_t'?
+# CXX=/usr/bin/g++ pip install . -v
+# # https://github.com/openai/triton/issues/808
 
-# this works for triton on ThetaGPU, even with Python 3.10
-###pip install .
+# # this works for triton on ThetaGPU, even with Python 3.10
+# ###pip install .
 
+# -----------------
+
+# 0.10.3 (2023-09-11)
 #pip install deepspeed
+#DS_BUILD_OPS=1 pip install deepspeed --global-option="build_ext" --global-option="-j8"
+# # (need to export CFLAGS, etc. for libaio)
+# # also DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
+# vs.
 
 cd $BASE_PATH
 echo "Install DeepSpeed from source"
@@ -748,7 +807,7 @@ cd DeepSpeed
 export CFLAGS="-I${CONDA_PREFIX}/include/"
 export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
 #DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
-DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
+DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
 # if no rpath, add this to Lmod modulefile:
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
 # Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed.
@@ -757,10 +816,49 @@ DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
 cd $BASE_PATH
 
 # HARDCODE
-pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+###pip install --upgrade "jax[cuda11_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+# --- Building wheels for collected packages: nvidia-cublas-cu11, nvidia-cuda-cupti-cu11, nvidia-cuda-nvcc-cu11, nvidia-cuda-runtime-cu11, nvidia-cudnn-cu11
+
+# KGF POTENTIAL ISSUE SEPTEMBER 2023:
+# Try building from source, OR getting wheel that links to local CUDA and cuDNN
+# See https://jax.readthedocs.io/en/latest/developer.html#building-from-source
+# OR
+pip install --upgrade "jax[cuda11_local]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+#
+# CONCERN: Some GPU functionality expects the CUDA installation to be at /usr/local/cuda-X.X, where X.X should be replaced with the CUDA version number (e.g. cuda-11.8). If CUDA is installed elsewhere on your system, you can either create a symlink:
+# -----
+# jax[cuda11_pip] brings:
+# Installing collected packages: nvidia-cudnn-cu116, nvidia-cuda-runtime-cu117, nvidia-cuda-nvcc-cu117, nvidia-cuda-cupti-cu117, nvidia-cublas-cu117, ml-dtypes, nvidia-cudnn-cu11, nvidia-cuda-runtime-cu11, nvidia-cuda-nvcc-cu11, nvidia-cuda-cupti-cu11, nvidia-cublas-cu11, jaxlib, jax
+#   Attempting uninstall: nvidia-cudnn-cu11
+#     Found existing installation: nvidia-cudnn-cu11 8.5.0.96
+#     Uninstalling nvidia-cudnn-cu11-8.5.0.96:
+#       Successfully uninstalled nvidia-cudnn-cu11-8.5.0.96
+#   Attempting uninstall: nvidia-cuda-runtime-cu11
+#     Found existing installation: nvidia-cuda-runtime-cu11 11.7.99
+#     Uninstalling nvidia-cuda-runtime-cu11-11.7.99:
+#       Successfully uninstalled nvidia-cuda-runtime-cu11-11.7.99
+#   Attempting uninstall: nvidia-cuda-cupti-cu11
+#     Found existing installation: nvidia-cuda-cupti-cu11 11.7.101
+#     Uninstalling nvidia-cuda-cupti-cu11-11.7.101:
+#       Successfully uninstalled nvidia-cuda-cupti-cu11-11.7.101
+#   Attempting uninstall: nvidia-cublas-cu11
+#     Found existing installation: nvidia-cublas-cu11 11.10.3.66
+#     Uninstalling nvidia-cublas-cu11-11.10.3.66:
+#       Successfully uninstalled nvidia-cublas-cu11-11.10.3.66
+# ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+# torch 2.0.1 requires nvidia-cublas-cu11==11.10.3.66; platform_system == "Linux" and platform_machine == "x86_64", but you have nvidia-cublas-cu11 2022.4.8 which is incompatible.
+# torch 2.0.1 requires nvidia-cuda-cupti-cu11==11.7.101; platform_system == "Linux" and platform_machine == "x86_64", but you have nvidia-cuda-cupti-cu11 2022.4.8 which is incompatible.
+# torch 2.0.1 requires nvidia-cuda-runtime-cu11==11.7.99; platform_system == "Linux" and platform_machine == "x86_64", but you have nvidia-cuda-runtime-cu11 2022.4.25 which is incompatible.
+# torch 2.0.1 requires nvidia-cudnn-cu11==8.5.0.96; platform_system == "Linux" and platform_machine == "x86_64", but you have nvidia-cudnn-cu11 2022.5.19 which is incompatible.
+# Successfully installed jax-0.4.16 jaxlib-0.4.16+cuda11.cudnn86 ml-dtypes-0.3.0 nvidia-cublas-cu11-2022.4.8 nvidia-cublas-cu117-11.10.1.25 nvidia-cuda-cupti-cu11-2022.4.8 nvidia-cuda-cupti-cu117-11.7.50 nvidia-cuda-nvcc-cu11-2022.5.4 nvidia-cuda-nvcc-cu117-11.7.64 nvidia-cuda-runtime-cu11-2022.4.25 nvidia-cuda-runtime-cu117-11.7.60 nvidia-cudnn-cu11-2022.5.19 nvidia-cudnn-cu116-8.4.0.27
+
+#pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn86]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install pymongo optax flax
 pip install "numpyro[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+
+
+# --- MPI4JAX
 # https://github.com/mpi4jax/mpi4jax/issues/153
 # CUDA_ROOT=/soft/datascience/cuda/cuda_11.5.2_495.29.05_linux python setup.py --verbose build_ext --inplace
 # be sure to "rm -rfd build/" to force .so libraries to rebuild if you change the build options, etc.

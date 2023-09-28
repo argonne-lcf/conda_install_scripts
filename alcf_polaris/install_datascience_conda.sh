@@ -632,12 +632,16 @@ if [[ -z "$DH_REPO_TAG" ]]; then
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
-    pip install ".[analytics,hvd,nas,autodeuq]"
+
+    #####pip install ".[analytics,hvd,nas,autodeuq]"
     # Adding "sdv" optional requirement on Polaris with Python 3.8 force re-installed:
     # numpy-1.22.4, torch-1.13.1, which requires nvidia-cuda-nvrtc-cu11 + many other deps
     # No problem on ThetaGPU. Switching to Python 3.10 apparently avoids everything
     # TODO: if problems start again, test installing each of the sdv deps one-by-one (esp. ctgan)
-    pip install ".[analytics,hvd,nas,hps-tl,autodeuq]"
+    #####pip install ".[analytics,hvd,nas,hps-tl,autodeuq]"
+
+    pip install ".[hps,hps-tl,nas,autodeuq,jax-gpu,automl,mpi,ray,redis-hiredis]"
+
     cd ..
     cd $BASE_PATH
 else
@@ -668,8 +672,8 @@ pip install 'libensemble'
 # HARDCODE
 # PyTorch Geometric Dependencies (2.3.x)
 # torch 2.0.1 wheels just redirect to 2.0.0 wheels: https://data.pyg.org/whl/torch-2.0.1%2Bcu118.html
-pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
-# KGF: first 3x wheels still not working against torch 2.0.1 built from source
+pip install pyg_lib torch_sparse torch_cluster torch_scatter torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+# KGF: first 3x wheels still not working against torch 2.0.1 built from source; torch_scatter, torch_spline_conv seem to work fine
 
 # pyg-lib, torch-scatter, torch-sparse were required deps for pytorch_geometric 2.2.x and earlier, rest were optional. As of pytorch_geometric 2.3.x, the latter 2x pkgs were upstreamed to PyTorch. The 5x optional dependencies were kept around to offer minimal tweaks/use-cases: https://github.com/pyg-team/pytorch_geometric/releases/tag/2.3.0
 
@@ -730,7 +734,7 @@ pip install opencv-python-headless
 # onnx 1.13.0 pushes protobuf to >3.20.2 and "tensorflow 2.11.0 requires protobuf<3.20,>=3.9.2, but you have protobuf 3.20.3 which is incompatible."
 #  onnx runtime 1.13.1 pushes numpy>=1.21.6, which installs 1.24.x for some reason, breaking <1.22 compat with numba
 # HARDCODE
-pip install 'onnx==1.14.0' 'onnxruntime-gpu==1.15.1'
+pip install 'onnx==1.14.1' 'onnxruntime-gpu==1.16.0'
 # onnxruntime is CPU-only. onnxruntime-gpu includes most CPU abilities
 # https://github.com/microsoft/onnxruntime/issues/10685
 # onnxruntime probably wont work on ThetaGPU single-gpu queue with CPU thread affinity
@@ -797,7 +801,7 @@ pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn 
 #pip install deepspeed
 #DS_BUILD_OPS=1 pip install deepspeed --global-option="build_ext" --global-option="-j8"
 # # (need to export CFLAGS, etc. for libaio)
-# # also DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
+# # also KGF DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
 # vs.
 
 cd $BASE_PATH

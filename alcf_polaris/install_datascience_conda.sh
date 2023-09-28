@@ -436,8 +436,13 @@ pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
 cd $BASE_PATH
 echo "Clone PyTorch"
 
-# KGF: 2023-09, --recursive clone caused issues in subsequent "git checkout --recurse-submodules" or "git submodule sync" within script on Polaris (but couldnt reproduce on login node interactively, nor on my macOS system:
+# KGF: 2023-09, --recursive clone caused issues in subsequent command "git checkout --recurse-submodules" (likely this one)
+# or "git submodule sync" within script on Polaris (but couldnt reproduce on login node interactively, nor on my macOS system:
 # "fatal: not a git repository: ../../.git/modules/third_party/python-enum"
+
+# https://github.com/pytorch/pytorch/tree/release/2.0#get-the-pytorch-source
+# still recommends those sequence of commands, except the branch checkout
+# Maybe the --recurse-submodules is an issue if a submodule is undefined on the target branch?
 
 # git clone --recursive $PT_REPO_URL
 git clone $PT_REPO_URL
@@ -673,7 +678,14 @@ pip install 'libensemble'
 # PyTorch Geometric Dependencies (2.3.x)
 # torch 2.0.1 wheels just redirect to 2.0.0 wheels: https://data.pyg.org/whl/torch-2.0.1%2Bcu118.html
 pip install pyg_lib torch_sparse torch_cluster torch_scatter torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
-# KGF: first 3x wheels still not working against torch 2.0.1 built from source; torch_scatter, torch_spline_conv seem to work fine
+# KGF: first 3x wheels still not working against our torch 2.0.1 built from source; torch_scatter, torch_spline_conv seem to work fine
+# TODO: which git SHA are the pyg optional dep wheels built against? or is it an issue with the "torch.__version__" 2.0.0a0+gite9ebda2 (also in Pip)?
+# TODO: file GitHub Issue about their wheels
+pip install torch_scatter torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+# build the rest from source:
+pip install --verbose git+https://github.com/pyg-team/pyg-lib.git
+pip install --verbose torch_sparse
+pip install --verbose torch_cluster
 
 # pyg-lib, torch-scatter, torch-sparse were required deps for pytorch_geometric 2.2.x and earlier, rest were optional. As of pytorch_geometric 2.3.x, the latter 2x pkgs were upstreamed to PyTorch. The 5x optional dependencies were kept around to offer minimal tweaks/use-cases: https://github.com/pyg-team/pytorch_geometric/releases/tag/2.3.0
 

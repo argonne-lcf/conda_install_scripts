@@ -500,7 +500,51 @@ export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
 #export TENSORRT_LIBRARY_INFER_PLUGIN=$TENSORRT_BASE/lib/libnvinfer_plugin.so
 #export TENSORRT_INCLUDE_DIR=$TENSORRT_BASE/include
 
-# KGF 2023-09 update:
+# -------------
+# KGF 2023-09 update: torch devs never update version.txt for patch releases, but it is dilligently
+# uploaded before a minor release is tagged, e.g. compare:
+# https://github.com/pytorch/pytorch/blob/v1.13.0/version.txt
+# https://github.com/pytorch/pytorch/blob/v1.13.1/version.txt
+# https://github.com/pytorch/pytorch/blob/release/1.13/version.txt
+# etc. In fact, they never mint more than 1x patch release per minor version
+
+# When building wheels for distribution, they likely always override version.txt via below 2x env vars.
+# Indeed, they do: https://github.com/pytorch/builder/blob/main/wheel/build_wheel.sh
+
+# see setup.py:
+#   PYTORCH_BUILD_VERSION
+#   PYTORCH_BUILD_NUMBER
+#     specify the version of PyTorch, rather than the hard-coded version
+#     in this file; used when we're building binaries for distribution
+
+# "version" variable passed to setup() is from get_torch_version() in tools/generate_torch_version.py
+# which parses those env vars, or falls back to version.txt
+
+# https://discuss.pytorch.org/t/how-to-build-from-source-code-without-trailing-torch-1-8-0a0-gitf2a38a0-version/115698/4
+# https://discuss.pytorch.org/t/how-to-specify-pytorch-version-with-the-cuda-version-when-building-from-source/134447
+# https://github.com/pytorch/pytorch/issues/50730#issuecomment-763207634
+# https://github.com/pytorch/pytorch/issues/61468
+# https://github.com/pytorch/pytorch/issues/20525
+# https://github.com/pytorch/pytorch/issues/51868
+# > More that version.txt is only used in the absence of PYTORCH_BUILD_VERSION which means that it actually never gets updated.
+
+# https://github.com/pytorch/pytorch/pull/95790#issuecomment-1450443579
+# (on why they are bumping main's version.txt to 2.1.0a0 even though 2.0.0 hasnt been released as of 2023-03-01)
+# > Release 2.0.0 is coming. We have a branch for it, release/2.0 . Normally we should bump the version as soon as we do the branch
+
+# https://github.com/pytorch/pytorch/issues/9926
+# https://github.com/pytorch/pytorch/issues/7954#issuecomment-394443358
+
+# scripts/release/cut-release-branch.sh script is just for creating release/X.Y branches
+# and pushing them to remotes. It does read from version.txt:
+# RELEASE_VERSION=${RELEASE_VERSION:-$(cut -d'.' -f1-2 "${GIT_TOP_DIR}/version.txt")}
+
+# https://github.com/pytorch/pytorch/commits/release/2.0
+# e.g. tag v2.0.1 is on this branch, and there are even 3x commits beyond that even though there isnt yet a 2.0.2
+# See https://github.com/pytorch/pytorch/blob/main/RELEASE.md#pytorchbuilder--pytorch-domain-libraries
+export PYTORCH_BUILD_VERISON=$PT_REPO_TAG
+export PYTORCH_BUILD_NUMBER=1
+# -------------
 
 CC=$(which cc) CXX=$(which CC) python setup.py bdist_wheel
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
@@ -787,10 +831,10 @@ pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn 
 #pip install 'triton==2.0.0.dev20221202' || true
 
 # But, DeepSpeed sparse support only supported triton v1.0 for a long time (KGF: still true as of September 2023)
-# --- other features like stable diff. req/work with triton v2.1.0 as of late September 2023
-# but must build DeepSpeed from source for that. Latest wheel, DS 0.10.3, supports triton >=2.0.0, <2.1.0?
-# https://github.com/microsoft/DeepSpeed/pull/4251
-# https://github.com/microsoft/DeepSpeed/pull/4278
+# --- other features like stable diff. req/work with triton v2.1.0 as of late September 2023:
+# https://github.com/microsoft/DeepSpeed/pull/4251  (triton>=2.0.0,<2.1.0, 2023-09-01)
+# https://github.com/microsoft/DeepSpeed/pull/4278  (triton>=2.1.0, 2023-09-07)
+# (initially, I thought you had to build DeepSpeed master > 0.10.3 from source for triton v2.1.0 support)
 
 # ----------------
 # HARDCODE
@@ -813,7 +857,8 @@ pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn 
 # # this works for triton on ThetaGPU, even with Python 3.10
 # ###pip install .
 
-pip install triton  # KGF: do I end up with 2.1.0 or 2.0.0? 2.1.0 if it hasnt already been pulled in as a dep above
+# KGF: do I end up with 2.1.0 or 2.0.0? 2.1.0 if it hasnt already been pulled in as a dep above
+pip install triton
 # but recall, triton 2.1.0 is incompat with deepspeed 0.10.3 (2023-09-11), but works if building DS master from source
 # after 2023-09-07
 # https://github.com/microsoft/DeepSpeed/pull/4278
@@ -838,7 +883,7 @@ export CUDACXX=${CUDA_INSTALL_PATH}/bin/nvcc
 cmake .. -DCUTLASS_NVCC_ARCHS=80 -DCUTLASS_ENABLE_CUBLAS=ON -DCUTLASS_ENABLE_CUDNN=ON
 # KGF issue https://github.com/NVIDIA/cutlass/issues/1118
 #make cutlass_profiler -j32
-#make test_unit -j32
+#make test_unit -j32  # this passes
 
 # https://github.com/NVIDIA/cutlass/blob/main/python/README.md
 # export CUDA_INSTALL_PATH=${CUDA_HOME}
@@ -850,31 +895,44 @@ cmake .. -DCUTLASS_NVCC_ARCHS=80 -DCUTLASS_ENABLE_CUBLAS=ON -DCUTLASS_ENABLE_CUD
 
 # -----------------
 
-# DeepSpeed 0.10.3 (2023-09-11) noteS:
+# DeepSpeed 0.10.3 (2023-09-11) notes:
 # 1) https://github.com/microsoft/DeepSpeed/issues/3491
 # DS_BUILD_SPARSE_ATTN=0 because this feature requires triton 1.x (old), while Stable Diffusion requires triton 2.x
 
-# 2)
-
+# 2) do we really care about JIT vs. precompiled features?
+# 3) DS_BUILD_UTILS=1 ---> what does it include? does it imply DS_BUILD_EVOFORMER_ATTN=1?
 #pip install deepspeed
-#DS_BUILD_OPS=1 pip install deepspeed --global-option="build_ext" --global-option="-j32"
-# # (need to export CFLAGS, etc. for libaio)
-# # also KGF TODO DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
-# vs.
 
 cd $BASE_PATH
 echo "Install DeepSpeed from source"
 git clone https://github.com/microsoft/DeepSpeed.git
 cd DeepSpeed
+# HARDCODE
+git checkout v0.10.3
 export CFLAGS="-I${CONDA_PREFIX}/include/"
 export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
-#DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
-DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install --verbose .
+#DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
+
+##### also KGF TODO pip DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
+
+#DS_BUILD_EVOFORMER_ATTN=0 ????
+#DS_BUILD_UTILS no longer does anything after 0.9.x: https://github.com/microsoft/DeepSpeed/issues/4422
+# CMAKE_POSITION_INDEPENDENT_CODE=ON NVCC_PREPEND_FLAGS="--forward-unknown-opts"  # https://github.com/microsoft/DeepSpeed/issues/3233
+
+#DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . --global-option="build_ext" --global-option="-j32"
+
+#DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose deepspeed --global-option="build_ext" --global-option="-j32"
+
+DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 python setup.py build_ext -j32 bdist_wheel
+# ---> error: command '/soft/compilers/cudatoolkit/cuda-11.8.0/bin/nvcc' failed with exit code 1 (real error seems hidden?)
+
 # if no rpath, add this to Lmod modulefile:
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
 # Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed.
 # e.g. if you put "export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}", it overrides many system libraries
 # breaking "module list", "emacs", etc.
+
+# > ds_report
 cd $BASE_PATH
 
 # HARDCODE

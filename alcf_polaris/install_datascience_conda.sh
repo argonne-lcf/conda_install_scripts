@@ -339,7 +339,7 @@ set -e
 echo "Conda install some dependencies"
 
 # note, numba pulls in numpy here too
-conda install -y -c defaults -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
+conda install -y -c defaults -c conda-forge cmake zip unzip astunparse setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio
 conda install -y -c defaults -c conda-forge mkl mkl-include  # onednn mkl-dnn git-lfs ### on ThetaGPU
 # conda install -y cffi typing_extensions pyyaml
 
@@ -390,7 +390,7 @@ echo "Install TensorFlow Dependencies"
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
-pip install -U numpy numba
+pip install -U numpy numba ninja
 # the above line can be very important or very bad, to get have pip control the numpy dependency chain right before TF build
 # Start including numba here too in order to ensure mutual compat; numba 0.56.4 req numpy <1.24.0, e.g.
 # Check https://github.com/numpy/numpy/blob/main/numpy/core/setup_common.py
@@ -499,6 +499,9 @@ export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
 #export TENSORRT_LIBRARY_INFER=$TENSORRT_BASE/lib/libnvinfer.so
 #export TENSORRT_LIBRARY_INFER_PLUGIN=$TENSORRT_BASE/lib/libnvinfer_plugin.so
 #export TENSORRT_INCLUDE_DIR=$TENSORRT_BASE/include
+
+# KGF 2023-09 update:
+
 CC=$(which cc) CXX=$(which CC) python setup.py bdist_wheel
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
 echo "copying pytorch wheel file $PT_WHEEL"
@@ -783,18 +786,21 @@ pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn 
 #pip install "triton==1.0.0"
 #pip install 'triton==2.0.0.dev20221202' || true
 
-# But, DeepSpeed sparse support only supported triton v1.0 for a long time (??? KGF: check if this is still true as of Aug 2023)
-# --- may work with triton v2.1.0 as of late September 2023: https://github.com/microsoft/DeepSpeed/pull/4278
-# but must build DeepSpeed from source for that. Latest wheel, DS 0.10.3, supports triton >=2.0.0, <2.1.0 https://github.com/microsoft/DeepSpeed/pull/4251
+# But, DeepSpeed sparse support only supported triton v1.0 for a long time (KGF: still true as of September 2023)
+# --- other features like stable diff. req/work with triton v2.1.0 as of late September 2023
+# but must build DeepSpeed from source for that. Latest wheel, DS 0.10.3, supports triton >=2.0.0, <2.1.0?
+# https://github.com/microsoft/DeepSpeed/pull/4251
+# https://github.com/microsoft/DeepSpeed/pull/4278
+
 # ----------------
 # HARDCODE
 # cd $BASE_PATH
-# echo "Install triton v2.0.1 from source"
+# echo "Install triton v2.1.0 from source"
 # git clone https://github.com/openai/triton.git
 # cd triton/python
-# # git checkout v2.0.1
+# # git checkout v2.1.0
 # ## did they change the tag numbering in summer 2023? No longer "v2.0", only "v2.0.0" (2023-03-02). Also no tag matching 2.1.0 wheel on PyPI
-# v2.1.0 on 2023-09-01 (PyPI only)
+# v2.1.0 on 2023-09-01 (PyPI only) -- https://github.com/openai/triton/issues/2407
 # v2.0.0 on 2023-03-02 (PyPI and GitHub)
 
 # # Polaris-only issue:
@@ -807,13 +813,53 @@ pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn 
 # # this works for triton on ThetaGPU, even with Python 3.10
 # ###pip install .
 
+pip install triton  # KGF: do I end up with 2.1.0 or 2.0.0? 2.1.0 if it hasnt already been pulled in as a dep above
+# but recall, triton 2.1.0 is incompat with deepspeed 0.10.3 (2023-09-11), but works if building DS master from source
+# after 2023-09-07
+# https://github.com/microsoft/DeepSpeed/pull/4278
+# https://github.com/microsoft/DeepSpeed/commit/e8ed7419ed40306100f0454bf85c6f4cc4d55f34
+
+# -----------------
+# https://www.deepspeed.ai/tutorials/ds4sci_evoformerattention/#31-installation
+# DeepSpeed Evoformer requires CUTLASS, and looks for it at CUTLASS_PATH
+# CUTLASS is a header-only template library and does not need to be built to be used by other projects.
+# Client applications should target CUTLASS's include/ directory in their include paths.
+cd $BASE_PATH
+echo "Install CUTLASS from source"
+git clone https://github.com/NVIDIA/cutlass
+cd cutlass
+export CUTLASS_PATH="${BASE_PATH}/cutlass"
+# https://github.com/NVIDIA/cutlass/blob/main/media/docs/quickstart.md
+mkdir build && cd build
+# strangely, https://github.com/NVIDIA/cutlass/blob/main/cuDNN.cmake doesnt respect $CUDNN_INCLUDE_DIR
+export CUDNN_PATH=${CUDNN_BASE}
+export CUDA_INSTALL_PATH=${CUDA_HOME}
+export CUDACXX=${CUDA_INSTALL_PATH}/bin/nvcc
+cmake .. -DCUTLASS_NVCC_ARCHS=80 -DCUTLASS_ENABLE_CUBLAS=ON -DCUTLASS_ENABLE_CUDNN=ON
+# KGF issue https://github.com/NVIDIA/cutlass/issues/1118
+#make cutlass_profiler -j32
+#make test_unit -j32
+
+# https://github.com/NVIDIA/cutlass/blob/main/python/README.md
+# export CUDA_INSTALL_PATH=${CUDA_HOME}
+# if unset, it defaults to:
+#        which nvcc | awk -F'/bin/nvcc' '{print $1}'
+##python setup.py develop --user
+# KGF: both "develop" and "--user" installs are problematic for our shared Anaconda envs
+# "We plan to add support for installing via python setup.py install in a future release."
+
 # -----------------
 
-# 0.10.3 (2023-09-11)
+# DeepSpeed 0.10.3 (2023-09-11) noteS:
+# 1) https://github.com/microsoft/DeepSpeed/issues/3491
+# DS_BUILD_SPARSE_ATTN=0 because this feature requires triton 1.x (old), while Stable Diffusion requires triton 2.x
+
+# 2)
+
 #pip install deepspeed
-#DS_BUILD_OPS=1 pip install deepspeed --global-option="build_ext" --global-option="-j8"
+#DS_BUILD_OPS=1 pip install deepspeed --global-option="build_ext" --global-option="-j32"
 # # (need to export CFLAGS, etc. for libaio)
-# # also KGF DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
+# # also KGF TODO DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
 # vs.
 
 cd $BASE_PATH
@@ -823,7 +869,7 @@ cd DeepSpeed
 export CFLAGS="-I${CONDA_PREFIX}/include/"
 export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
 #DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
-DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
+DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install --verbose .
 # if no rpath, add this to Lmod modulefile:
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
 # Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed.

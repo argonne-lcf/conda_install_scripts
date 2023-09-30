@@ -542,10 +542,12 @@ export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
 # https://github.com/pytorch/pytorch/commits/release/2.0
 # e.g. tag v2.0.1 is on this branch, and there are even 3x commits beyond that even though there isnt yet a 2.0.2
 # See https://github.com/pytorch/pytorch/blob/main/RELEASE.md#pytorchbuilder--pytorch-domain-libraries
-export PYTORCH_BUILD_VERISON=$PT_REPO_TAG
+# (trim the first character of the tag, "v")
+export PYTORCH_BUILD_VERISON="${PT_REPO_TAG:1}"
 export PYTORCH_BUILD_NUMBER=1
 # -------------
 
+echo "PYTORCH_BUILD_VERISON=$PYTORCH_BUILD_VERISON and PYTORCH_BUILD_NUMBER=$PYTORCH_BUILD_NUMBER"
 CC=$(which cc) CXX=$(which CC) python setup.py bdist_wheel
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
 echo "copying pytorch wheel file $PT_WHEEL"
@@ -813,6 +815,7 @@ pip install --no-deps xformers
 #pip install ninja
 #pip install -v -U 'git+https://github.com/facebookresearch/xformers.git@main#egg=xformers'
 pip install scikit-image
+pip install ipython   # KGF (2023-09-29): how was this missing from earlier scripts??
 pip install line_profiler
 pip install torch-tb-profiler
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
@@ -880,9 +883,22 @@ mkdir build && cd build
 export CUDNN_PATH=${CUDNN_BASE}
 export CUDA_INSTALL_PATH=${CUDA_HOME}
 export CUDACXX=${CUDA_INSTALL_PATH}/bin/nvcc
+echo "About to run CMake for CUTLASS python = $(which python)"
+conda info
 cmake .. -DCUTLASS_NVCC_ARCHS=80 -DCUTLASS_ENABLE_CUBLAS=ON -DCUTLASS_ENABLE_CUDNN=ON
+# KGF: spurious errors with above CUTLASS cmake command in script (never encountered in interactive job
+# CMake Error at tools/library/CMakeLists.txt:285 (message):
+#   Error generating library instances.  See
+#   /soft/datascience/conda/2023-09-28/cutlass/build/tools/library/library_instance_generation.log
+# ... (in that file:)
+#
+
 # KGF issue https://github.com/NVIDIA/cutlass/issues/1118
-#make cutlass_profiler -j32
+echo "apply patch for CUTLASS #include <limits> in platform.h"
+cd ..
+git apply ~/cutlass_limits.patch
+cd build
+make cutlass_profiler -j32  # fails at 98% cudnn_helpers.cpp.o without patch
 #make test_unit -j32  # this passes
 
 # https://github.com/NVIDIA/cutlass/blob/main/python/README.md
@@ -898,10 +914,23 @@ cmake .. -DCUTLASS_NVCC_ARCHS=80 -DCUTLASS_ENABLE_CUBLAS=ON -DCUTLASS_ENABLE_CUD
 # DeepSpeed 0.10.3 (2023-09-11) notes:
 # 1) https://github.com/microsoft/DeepSpeed/issues/3491
 # DS_BUILD_SPARSE_ATTN=0 because this feature requires triton 1.x (old), while Stable Diffusion requires triton 2.x
-
 # 2) do we really care about JIT vs. precompiled features?
-# 3) DS_BUILD_UTILS=1 ---> what does it include? does it imply DS_BUILD_EVOFORMER_ATTN=1?
-#pip install deepspeed
+# 3) DS_BUILD_UTILS=1 ---> what does it include? does it imply DS_BUILD_EVOFORMER_ATTN=1? No; see below
+# 4) -j32 might be too much? overall, "pip install deepspeed" appears more stable than setup.py or any in-dir builds
+
+##### also KGF TODO pip DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
+
+#DS_BUILD_EVOFORMER_ATTN=0 ????
+# Evoformer (and its CUTLASS dependency) was not added to master until AFTER 0.10.3 (you can grep the entire repo for it, and it doesnt appear until then)
+# The op wont appear in ds_report unless building unstable master
+
+#DS_BUILD_UTILS no longer does anything after 0.9.x: https://github.com/microsoft/DeepSpeed/issues/4422
+
+# CMAKE_POSITION_INDEPENDENT_CODE=ON NVCC_PREPEND_FLAGS="--forward-unknown-opts"  # https://github.com/microsoft/DeepSpeed/issues/3233
+# KGF: the PIC option seems to cause problems, but maybe the latter option helps? nvcc was emitting warnings about -Wno-reorder
+# the following line works with 0.10.3
+# NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose deepspeed
+
 
 cd $BASE_PATH
 echo "Install DeepSpeed from source"
@@ -911,19 +940,16 @@ cd DeepSpeed
 git checkout v0.10.3
 export CFLAGS="-I${CONDA_PREFIX}/include/"
 export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
+# KGF: above two lines need to be added to modulefile?
+
 #DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 
-##### also KGF TODO pip DEPRECATION: --build-option and --global-option are deprecated. pip 23.3 will enforce this behaviour change.
-
-#DS_BUILD_EVOFORMER_ATTN=0 ????
-#DS_BUILD_UTILS no longer does anything after 0.9.x: https://github.com/microsoft/DeepSpeed/issues/4422
-# CMAKE_POSITION_INDEPENDENT_CODE=ON NVCC_PREPEND_FLAGS="--forward-unknown-opts"  # https://github.com/microsoft/DeepSpeed/issues/3233
-
-#DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . --global-option="build_ext" --global-option="-j32"
+NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . --global-option="build_ext" --global-option="-j16"
 
 #DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose deepspeed --global-option="build_ext" --global-option="-j32"
 
-DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 python setup.py build_ext -j32 bdist_wheel
+#NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 python setup.py build_ext -j16 bdist_wheel
+
 # ---> error: command '/soft/compilers/cudatoolkit/cuda-11.8.0/bin/nvcc' failed with exit code 1 (real error seems hidden?)
 
 # if no rpath, add this to Lmod modulefile:

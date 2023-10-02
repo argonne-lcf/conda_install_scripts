@@ -874,7 +874,8 @@ pip install triton
 # Client applications should target CUTLASS's include/ directory in their include paths.
 cd $BASE_PATH
 echo "Install CUTLASS from source"
-git clone https://github.com/NVIDIA/cutlass
+git clone https://github.com/felker/cutlass
+git checkout alcf_polaris
 cd cutlass
 export CUTLASS_PATH="${BASE_PATH}/cutlass"
 # https://github.com/NVIDIA/cutlass/blob/main/media/docs/quickstart.md
@@ -886,18 +887,25 @@ export CUDACXX=${CUDA_INSTALL_PATH}/bin/nvcc
 echo "About to run CMake for CUTLASS python = $(which python)"
 conda info
 cmake .. -DCUTLASS_NVCC_ARCHS=80 -DCUTLASS_ENABLE_CUBLAS=ON -DCUTLASS_ENABLE_CUDNN=ON
-# KGF: spurious errors with above CUTLASS cmake command in script (never encountered in interactive job
+# KGF: spurious errors with above CUTLASS cmake command in script (never encountered in interactive job)
 # CMake Error at tools/library/CMakeLists.txt:285 (message):
 #   Error generating library instances.  See
 #   /soft/datascience/conda/2023-09-28/cutlass/build/tools/library/library_instance_generation.log
 # ... (in that file:)
 #
+# Issue: CMake builds cutlass_library via "python setup_library.py develop --user"
+# which puts it in:
+# "PYTHONUSERBASE","/home/felker/.local/polaris/conda/2023-09-29" OR
+# ~/.local/lib/python3.10/site-packages/easy-install.pth
+# but then later in the CMake build chain, it cannot find/import it
+# See https://github.com/felker/cutlass/commit/2368ed63d5dd2f4899873966c8b04912df6132fa
 
 # KGF issue https://github.com/NVIDIA/cutlass/issues/1118
-echo "apply patch for CUTLASS #include <limits> in platform.h"
-cd ..
-git apply ~/cutlass_limits.patch
-cd build
+# echo "apply patch for CUTLASS #include <limits> in platform.h"
+# cd ..
+# git apply ~/cutlass_limits.patch
+# cd build
+
 make cutlass_profiler -j32  # fails at 98% cudnn_helpers.cpp.o without patch
 #make test_unit -j32  # this passes
 

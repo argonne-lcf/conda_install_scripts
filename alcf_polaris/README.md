@@ -11,13 +11,15 @@ Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
 - [ ] Add Ray
 - [ ] Add Redis, Redis JSON, newer DeepHyper
 - [ ] Build new module with PyTorch 2.1.0 (released 2023-10-04); latest built is 2.0.1
+- [ ] XLA performance regression?
+- [ ] Confirm that removing Conda Bash shell function `__add_sys_prefix_to_path` for 2023 modules doesnt have adverse side effects. Document when/which conda version it was removed
+- [ ] Known problem: no support for DeepSpeed Sparse Attention with Triton 2.x, PyTorch 2.x, Python 3.10
 - [x] Confirm fix to `pip list | grep torch` version string via `PYTORCH_BUILD_VERSION`
 - [ ] Decide on separate venv/cloned conda for `Megatron-DeepSpeed`
   - [ ] How volatile is the main branch, and how important is it to have the cutting edge version installed in a module on Polaris?
 - [ ] Can we relax Apex being pinned to `52e18c894223800cb611682dce27d88050edf1de` ? What are the build failures on `master` 58acf96? Should we stick to tags like `23.08`, even though `README.md` suggests building latest `master`?
 - [ ] What specific Apex features does `Megatron-DeepSpeed` rely on? `MixedFusedRMSNorm,FusedAdam,FusedSGD,amp_C,fused_weight_gradient_mlp_cuda`, multi-tensor applier for efficiency reasons, etc. How many of those are truly necessary? E.g. `amp_C` should be deprecated and PyTorch mixed precision should be used. Can a PR be opened to get rid of it?
 - [ ] S. Foreman reporting multiple ranks place on a single GPU with PyTorch DDP? Specific to `Megatron-DeepSpeed`? Wrong NCCL version too; should be 2.18.3
-
 ```
 torch.distributed.DistBackendError: NCCL error in: /soft/datascience/conda/2023-09-29/pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1275, internal error, NCCL version 2.14.3
 ncclInternalError: Internal check failed.
@@ -32,7 +34,7 @@ Duplicate GPU detected : rank 7 and rank 3 both on CUDA device c7000
     work = default_pg.barrier(opts=opts)
 torch.distributed.DistBackendError: NCCL error in: /soft/datascience/conda/2023-09-29/pytorch/torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1275, internal error, NCCL version 2.14.3
 ```
-- [ ] C. Simpson reporting classic Conda JSON permissions issues:
+- [x] C. Simpson reporting classic Conda JSON permissions issues (was only on hacked-together `conda/2023-09-29`, not `conda/2023-10-04`):
 ```
 (base)csimpson@polaris-login-01:/eagle/datascience/csimpson/dragon_public> conda list
 WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(188): Could not remove or rename /soft/datascience/conda/2023-09-29/mconda3/conda-meta/wheel-0.38.4-py310h06a4308_0.json.  Please remove this file manually (you may need to reboot to free file handles)

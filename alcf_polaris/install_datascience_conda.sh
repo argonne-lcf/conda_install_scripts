@@ -543,11 +543,11 @@ export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
 # e.g. tag v2.0.1 is on this branch, and there are even 3x commits beyond that even though there isnt yet a 2.0.2
 # See https://github.com/pytorch/pytorch/blob/main/RELEASE.md#pytorchbuilder--pytorch-domain-libraries
 # (trim the first character of the tag, "v")
-export PYTORCH_BUILD_VERISON="${PT_REPO_TAG:1}"
+export PYTORCH_BUILD_VERSION="${PT_REPO_TAG:1}"
 export PYTORCH_BUILD_NUMBER=1
 # -------------
 
-echo "PYTORCH_BUILD_VERISON=$PYTORCH_BUILD_VERISON and PYTORCH_BUILD_NUMBER=$PYTORCH_BUILD_NUMBER"
+echo "PYTORCH_BUILD_VERSION=$PYTORCH_BUILD_VERSION and PYTORCH_BUILD_NUMBER=$PYTORCH_BUILD_NUMBER"
 CC=$(which cc) CXX=$(which CC) python setup.py bdist_wheel
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
 echo "copying pytorch wheel file $PT_WHEEL"
@@ -726,10 +726,13 @@ pip install 'libensemble'
 # HARDCODE
 # PyTorch Geometric Dependencies (2.3.x)
 # torch 2.0.1 wheels just redirect to 2.0.0 wheels: https://data.pyg.org/whl/torch-2.0.1%2Bcu118.html
-pip install pyg_lib torch_sparse torch_cluster torch_scatter torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+
+#pip install pyg_lib torch_sparse torch_cluster torch_scatter torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+
 # KGF: first 3x wheels still not working against our torch 2.0.1 built from source; torch_scatter, torch_spline_conv seem to work fine
 # TODO: which git SHA are the pyg optional dep wheels built against? or is it an issue with the "torch.__version__" 2.0.0a0+gite9ebda2 (also in Pip)?
-# TODO: file GitHub Issue about their wheels
+
+# KGF filed GitHub Issue about their wheels: https://github.com/pyg-team/pytorch_geometric/issues/8128
 pip install torch_scatter torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
 # build the rest from source:
 pip install --verbose git+https://github.com/pyg-team/pyg-lib.git
@@ -875,8 +878,8 @@ pip install triton
 cd $BASE_PATH
 echo "Install CUTLASS from source"
 git clone https://github.com/felker/cutlass
-git checkout alcf_polaris
 cd cutlass
+git checkout alcf_polaris
 export CUTLASS_PATH="${BASE_PATH}/cutlass"
 # https://github.com/NVIDIA/cutlass/blob/main/media/docs/quickstart.md
 mkdir build && cd build
@@ -952,7 +955,8 @@ export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PRE
 
 #DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 
-NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . --global-option="build_ext" --global-option="-j16"
+NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . ### --global-option="build_ext" --global-option="-j16"
+# the parallel build options seem to cause issues
 
 #DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose deepspeed --global-option="build_ext" --global-option="-j32"
 
@@ -968,6 +972,17 @@ NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=
 
 # > ds_report
 cd $BASE_PATH
+
+# HARDCODE
+# Apex (for Megatron-Deepspeed)
+python3 -m pip install \
+	-vv \
+	--disable-pip-version-check \
+	--no-cache-dir \
+	--no-build-isolation \
+	--config-settings "--build-option=--cpp_ext" \
+	--config-settings "--build-option=--cuda_ext" \
+	"git+https://github.com/NVIDIA/apex.git@52e18c894223800cb611682dce27d88050edf1de"
 
 # HARDCODE
 ###pip install --upgrade "jax[cuda11_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
@@ -1068,7 +1083,6 @@ rm -rf $DOWNLOAD_PATH
 conda list
 
 chmod -R a-w $BASE_PATH/
-
 
 set +e
 # KGF: still need to apply manual postfix for the 4x following warnings that appear whenever "conda list" or other commands are run

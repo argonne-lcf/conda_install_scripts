@@ -387,7 +387,7 @@ cd $BASE_PATH
 
 echo "Install TensorFlow Dependencies"
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
-# KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
+# KGF: try relaxing the dependency version requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
 pip install -U numpy numba ninja
@@ -983,6 +983,8 @@ python3 -m pip install \
 	--config-settings "--build-option=--cpp_ext" \
 	--config-settings "--build-option=--cuda_ext" \
 	"git+https://github.com/NVIDIA/apex.git@52e18c894223800cb611682dce27d88050edf1de"
+
+python3 -m pip install "git+https://github.com/microsoft/Megatron-DeepSpeed.git"
 
 # HARDCODE
 ###pip install --upgrade "jax[cuda11_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html

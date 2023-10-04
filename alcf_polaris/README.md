@@ -8,9 +8,11 @@ Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
 ```
 
 - [ ] Rebuild DeepSpeed after next stable release following 0.10.3 with CUTLASS and Evoformer precompiled op support
+- [ ] Unpin CUTLASS from fork with my 2x patches now that 1x patch is merged upstream
 - [ ] Add Ray
 - [ ] Add Redis, Redis JSON, newer DeepHyper
-- [ ] Build new module with PyTorch 2.1.0 (released 2023-10-04); latest built is 2.0.1
+- [ ] Track all my GitHub issues from last 2x months
+- [ ] Build new module with PyTorch 2.1.0 (released 2023-10-04); latest built is 2.0.1. Is the ATen cuDNN issue fixed?
 - [ ] XLA performance regression?
 - [ ] Confirm that removing Conda Bash shell function `__add_sys_prefix_to_path` for 2023 modules doesnt have adverse side effects. Document when/which conda version it was removed
 - [ ] Known problem: no support for DeepSpeed Sparse Attention with Triton 2.x, PyTorch 2.x, Python 3.10

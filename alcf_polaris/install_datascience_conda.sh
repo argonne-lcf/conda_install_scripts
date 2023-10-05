@@ -733,11 +733,14 @@ pip install 'libensemble'
 # TODO: which git SHA are the pyg optional dep wheels built against? or is it an issue with the "torch.__version__" 2.0.0a0+gite9ebda2 (also in Pip)?
 
 # KGF filed GitHub Issue about their wheels: https://github.com/pyg-team/pytorch_geometric/issues/8128
-pip install torch_scatter torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+pip install torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
 # build the rest from source:
 pip install --verbose git+https://github.com/pyg-team/pyg-lib.git
+# next 2x require CPATH to be set?
+export CPATH=${CUDA_TOOLKIT_BASE}/include:$CPATH
 pip install --verbose torch_sparse
-pip install --verbose torch_cluster
+pip install --verbose torch_scatter
+pip install --verbose torch_cluster  # this takes a long time
 
 # pyg-lib, torch-scatter, torch-sparse were required deps for pytorch_geometric 2.2.x and earlier, rest were optional. As of pytorch_geometric 2.3.x, the latter 2x pkgs were upstreamed to PyTorch. The 5x optional dependencies were kept around to offer minimal tweaks/use-cases: https://github.com/pyg-team/pytorch_geometric/releases/tag/2.3.0
 

@@ -735,11 +735,13 @@ pip install 'libensemble'
 # KGF filed GitHub Issue about their wheels: https://github.com/pyg-team/pytorch_geometric/issues/8128
 pip install torch_spline_conv -f https://data.pyg.org/whl/torch-2.0.1+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
 # build the rest from source:
+# KGF: note, the below LDFLAGS setting causes issues with "ldd libpyg.so" unable to find libpython3.10.so.1.0
+# Need to "unset LDFLAGS" before the next line if installing it after this script in an interactive session
 pip install --verbose git+https://github.com/pyg-team/pyg-lib.git
 # next 2x require CPATH to be set?
 export CPATH=${CUDA_TOOLKIT_BASE}/include:$CPATH
 pip install --verbose torch_sparse
-pip install --verbose torch_scatter
+pip install --verbose torch_scatter  # are we sure this needs to be built from source? used to install in above -f line
 pip install --verbose torch_cluster  # this takes a long time
 
 # pyg-lib, torch-scatter, torch-sparse were required deps for pytorch_geometric 2.2.x and earlier, rest were optional. As of pytorch_geometric 2.3.x, the latter 2x pkgs were upstreamed to PyTorch. The 5x optional dependencies were kept around to offer minimal tweaks/use-cases: https://github.com/pyg-team/pytorch_geometric/releases/tag/2.3.0
@@ -944,7 +946,6 @@ make cutlass_profiler -j32  # fails at 98% cudnn_helpers.cpp.o without patch
 # KGF: the PIC option seems to cause problems, but maybe the latter option helps? nvcc was emitting warnings about -Wno-reorder
 # the following line works with 0.10.3
 # NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose deepspeed
-
 
 cd $BASE_PATH
 echo "Install DeepSpeed from source"

@@ -16,15 +16,50 @@ Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
 - [ ] Make `conda/2023-10-04` public; send notice to ALCF Announcements
 - [ ] Make `conda/2023-10-04` the default; send notice to ALCF Announcements
 - [ ] Update documentation
-- [ ] Still some spurious errors with `pyg_lib` and `torch_sparse` at runtime when importing:
+- [ ] Still some spurious errors with `pyg_lib` (and `torch_sparse`, but that is just because it loads `libpyg.so`) at runtime when importing:
 ```
-Disabling its usage. Stacktrace: libpython3.10.so.1.0: cannot open shared object file: No such file or directory
-```
-`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/soft/datascience/conda/2023-10-02/mconda3/lib` of course avoids the error, but is less than ideal. 
-Occurred in `conda/2023-10-02`, which first had PyG and its deps built incorrectly (from wheels). I then rebuilt the packages from source
-Does not occur in `conda/2023-10-04`, which had a similar journey, but only for `torch_sparse`, `torch_scatter` which required `CFLAGS` to be set??
+Cell In[1], line 1
+----> 1 import pyg_lib
 
-Is this error dependent on the order of installation or something? Is `LDFLAGS` an issue? It isnt set until after PyG installation in the script, but then is set for post-scrip interactive sessions:
+File /soft/datascience/conda/2023-10-02/mconda3/lib/python3.10/site-packages/pyg_lib/__init__.py:39
+     35     else:
+     36         torch.ops.load_library(spec.origin)
+---> 39 load_library('libpyg')
+     42 def cuda_version() -> int:
+     43     r"""Returns the CUDA version for which :obj:`pyg_lib` was compiled with.
+     44
+     45     Returns:
+     46         (int): The CUDA version.
+     47     """
+
+File /soft/datascience/conda/2023-10-02/mconda3/lib/python3.10/site-packages/pyg_lib/__init__.py:36, in load_library(lib_name)
+     34     warnings.warn(f"Could not find shared library '{lib_name}'")
+     35 else:
+---> 36     torch.ops.load_library(spec.origin)
+
+File /soft/datascience/conda/2023-10-02/mconda3/lib/python3.10/site-packages/torch/_ops.py:643, in _Ops.load_library(self, path)
+    638 path = _utils_internal.resolve_library_path(path)
+    639 with dl_open_guard():
+    640     # Import the shared library into the process, thus running its
+    641     # static (global) initialization code in order to register custom
+    642     # operators with the JIT.
+--> 643     ctypes.CDLL(path)
+    644 self.loaded_libraries.add(path)
+
+File /soft/datascience/conda/2023-10-02/mconda3/lib/python3.10/ctypes/__init__.py:374, in CDLL.__init__(self, name, mode, handle, use_errno, use_last_error, winmode)
+    371 self._FuncPtr = _FuncPtr
+    373 if handle is None:
+--> 374     self._handle = _dlopen(self._name, mode)
+    375 else:
+    376     self._handle = handle
+
+OSError: libpython3.10.so.1.0: cannot open shared object file: No such file or directory
+```
+Running `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/soft/datascience/conda/2023-10-02/mconda3/lib` of course avoids the error, but is less than ideal. 
+Occurred in `conda/2023-10-02`, which first had PyG and its deps built incorrectly (from wheels). I then rebuilt all of the dependency packages from source.
+Does not occur in `conda/2023-10-04`, which had a similar journey, but only needed to rebuild `torch_sparse`, `torch_scatter` from source, since they required `CFLAGS` to be set?
+
+Is this error dependent on the order of installation or something? Is `LDFLAGS` an issue? It isnt set until after PyG installation in the script, but then is set for post-script interactive sessions via the modulefile:
 ```
 ❯ echo $LDFLAGS
 -L/soft/datascience/conda/2023-10-02/mconda3/lib -Wl,--enable-new-dtags,-rpath,/soft/datascience/conda/2023-10-02/mconda3/lib
@@ -35,8 +70,9 @@ Is this error dependent on the order of installation or something? Is `LDFLAGS` 
 ...
 libpython3.10.so.1.0 => not found
 ```
+**Answer**: indeed, having `LDFLAGS` set as above during `pip install --verbose git+https://github.com/pyg-team/pyg-lib.git` results in a broken `libpyg.so`. Rebuilding after `unset LDFLAGS`, then re-exporting the env var is fine. **However, this emphasizes that it might be problematic to have the LDFLAGS setting in the modulefile**. When users load the Anaconda module, and try to build additional software from source (esp. in a cloned conda env), this may cause serious issues. 
 
-
+- [ ] Add warning about `LDFLAGS` to docs?
 - [ ] Add Ray
 - [ ] Add Redis, Redis JSON, newer DeepHyper
 - [ ] Track all my GitHub issues from last 2x months

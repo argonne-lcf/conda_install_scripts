@@ -118,9 +118,14 @@ export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PRE
 
 #DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
 
-#NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . --global-option="build_ext" --global-option="-j16"  # ERROR:  /soft/datascience/conda/2023-09-29/mconda3/compiler_compat/ld: build/temp.linux-x86_64-cpython-310/csrc/transformer/normalize_kernels.o: error adding symbols: no error
+#NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . --global-option="build_ext" --global-option="-j16"
+# ERROR:  /soft/datascience/conda/2023-09-29/mconda3/compiler_compat/ld: build/temp.linux-x86_64-cpython-310/csrc/transformer/normalize_kernels.o: error adding symbols: no error
 
-NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose .  # PASSES
+NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose .  # PASSES with 0.10.3
+
+#NVCC_PREPEND_FLAGS="--forward-unknown-opts" DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose . ### FAILS with master
+# /soft/datascience/conda/2023-10-01/mconda3/compiler_compat/ld: build/temp.linux-x86_64-cpython-310/csrc/deepspeed4science/evoformer_attn/attention.o:(.bss+0x0): multiple definition of `torch::autograd::(anonymous namespace)::graph_task_id'; build/temp.linux-x86_64-cpython-310/csrc/deepspeed4science/evoformer_attn/attention.o:(.bss+0x0): first defined here
+
 
 #DS_BUILD_SPARSE_ATTN=0 DS_BUILD_OPS=1 DS_BUILD_AIO=1 pip install --verbose deepspeed --global-option="build_ext" --global-option="-j32"
 

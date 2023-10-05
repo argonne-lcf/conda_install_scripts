@@ -7,16 +7,16 @@ For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
 Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
 ```
 
-- [ ] `chmod -R u-w /soft/datascience/conda/2023-10-04`
+- [x] `chmod -R u-w /soft/datascience/conda/2023-10-04`
 - [ ] Save build log to VCS
-- [ ] Remove `/soft/datascience/conda/2023-10-02`
+- [x] Remove `/soft/datascience/conda/2023-10-02`
 - [ ] Rebuild DeepSpeed after next stable release following 0.10.3 with CUTLASS and Evoformer precompiled op support
 - [ ] Update `pip` passthrough options to setuptools once pip 23.3 comes out (we are using 23.2.1): https://github.com/pypa/pip/issues/11859
 - [ ] Unpin CUTLASS from fork with my 2x patches now that 1x patch is merged upstream
 - [ ] Make `conda/2023-10-04` public; send notice to ALCF Announcements
 - [ ] Make `conda/2023-10-04` the default; send notice to ALCF Announcements
 - [ ] Update documentation
-- [ ] Still some spurious errors with `pyg_lib` (and `torch_sparse`, but that is just because it loads `libpyg.so`) at runtime when importing:
+- [x] Still some spurious errors with `pyg_lib` (and `torch_sparse`, but that is just because it loads `libpyg.so`) at runtime when importing:
 ```
 Cell In[1], line 1
 ----> 1 import pyg_lib

@@ -7,8 +7,36 @@ For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
 Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
 ```
 
+- [ ] `chmod -R u-w /soft/datascience/conda/2023-10-04`
+- [ ] Save build log to VCS
+- [ ] Remove `/soft/datascience/conda/2023-10-02`
 - [ ] Rebuild DeepSpeed after next stable release following 0.10.3 with CUTLASS and Evoformer precompiled op support
+- [ ] Update `pip` passthrough options to setuptools once pip 23.3 comes out (we are using 23.2.1): https://github.com/pypa/pip/issues/11859
 - [ ] Unpin CUTLASS from fork with my 2x patches now that 1x patch is merged upstream
+- [ ] Make `conda/2023-10-04` public; send notice to ALCF Announcements
+- [ ] Make `conda/2023-10-04` the default; send notice to ALCF Announcements
+- [ ] Update documentation
+- [ ] Still some spurious errors with `pyg_lib` and `torch_sparse` at runtime when importing:
+```
+Disabling its usage. Stacktrace: libpython3.10.so.1.0: cannot open shared object file: No such file or directory
+```
+`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/soft/datascience/conda/2023-10-02/mconda3/lib` of course avoids the error, but is less than ideal. 
+Occurred in `conda/2023-10-02`, which first had PyG and its deps built incorrectly (from wheels). I then rebuilt the packages from source
+Does not occur in `conda/2023-10-04`, which had a similar journey, but only for `torch_sparse`, `torch_scatter` which required `CFLAGS` to be set??
+
+Is this error dependent on the order of installation or something? Is `LDFLAGS` an issue? It isnt set until after PyG installation in the script, but then is set for post-scrip interactive sessions:
+```
+❯ echo $LDFLAGS
+-L/soft/datascience/conda/2023-10-02/mconda3/lib -Wl,--enable-new-dtags,-rpath,/soft/datascience/conda/2023-10-02/mconda3/lib
+```
+
+```
+> ldd /soft/datascience/conda/2023-10-02/mconda3/lib/python3.10/site-packages/libpyg.so
+...
+libpython3.10.so.1.0 => not found
+```
+
+
 - [ ] Add Ray
 - [ ] Add Redis, Redis JSON, newer DeepHyper
 - [ ] Track all my GitHub issues from last 2x months
@@ -48,6 +76,18 @@ WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(188): Could not rem
 WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(188): Could not remove or rename /soft/datascience/conda/2023-09-29/mconda3/conda-meta/psutil-5.9.0-py310h5eee18b_0.json.  Please remove this file manually (you may need to reboot to free file handles)
 WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(188): Could not remove or rename /soft/datascience/conda/2023-09-29/mconda3/conda-meta/cffi-1.15.1-py310h5eee18b_3.json.  Please remove this file manually (you may need to reboot to free file handles)
 ```
+- [ ] ThetaGPU follow-up: should I be periodically be [running](https://docs.conda.io/projects/conda/en/latest/commands/clean.html) `conda clean --all`  to deal with permissions issues with the shared package cache there?
+
+
+## GitHub issues and other tickets
+
+- [ ] https://github.com/pytorch/pytorch/issues/107389
+- [ ] https://github.com/pyg-team/pytorch_geometric/issues/8128
+- [ ] https://github.com/microsoft/DeepSpeed/issues/4422
+- [ ] https://github.com/google/jax/issues/17831
+- [ ] https://github.com/NVIDIA/cutlass/issues/1118
+  - [ ] https://github.com/NVIDIA/cutlass/pull/1121#event-10532195900
+- [ ] https://github.com/pypa/pip/issues/12010
 
 # Old 2022 to-do
 - [x] Migrate away from `/soft/datascience/conda/2022-07-19-login`

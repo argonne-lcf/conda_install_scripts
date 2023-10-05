@@ -31,7 +31,7 @@ depends_on("PrgEnv-gnu")
 depends_on("cray-hdf5-parallel/1.12.1.3")
 
 local conda_dir = "/soft/datascience/conda/2023-01-10/mconda3"
-local funcs = "conda __conda_activate __conda_hashr __conda_reactivate __add_sys_prefix_to_path"
+local funcs = "conda __conda_activate __conda_hashr __conda_reactivate"
 local home = os.getenv("HOME")
 
 -- Specify where system and user environments should be created

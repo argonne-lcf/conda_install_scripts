@@ -836,6 +836,8 @@ pip install pytorch-lightning
 pip install ml-collections
 pip install gpytorch xgboost multiprocess py4j
 pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
+pip install jupyter
+pip install climetlab # Piyush Garg request
 
 # PyPI binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
 #pip install "triton==1.0.0"
@@ -988,6 +990,13 @@ python3 -m pip install \
 	--config-settings "--build-option=--cuda_ext" \
 	"git+https://github.com/NVIDIA/apex.git@52e18c894223800cb611682dce27d88050edf1de"
 
+# KGF TODO: myriad issues with Megatron-LM and forked Megatron-DeepSpeed packaging:
+# - everything assumes that it was installed as --editable, everyone has write access, etc.
+# - detecting old NCCL version 2.14.3+cuda11.8
+# - model/vision/* not importable (fixed on ALCF fork)
+# - IBV_FORK_SAFE=1 still required?? leads to 100x slowdown on Polaris
+
+# https://github.com/microsoft/Megatron-DeepSpeed/pull/173#issuecomment-1755839097
 python3 -m pip install "git+https://github.com/microsoft/Megatron-DeepSpeed.git"
 
 # HARDCODE

@@ -30,7 +30,7 @@ depends_on("openmpi/openmpi-4.1.4_ucx-1.14.0_gcc-9.4.0_cuda-11.8")
 
 
 local conda_dir = "/lus/theta-fs0/software/thetagpu/conda/2023-01-11/mconda3"
-local funcs = "conda __conda_activate __conda_hashr __conda_reactivate __add_sys_prefix_to_path"
+local funcs = "conda __conda_activate __conda_hashr __conda_reactivate"
 local home = os.getenv("HOME")
 
 -- Specify where system and user environments should be created

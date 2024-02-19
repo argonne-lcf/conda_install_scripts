@@ -3,9 +3,13 @@
 # As of June 14 2021
 # This script will install (from scratch) DeepHyper, TensorFlow, PyTorch, and Horovod on ThetaGPU
 # 1 - Grab worker node interactively for 120 min (full-node queue)
-# 2 - Run 'bash install_dh_hvd_tf_torch_v2.sh'
-# 3 - script installs everything down in $PWD/deephyper/...
+# 2 - Run './<this script> /path/to/install/base/'
+# 3 - script installs everything down in /path/to/install/base/
 # 4 - wait for it to complete
+
+# e.g. /lus/theta-fs0/software/thetagpu/conda/2023-01-11 on ThetaGPU, /soft/datascience/conda/2023-01-10 on Polaris
+BASE_PATH=$1
+DATE_PATH="$(basename $BASE_PATH)"
 
 export PYTHONNOUSERSITE=1
 
@@ -13,54 +17,60 @@ export PYTHONNOUSERSITE=1
 # hardlinks should be preserved even if these files are moved (not across filesystem boundaries)
 export CONDA_PKGS_DIRS=/lus/theta-fs0/software/thetagpu/conda/pkgs
 
-# unset *_TAG variables to build latest master
-DH_REPO_TAG="0.4.0"
+# unset *_TAG variables to build latest master/main branch (or "develop" in the case of DeepHyper)
+#DH_REPO_TAG="0.4.2"
 DH_REPO_URL=https://github.com/deephyper/deephyper.git
 
 #TF_REPO_TAG="e5a6d2331b11e0e5e4b63a0d7257333ac8b8262a" # requires NumPy 1.19.x
-TF_REPO_TAG="v2.9.1"
-PT_REPO_TAG="v1.12.0"
-HOROVOD_REPO_TAG="v0.25.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
+TF_REPO_TAG="v2.11.0"
+PT_REPO_TAG="v1.13.1"
+HOROVOD_REPO_TAG="v0.27.0" # v0.22.1 released on 2021-06-10 should be compatible with TF 2.6.x and 2.5.x
 TF_REPO_URL=https://github.com/tensorflow/tensorflow.git
 HOROVOD_REPO_URL=https://github.com/uber/horovod.git
 PT_REPO_URL=https://github.com/pytorch/pytorch.git
 
-# where to install relative to current path
-# if [[ -z "$DH_REPO_TAG" ]]; then
-#     DH_INSTALL_SUBDIR='2021-06-28/'
-# else
-#     DH_INSTALL_SUBDIR=deephyper/${DH_REPO_TAG}
-# fi
-
-DH_INSTALL_SUBDIR='2022-07-01/'
+############################
+# Manual version checks/changes below that must be made compatible with TF/Torch/CUDA versions above:
+# - pytorch vision
+# - magma-cuda
+# - tensorflow_probability
+# - torch-geometric, torch-sparse, torch-scatter, pyg-lib
+# - cupy
+# - jax
+###########################
 
 # MPI source on ThetaGPU
 module list
-module load openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0
+module load openmpi/openmpi-4.1.4_ucx-1.14.0_gcc-9.4.0_cuda-11.8
 module list
-MPI=/lus/theta-fs0/software/thetagpu/openmpi/openmpi-4.1.4_ucx-1.12.1_gcc-9.4.0
+MPI=/lus/theta-fs0/software/thetagpu/openmpi/openmpi-4.1.4_ucx-1.14.0_gcc-9.4.0_cuda-11.8
 
 # KGF(2022-07-01): should probably upgrade CUDA runtime and driver to 11.6
 # CUDA path and version information
 CUDA_VERSION_MAJOR=11
-CUDA_VERSION_MINOR=4
+CUDA_VERSION_MINOR=8
+CUDA_VERSION_MINI=0
 CUDA_VERSION=$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
-CUDA_BASE=/usr/local/cuda-$CUDA_VERSION
+CUDA_VERSION_FULL=$CUDA_VERSION.$CUDA_VERSION_MINI
+#CUDA_TOOLKIT_BASE=/usr/local/cuda-$CUDA_VERSION
 
 CUDA_DEPS_BASE=/lus/theta-fs0/software/thetagpu/cuda
+CUDA_TOOLKIT_BASE=$CUDA_DEPS_BASE/cuda-$CUDA_VERSION_FULL
 
 CUDNN_VERSION_MAJOR=8
-CUDNN_VERSION_MINOR=4
-CUDNN_VERSION_EXTRA=1.50
+CUDNN_VERSION_MINOR=6
+CUDNN_VERSION_EXTRA=0.163
 CUDNN_VERSION=$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR.$CUDNN_VERSION_EXTRA
 #CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-$CUDA_VERSION-linux-x64-v$CUDNN_VERSION
-CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive
+CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-$CUDA_VERSION_MAJOR-linux-x64-v$CUDNN_VERSION
+# cudnn-linux-x86_64-8.6.0.163_cuda11-archive/
+#CUDNN_BASE=$CUDA_DEPS_BASE/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive
 
 NCCL_VERSION_MAJOR=2
-NCCL_VERSION_MINOR=12.12-1
+NCCL_VERSION_MINOR=16.2-1
 NCCL_VERSION=$NCCL_VERSION_MAJOR.$NCCL_VERSION_MINOR
-#NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
-NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.12.12-1+cuda11.0_x86_64
+NCCL_BASE=$CUDA_DEPS_BASE/nccl_$NCCL_VERSION+cuda${CUDA_VERSION}_x86_64
+#NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.12.12-1+cuda11.0_x86_64
 # KGF: no Extended Compatibility in NCCL --- use older NCCL version built with CUDA 11.0 until
 # GPU device kernel driver upgraded from 11.0 ---> 11.4 in November 2021
 #NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.9.9-1+cuda11.0_x86_64
@@ -68,7 +78,7 @@ NCCL_BASE=$CUDA_DEPS_BASE/nccl_2.12.12-1+cuda11.0_x86_64
 TENSORRT_VERSION_MAJOR=8
 # 8.4.1.5 not yet supported in TF 2.9.1
 # https://github.com/tensorflow/tensorflow/pull/56392
-TENSORRT_VERSION_MINOR=2.5.1
+TENSORRT_VERSION_MINOR=5.2.2
 
 TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR.$TENSORRT_VERSION_MINOR
 #TENSORRT_BASE=$CUDA_DEPS_BASE/TensorRT-$TENSORRT_VERSION.Linux.x86_64-gnu.cuda-$CUDA_VERSION.cudnn$CUDNN_VERSION_MAJOR.$CUDNN_VERSION_MINOR
@@ -84,7 +94,7 @@ export TF_CUDA_VERSION=$CUDA_VERSION_MAJOR
 export TF_CUDNN_VERSION=$CUDNN_VERSION_MAJOR
 export TF_TENSORRT_VERSION=$TENSORRT_VERSION_MAJOR
 export TF_NCCL_VERSION=$NCCL_VERSION_MAJOR
-export CUDA_TOOLKIT_PATH=$CUDA_BASE
+export CUDA_TOOLKIT_PATH=$CUDA_TOOLKIT_BASE
 export CUDNN_INSTALL_PATH=$CUDNN_BASE
 export NCCL_INSTALL_PATH=$NCCL_BASE
 export TENSORRT_INSTALL_PATH=$TENSORRT_BASE
@@ -96,36 +106,10 @@ export TF_NEED_MPI=0
 export TF_NEED_ROCM=0
 export TF_NEED_CUDA=1
 export TF_NEED_TENSORRT=1
-export TF_CUDA_PATHS=$CUDA_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
+export TF_CUDA_PATHS=$CUDA_TOOLKIT_BASE,$CUDNN_BASE,$NCCL_BASE,$TENSORRT_BASE
 export GCC_HOST_COMPILER_PATH=$(which gcc)
 export CC_OPT_FLAGS="-march=native -Wno-sign-compare"
 export TF_SET_ANDROID_WORKSPACE=0
-
-# get the folder where this script is living
-if [ -n "$ZSH_EVAL_CONTEXT" ]; then
-    THISDIR=$( cd "$( dirname "$0" )" && pwd -LP)
-else  # bash, sh, etc.
-    THISDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -LP)
-fi
-# KGF: why use -LP here? Aren't the flags more or less contradictory?
-# THISDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -LP )
-
-# set install path
-DH_INSTALL_BASE_DIR=$THISDIR/$DH_INSTALL_SUBDIR
-WHEEL_DIR=$DH_INSTALL_BASE_DIR/wheels
-
-# confirm install path
-echo On ThetaGPU $HOSTNAME
-echo Installing module into $DH_INSTALL_BASE_DIR
-#read -p "Are you sure? " -n 1 -r
-#echo
-#if [[ $REPLY =~ ^[Yy]$ ]]
-#then
-#    echo OK, you asked for it...
-#else
-#   exit -1
-#fi
-
 
 # Check for outside communication on ThetaGPU
 # (be sure not to inherit these vars from dotfiles)
@@ -142,26 +126,51 @@ else
     export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
 fi
 
+# get the folder where this script is living
+# if [ -n "$ZSH_EVAL_CONTEXT" ]; then
+#     THISDIR=$( cd "$( dirname "$0" )" && pwd -LP)
+# else  # bash, sh, etc.
+#     THISDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -LP)
+# fi
+# KGF: why use -LP here? Aren't the flags more or less contradictory?
+# THISDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -LP )
+
+# set install path
+####BASE_PATH=$THISDIR/$DH_INSTALL_SUBDIR
+
+
+# confirm install path
+echo "On ThetaGPU $HOSTNAME"
+echo "Installing module into $BASE_PATH"
+
+#################################################
+## Installing Miniconda
+#################################################
 
 # set Conda installation folder and where downloaded content will stay
-CONDA_PREFIX_PATH=$DH_INSTALL_BASE_DIR/mconda3
-DOWNLOAD_PATH=$DH_INSTALL_BASE_DIR/DOWNLOADS
+CONDA_PREFIX_PATH=$BASE_PATH/mconda3
+DOWNLOAD_PATH=$BASE_PATH/DOWNLOADS
+WHEELS_PATH=$BASE_PATH/wheels
 
 mkdir -p $CONDA_PREFIX_PATH
 mkdir -p $DOWNLOAD_PATH
+mkdir -p $WHEELS_PATH
+
+cd $BASE_PATH
 
 # Download and install conda for a base python installation
-CONDAVER='py38_4.12.0'
+CONDAVER='py310_22.11.1-1'
 # "latest" switched from Python 3.8.5 to 3.9.5 on 2021-07-21
 # CONDAVER=latest
 CONDA_DOWNLOAD_URL=https://repo.continuum.io/miniconda
 CONDA_INSTALL_SH=Miniconda3-$CONDAVER-Linux-x86_64.sh
-echo Downloading miniconda installer
+echo "Downloading miniconda installer"
 wget $CONDA_DOWNLOAD_URL/$CONDA_INSTALL_SH -P $DOWNLOAD_PATH
 chmod +x $DOWNLOAD_PATH/$CONDA_INSTALL_SH
 
-echo Installing Miniconda
-$DOWNLOAD_PATH/$CONDA_INSTALL_SH -b -p $CONDA_PREFIX_PATH -u
+echo "Installing Miniconda"
+echo "bash $DOWNLOAD_PATH/$CONDA_INSTALL_SH -b -p $CONDA_PREFIX_PATH -u"
+bash $DOWNLOAD_PATH/$CONDA_INSTALL_SH -b -p $CONDA_PREFIX_PATH -u
 
 cd $CONDA_PREFIX_PATH
 
@@ -189,8 +198,15 @@ else
    export http_proxy=http://proxy.tmi.alcf.anl.gov:3128
 fi
 
-export LD_LIBRARY_PATH=$MPI/lib:$CUDA_BASE/lib64:$CUDNN_BASE/lib64:$NCCL_BASE/lib:$TENSORRT_BASE/lib
-export PATH=$MPI/bin:\$PATH
+export CUDA_TOOLKIT_BASE=$CUDA_TOOLKIT_BASE
+export CUDNN_BASE=$CUDNN_BASE
+export NCCL_BASE=$NCCL_BASE
+export TENSORRT_BASE=$TENSORRT_BASE
+
+# original thetagpu script adds MPI, not in Polaris script
+export LD_LIBRARY_PATH=$MPI/lib:\$CUDA_TOOLKIT_BASE/lib64:\$CUDNN_BASE/lib:\$NCCL_BASE/lib:\$TENSORRT_BASE/lib:\$LD_LIBRARY_PATH:
+export PATH=$MPI/lib:\$CUDA_TOOLKIT_BASE/bin:\$PATH
+
 EOF
 
 # KGF: $CONDA_ENV (e.g. conda/2021-11-30) is not an official conda var; set by us in modulefile
@@ -212,83 +228,100 @@ channels:
    - defaults
    - pytorch
    - conda-forge
-env_prompt: "(${DH_INSTALL_SUBDIR}/{default_env}) "
+env_prompt: "(${DATE_PATH}/{default_env}) "
 pkgs_dirs:
    - ${CONDA_PKGS_DIRS}
    - \$HOME/.conda/pkgs
 EOF
 
 # move to base install directory
-cd $DH_INSTALL_BASE_DIR
+cd $BASE_PATH
+echo "cd $BASE_PATH"
 
 # setup conda environment
 source $CONDA_PREFIX_PATH/setup.sh
+echo "after sourcing conda"
 
 # KGF: probably dont need a third (removed) network check--- proxy env vars inherited from either sourced setup.sh
 # and/or first network check. Make sure "set+e" during above sourced setup.sh since the network check "wget" might
 # return nonzero code if network is offline
 
-echo CONDA BINARY: $(which conda)
-echo CONDA VERSION: $(conda --version)
-echo PYTHON VERSION: $(python --version)
+echo "CONDA BINARY: $(which conda)"
+echo "CONDA VERSION: $(conda --version)"
+echo "PYTHON VERSION: $(python --version)"
 
 set -e
 
-########
+################################################
 ### Install TensorFlow
-########
+################################################
 
-echo Conda install some dependencies
+echo "Conda install some dependencies"
 
-conda install -y cmake zip unzip ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests dataclasses graphviz numba pymongo conda-build
+# polaris has /usr/bin/git-lfs, thetagpu does not
+conda install -y -c defaults -c pytorch -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio mkl mkl-include onednn mkl-dnn git-lfs magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+
+# note, numba pulls in numpy here too
+#####conda install -y -c defaults -c conda-forge cmake zip unzip astunparse ninja setuptools future six requests dataclasses graphviz numba numpy pymongo conda-build pip libaio git-lfs
+#####conda install -y -c defaults -c conda-forge mkl mkl-include onednn mkl-dnn
+##### conda install -y cffi typing_extensions pyyaml # KGF: stopped using
+
+# KGF: note, ordering of the above "defaults" channel install relative to "conda install -y -c conda-forge mamba; conda install -y pip"
+# (used to leave the pip re-install on a separate line) may affect what version of numpy you end up with
+# E.g. Jan 2023, Polaris ordering (defaults, then mamba then pip) got numpy 1.23.5 and ThetaGPU (mamba, pip, then defaults) got numpy 1.21.5
 
 # CUDA only: Add LAPACK support for the GPU if needed
-# conda install -y -c pytorch magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
-# No magma-cuda114: https://anaconda.org/pytorch/repo
-conda install -y -c pytorch magma-cuda116 #magma-cuda113
+#####conda install -y -c defaults -c pytorch -c conda-forge magma-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+# No magma-cuda114: https://anaconda.org/pytorch/repo ; but magma-cuda116 #magma-cuda113
 
-conda install -y -c conda-forge mamba
-conda update -y pip
+#####conda install -y -c defaults -c conda-forge mamba
 
-echo Clone TensorFlow
-cd $DH_INSTALL_BASE_DIR
+echo "Clone TensorFlow"
+cd $BASE_PATH
 git clone $TF_REPO_URL
 cd tensorflow
 
 if [[ -z "$TF_REPO_TAG" ]]; then
-    echo Checkout TensorFlow master
+    echo "Checkout TensorFlow master"
 else
-    echo Checkout TensorFlow tag $TF_REPO_TAG
+    echo "Checkout TensorFlow tag $TF_REPO_TAG"
     git checkout --recurse-submodules $TF_REPO_TAG
 fi
 BAZEL_VERSION=$(cat .bazelversion)
-echo Found TensorFlow depends on Bazel version $BAZEL_VERSION
+echo "Found TensorFlow depends on Bazel version $BAZEL_VERSION"
 
-cd $DH_INSTALL_BASE_DIR
-echo Download Bazel binaries
+cd $BASE_PATH
+echo "Download Bazel binaries"
 BAZEL_DOWNLOAD_URL=https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION
 BAZEL_INSTALL_SH=bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
-BAZEL_INSTALL_PATH=$DH_INSTALL_BASE_DIR/bazel-$BAZEL_VERSION
+BAZEL_INSTALL_PATH=$BASE_PATH/bazel-$BAZEL_VERSION
 wget $BAZEL_DOWNLOAD_URL/$BAZEL_INSTALL_SH -P $DOWNLOAD_PATH
 chmod +x $DOWNLOAD_PATH/$BAZEL_INSTALL_SH
-echo Intall Bazel in $BAZEL_INSTALL_PATH
+echo "Intall Bazel in $BAZEL_INSTALL_PATH"
 bash $DOWNLOAD_PATH/$BAZEL_INSTALL_SH --prefix=$BAZEL_INSTALL_PATH
 export PATH=$PATH:/$BAZEL_INSTALL_PATH/bin
 
-cd $DH_INSTALL_BASE_DIR
+cd $BASE_PATH
 
-echo Install TensorFlow Dependencies
+echo "Install TensorFlow Dependencies"
 # KGF: ignore $HOME/.local/lib/python3.8/site-packages pip user site-packages
-export PYTHONNOUSERSITE=1
 #pip install -U pip six 'numpy<1.19.0' wheel setuptools mock 'future>=0.17.1' 'gast==0.3.3' typing_extensions portpicker
 # KGF: try relaxing the dependency verison requirements (esp NumPy, since PyTorch wants a later version?)
 #pip install -U pip six 'numpy~=1.19.5' wheel setuptools mock future gast typing_extensions portpicker pydot
 # KGF (2021-12-15): stop limiting NumPy for now. Unclear if problems with 1.20.3 and TF/Pytorch
-pip install -U pip six numpy wheel setuptools mock future gast typing_extensions portpicker pydot packaging
+pip install -U numpy numba
+# the above line can be very important or very bad, to get have pip control the numpy dependency chain right before TF build
+# Start including numba here too in order to ensure mutual compat; numba 0.56.4 req numpy <1.24.0, e.g.
+# Check https://github.com/numpy/numpy/blob/main/numpy/core/setup_common.py
+# for C_API_VERSION, and track everytime numpy is reinstalled in the build log
+
+# consistent with polaris:
+pip install -U pip wheel mock gast portpicker pydot packaging pyyaml
+# pip install -U pip pyyaml six wheel setuptools mock future gast typing_extensions portpicker pydot packaging
 pip install -U keras_applications --no-deps
 pip install -U keras_preprocessing --no-deps
 
-echo Configure TensorFlow
+echo "Configure TensorFlow"
 
 # KGF: avoid problem when building post 2.5.0 master (762790710496e04801ec17dd7f012fd9aa37a1df)
 # ERROR: /lus/theta-fs0/software/thetagpu/conda/deephyper/latest/tensorflow/tensorflow/core/kernels/mlir_generated/BUILD:910:23: compile tensorflow/core/kernels/mlir_generated/bitwise_xor_gpu_i32_i32_kernel_generator_kernel.o failed (Exit 1): tf_to_kernel failed: error executing command bazel-out/k8-opt/bin/tensorflow/compiler/mlir/tools/kernel_gen/tf_to_kernel '--tile_sizes=1024' '--max-supported-rank=5' '--arch=compute_80' ... (remaining 4 argument(s) skipped)
@@ -304,40 +337,42 @@ export PYTHON_LIB_PATH=$(python -c 'import site; print(site.getsitepackages()[0]
 export TMP=/tmp
 
 ./configure
-echo Bazel Build TensorFlow
+echo "Bazel Build TensorFlow"
 # KGF: restrict Bazel to only see 32 cores of the dual socket 64-core (physical) AMD Epyc node (e.g. 256 logical cores).
 # Else, Bazel will hit PID limit, even when set to 32,178 in /sys/fs/cgroup/pids/user.slice/user-XXXXX.slice/pids.max
 # even if --jobs=500
 HOME=$DOWNLOAD_PATH bazel build --jobs=500 --local_cpu_resources=32 --verbose_failures --config=cuda //tensorflow/tools/pip_package:build_pip_package
 
-echo Build TensorFlow wheel
-./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEEL_DIR
+echo "Build TensorFlow wheel"
+./bazel-bin/tensorflow/tools/pip_package/build_pip_package $WHEELS_PATH
 
-echo Install TensorFlow
-pip install $(find $WHEEL_DIR/ -name "tensorflow*.whl" -type f)
+echo "Install TensorFlow"
+pip install $(find $WHEELS_PATH/ -name "tensorflow*.whl" -type f)
 # KGF(2021-09-27): This installs Keras 2.6.0
 
 
-########
+#################################################
 ### Install PyTorch
-########
+#################################################
 
-cd $DH_INSTALL_BASE_DIR
-echo Clone PyTorch
+cd $BASE_PATH
+echo "Clone PyTorch"
 
 git clone --recursive $PT_REPO_URL
 cd pytorch
 if [[ -z "$PT_REPO_TAG" ]]; then
-    echo Checkout PyTorch master
+    echo "Checkout PyTorch master"
 else
-    echo Checkout PyTorch tag $PT_REPO_TAG
+    echo "Checkout PyTorch tag $PT_REPO_TAG"
     git checkout --recurse-submodules $PT_REPO_TAG
+    git submodule sync
+    git submodule update --init --recursive
 fi
 
 echo "Install PyTorch"
 
 # https://github.com/pytorch/pytorch/blob/master/setup.py
-export CUDA_TOOLKIT_ROOT_DIR=$CUDA_BASE
+export CUDA_TOOLKIT_ROOT_DIR=$CUDA_TOOLKIT_BASE
 export NCCL_ROOT_DIR=$NCCL_BASE
 export CUDNN_ROOT=$CUDNN_BASE
 export USE_TENSORRT=ON
@@ -373,27 +408,27 @@ CFLAGS="-DOMPI_SKIP_MPICXX" CC=$MPI/bin/mpicc CXX=$MPI/bin/mpic++ python setup.p
 # https://github.com/pytorch/pytorch/blob/master/cmake/Summary.cmake
 PT_WHEEL=$(find dist/ -name "torch*.whl" -type f)
 echo "Copying pytorch wheel file $PT_WHEEL"
-cp $PT_WHEEL $WHEEL_DIR/
-cd $WHEEL_DIR
+cp $PT_WHEEL $WHEELS_PATH/
+cd $WHEELS_PATH
 echo "pip installing $(basename $PT_WHEEL)"
 pip install $(basename $PT_WHEEL)
 
 
-########
+#################################################
 ### Install Horovod
-########
+#################################################
 
-cd $DH_INSTALL_BASE_DIR
+cd $BASE_PATH
 
-echo Clone Horovod
+echo "Clone Horovod"
 
 git clone --recursive $HOROVOD_REPO_URL
 cd horovod
 
 if [[ -z "$HOROVOD_REPO_TAG" ]]; then
-    echo Checkout Horovod master
+    echo "Checkout Horovod master"
 else
-    echo Checkout Horovod tag $HOROVOD_REPO_TAG
+    echo "Checkout Horovod tag $HOROVOD_REPO_TAG"
     git checkout --recurse-submodules $HOROVOD_REPO_TAG
 fi
 
@@ -404,11 +439,11 @@ echo "Build Horovod Wheel using MPI from $MPI and NCCL from ${NCCL_BASE}"
 export LD_LIBRARY_PATH=$MPI/lib:$NCCL_BASE/lib:$LD_LIBRARY_PATH
 export PATH=$MPI/bin:$PATH
 
-HOROVOD_CUDA_HOME=${CUDA_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
+HOROVOD_CUDA_HOME=${CUDA_TOOLKIT_BASE} HOROVOD_NCCL_HOME=$NCCL_BASE HOROVOD_CMAKE=$(which cmake) HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 python setup.py bdist_wheel
 HVD_WHL=$(find dist/ -name "horovod*.whl" -type f)
-cp $HVD_WHL $WHEEL_DIR/
-HVD_WHEEL=$(find $WHEEL_DIR/ -name "horovod*.whl" -type f)
-echo Install Horovod $HVD_WHEEL
+cp $HVD_WHL $WHEELS_PATH/
+HVD_WHEEL=$(find $WHEELS_PATH/ -name "horovod*.whl" -type f)
+echo "Install Horovod $HVD_WHEEL"
 pip install --force-reinstall --no-cache-dir $HVD_WHEEL
 
 echo "Pip install TensorBoard profiler plugin"
@@ -418,38 +453,55 @@ pip install pandas h5py matplotlib scikit-learn scipy pytest
 pip install sacred wandb # Denis requests, April 2022
 
 echo "Adding module snooper so we can tell what modules people are using"
+# KGF: TODO, modify this path at the top of the script somehow; pick correct sitecustomize_polaris.py, etc.
+# wont error out if first path does not exist; will just make a broken symbolic link
 ln -s /lus/theta-fs0/software/datascience/PyModuleSnooper/sitecustomize.py $(python -c 'import site; print(site.getsitepackages()[0])')/sitecustomize.py
 
 # DeepHyper stuff
 export PATH=$MPI/bin:$PATH  # hvd optional feature will build mpi4py wheel
 
-pip install 'tensorflow_probability==0.17.0'
+pip install 'tensorflow_probability==0.19.0'
 # KGF: 0.17.0 (2022-06-06) tested against TF 2.9.1
 # KGF: 0.14.0 (2021-09-15) only compatible with TF 2.6.0
 # KGF: 0.13.0 (2021-06-18) only compatible with TF 2.5.0
 
 if [[ -z "$DH_REPO_TAG" ]]; then
-    echo Clone and checkout DeepHyper develop branch from git
-    cd $DH_INSTALL_BASE_DIR
+    echo "Clone and checkout DeepHyper develop branch from git"
+    cd $BASE_PATH
     git clone $DH_REPO_URL
     cd deephyper
     # KGF: use of GitFlow means that master branch might be too old for us:
     git checkout develop
-    pip --version
-    pip index versions deepspace
-    pip install dh-scikit-optimize==0.9.0
+    #     pip --version
+    #     pip index versions deepspace
+    #     pip install dh-scikit-optimize==0.9.0
+
     # Do not use editable pip installs
     # Uses deprecated egg format for symbolic link instead of wheels.
     # This causes permissions issues with read-only easy-install.pth
-    pip install ".[analytics,hvd]"  # deepspace extra preseent in v0.3.3 but removed in develop branch
+    # -----------------
+    pip install ".[analytics,hvd,nas,popt,autodeuq]"
+    # Adding "sdv" optional requirement on Polaris with Python 3.8 force re-installed:
+    # numpy-1.22.4, torch-1.13.1, which requires nvidia-cuda-nvrtc-cu11 + many other deps
+    # No problem on ThetaGPU. Switching to Python 3.10 apparently avoids everything
+    # TODO: if problems start again, test installing each of the sdv deps one-by-one (esp. ctgan)
+    pip install ".[analytics,hvd,nas,popt,autodeuq,sdv]"
     cd ..
-    cd $DH_INSTALL_BASE_DIR
+    cd $BASE_PATH
 else
     # hvd optional feature pinned to an old version in DH 0.2.5. Omit here
-    echo Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI
-    pip install "deephyper[nas,popt,autodeuq,analytics,hvd]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
+    echo "Build DeepHyper tag $DH_REPO_TAG and Balsam from PyPI"
+    #pip install "deephyper[analytics,hvd,nas,popt,autodeuq]==${DH_REPO_TAG}"
+    pip install "deephyper[analytics,hvd,nas,popt,autodeuq,sdv]==${DH_REPO_TAG}"  # otherwise, pulls 0.2.2 due to dependency conflicts?
 fi
 
+pip install 'libensemble'
+
+
+# PyTorch Geometric--- Hardcoding PyTorch 1.13.0, CUDA 11.7  even though installing Pytorch 1.13.1, CUDA 11.8 above
+pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
+#pip install pyg-lib torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-1.13.0+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}.html
+pip install torch-geometric
 
 # random inconsistencies that pop up with the specific "pip installs" from earlier
 pip install 'pytz>=2017.3' 'pillow>=6.2.0' 'django>=2.1.1'
@@ -472,7 +524,7 @@ cd $BASE_PATH
 echo "Install PyTorch Vision from source"
 git clone https://github.com/pytorch/vision.git
 cd vision
-git checkout v0.13.0
+git checkout v0.14.1
 # KGF: this falls back to building a deprecated .egg format with easy_install, which puts an entry in
 # mconda3/lib/python3.8/site-packages/easy-install.pth, causing read-only premissions problems in cloned
 # environments.
@@ -484,7 +536,7 @@ python setup.py bdist_wheel
 VISION_WHEEL=$(find dist/ -name "torchvision*.whl" -type f)
 cp $VISION_WHEEL $WHEELS_PATH/
 cd $WHEELS_PATH
-echo pip installing $(basename $VISION_WHEEL)
+echo "pip installing $(basename $VISION_WHEEL)"
 # KGF: unlike "python setup.py install", still tries to install PyTorch again by default, despite being a local wheel
 pip install --force-reinstall --no-deps $(basename $VISION_WHEEL)
 
@@ -493,8 +545,10 @@ cd $BASE_PATH
 pip install --no-deps timm
 pip install opencv-python-headless
 
-pip install onnx
-pip install onnxruntime-gpu  # onnxruntime is CPU-only. onnxruntime-gpu includes most CPU abilities
+# onnx 1.13.0 pushes protobuf to >3.20.2 and "tensorflow 2.11.0 requires protobuf<3.20,>=3.9.2, but you have protobuf 3.20.3 which is incompatible."
+#  onnx runtime 1.13.1 pushes numpy>=1.21.6, which installs 1.24.x for some reason, breaking <1.22 compat with numba
+pip install 'onnx==1.12.0' 'onnxruntime-gpu==1.12.1'
+# onnxruntime is CPU-only. onnxruntime-gpu includes most CPU abilities
 # https://github.com/microsoft/onnxruntime/issues/10685
 # onnxruntime probably wont work on ThetaGPU single-gpu queue with CPU thread affinity
 # https://github.com/microsoft/onnxruntime/issues/8313
@@ -503,19 +557,56 @@ pip install onnx-tf  # backend (onnx->tf) and frontend (tf->onnx, deprecated) fo
 # https://github.com/onnx/onnx-tensorflow/issues/1010
 # https://github.com/onnx/tensorflow-onnx/issues/1793
 # https://github.com/onnx/onnx-tensorflow/issues/422
-pip install transformers
+pip install huggingface-hub
+pip install transformers evaluate datasets accelerate
 pip install scikit-image
+pip install line_profiler
+pip install torch-tb-profiler
 pip install torchinfo  # https://github.com/TylerYep/torchinfo successor to torchsummary (https://github.com/sksq96/pytorch-summary)
-pip install cupy-cuda${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}
+pip install cupy-cuda${CUDA_VERSION_MAJOR}x
+pip install pycuda
 pip install pytorch-lightning
-pip install gpytorch
-pip install deepspeed
+pip install ml-collections
+pip install gpytorch xgboost multiprocess py4j
+pip install hydra-core hydra_colorlog accelerate arviz pyright celerite seaborn xarray bokeh matplotx aim torchviz rich parse
+
+# PyPI binary wheels 1.1.1, 1.0.0 might only work with CPython 3.6-3.9, not 3.10
+#pip install "triton==1.0.0"
+#pip install 'triton==2.0.0.dev20221202' || true
+
+# But, DeepSpeed sparse support only supports triton v1.0
+cd $BASE_PATH
+echo "Install triton v1.0 from source"
+git clone https://github.com/openai/triton.git
+cd triton/python
+git checkout v1.0
+pip install .
+#pip install deepspeed
+
+cd $BASE_PATH
+echo "Install DeepSpeed from source"
+git clone https://github.com/microsoft/DeepSpeed.git
+cd DeepSpeed
+export CFLAGS="-I${CONDA_PREFIX}/include/"
+#export LDFLAGS="-L${CONDA_PREFIX}/lib/"
+export LDFLAGS="-L${CONDA_PREFIX}/lib/ -Wl,--enable-new-dtags,-rpath,${CONDA_PREFIX}/lib"
+#DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 bash install.sh --verbose
+DS_BUILD_OPS=1 DS_BUILD_AIO=1 DS_BUILD_UTILS=1 pip install .
+# if no rpath, add this to Lmod modulefile:
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib"
+# Suboptimal, since we really only want "libaio.so" from that directory to run DeepSpeed.
+# e.g. if you put "export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}", it overrides many system libraries
+# breaking "module list", "emacs", etc.
+
+cd $BASE_PATH
 
 pip install --upgrade "jax[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 #pip install "jax[cuda11_cudnn82]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 pip install pymongo optax flax
+pip install "numpyro[cuda]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
-env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
+# note, polaris script installs mpi4py after Horovod, before DeepHyper, PyTorch vision, ...
+env MPICC=$MPI/bin/mpicc pip install mpi4py --force-reinstall --no-cache-dir --no-binary=mpi4py
 # conda install -c conda-forge cupy cudnn cutensor nccl
 # https://github.com/cupy/cupy/issues/4850
 ## https://docs.cupy.dev/en/stable/install.html?highlight=cutensor#additional-cuda-libraries
@@ -534,6 +625,11 @@ env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
 # https://docs.cupy.dev/en/stable/upgrade.html?highlight=cutensor#compatibility-matrix
 # https://docs.cupy.dev/en/stable/reference/environment.html?highlight=cutensor#envvar-CUTENSOR_PATH
 
+pip install cython
+git clone https://github.com/mpi4jax/mpi4jax.git
+cd mpi4jax
+CUDA_ROOT=$CUDA_TOOLKIT_BASE pip install --no-build-isolation --no-cache-dir --no-binary=mpi4jax -v .
+cd $BASE_PATH
 
 # ------------------------------------------------
 # KGF: unreleased tf sometimes pulls in keras-nightly, which confuses Horovod with the standalone Keras (usually installed as a dependency of DeepHyper). But it seems necessary in order to run the resulting Horovod installation
@@ -551,14 +647,14 @@ env MPICC=$MPI/bin/mpicc pip install mpi4py --no-cache-dir --no-binary=mpi4py
 # ANSWER: https://github.com/tensorflow/tensorflow/commit/e457b3604ac31e7e0e38eaae8622509302f8c7d6#diff-f526feeafa1000c4773410bdc5417c4022cb2c7b686ae658b629beb541ae9112
 # They were temporarily using keras-nightly for the dep; switched away from that on 2021-08-09.
 
-echo Cleaning up
+echo "Cleaning up"
 chmod -R u+w $DOWNLOAD_PATH/
 rm -rf $DOWNLOAD_PATH
 
 # KGF: see below
 conda list
 
-chmod -R a-w $DH_INSTALL_BASE_DIR/
+chmod -R a-w $BASE_PATH/
 
 
 set +e

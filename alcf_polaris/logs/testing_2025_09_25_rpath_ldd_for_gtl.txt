@@ -1,0 +1,168 @@
+❯ python - <<'PY'
+import os
+from pathlib import Path
+import torch
+
+libdir = Path(torch.__file__).parent / "lib"
+cands = []
+# Focus on the usual suspects
+for name in ["libtorch.so", "libtorch_cpu.so", "libtorch_cuda.so", "libtorch_python.so", "_C.cpython-*.so"]:
+    cands += list(libdir.rglob(name))
+
+print("Torch libdir:", libdir)
+for so in sorted(set(cands)):
+    print("\n=== READ: ", so, " ===")
+    os.system(f'readelf -d "{so}" | egrep "NEEDED|RPATH|RUNPATH|mpi|gtl"')
+PY
+
+Torch libdir: /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib
+
+=== READ:  /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch.so  ===
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gtl_cuda.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch_cpu.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch_cuda.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdarshan.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgomp.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]                                               0x000000000000000f (RPATH)              Library rpath: [/opt/cray/pe/lib64:$ORIGIN:/lib/intel64:/lib/intel64_win:/lib/win-x64:/soft/applications/conda/2025-09-25/mconda3/lib:/soft/compilers/cudatoolkit/cuda-12.9.1/lib64:/soft/perftools/darshan/darshan-3.4.4/lib]
+
+=== READ:  /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so  ===
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gtl_cuda.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmkl_intel_lp64.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmkl_gnu_thread.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmkl_core.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libomp.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcupti.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudart.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdarshan.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gnu_123.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgomp.so.1]
+ 0x000000000000000f (RPATH)              Library rpath: [/opt/cray/pe/lib64:$ORIGIN:/lib/intel64:/lib/intel64_win:/lib/win-x64:/soft/applications/conda/2025-09-25/mconda3/lib:/soft/compilers/cudatoolkit/cuda-12.9.1/extras/CUPTI/lib64:/soft/compilers/cudatoolkit/cuda-12.9.1/lib64:/soft/perftools/darshan/darshan-3.4.4/lib]
+
+=== READ:  /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so  ===
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gtl_cuda.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10_cuda.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudart.so.12]                                 [0/590]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcusparse.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcufft.so.11]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcufile.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcusparseLt.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libnccl.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcurand.so.10]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcublas.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcublasLt.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudnn.so.9]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch_cpu.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdarshan.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgomp.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x000000000000000f (RPATH)              Library rpath: [/opt/cray/pe/lib64:$ORIGIN:/lib/intel64:/lib/intel64_win:
+/lib/win-x64:/soft/compilers/cudatoolkit/cuda-12.9.1/lib64:/soft/libraries/cusparselt/libcusparse_lt-linux-x86_64-
+0.8.1.1_cuda12-archive/lib:/soft/libraries/nccl/nccl_2.28.3-1+cuda12.9_x86_64/lib:/soft/libraries/cudnn/cudnn-cuda
+12-linux-x64-v9.13.0.50/lib:/soft/applications/conda/2025-09-25/mconda3/lib:/soft/perftools/darshan/darshan-3.4.4/
+lib]
+
+=== READ:  /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch_python.so
+===
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gtl_cuda.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libshm.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch_cpu.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch_cuda.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10_cuda.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudart.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudnn.so.9]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcufile.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdarshan.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgomp.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x000000000000000f (RPATH)              Library rpath: [/opt/cray/pe/lib64:$ORIGIN:/lib/intel64:/lib/intel64_win:
+/lib/win-x64:/soft/compilers/cudatoolkit/cuda-12.9.1/lib64:/soft/applications/conda/2025-09-25/mconda3/lib:/soft/l
+ibraries/cudnn/cudnn-cuda12-linux-x64-v9.13.0.50/lib:/soft/libraries/cusparselt/libcusparse_lt-linux-x86_64-0.8.1.
+1_cuda12-archive/lib:/soft/libraries/nccl/nccl_2.28.3-1+cuda12.9_x86_64/lib:/soft/perftools/darshan/darshan-3.4.4/
+lib]
+
+
+
+--------------------
+
+
+❯ python - <<'PY'
+import torch, os, glob
+import torch
+import sys
+from pathlib import Path
+# Find a big torch library to inspect (libtorch_python or _C)
+p = Path(torch.__file__).parent
+cands = list(p.rglob("*torch*.so")) + list(p.rglob("*_C*.so"))
+for so in cands[:3]:
+    print("CHECK:", so)
+    os.system(f'ldd "{so}" | egrep "mpi|gtl|cuda"')
+PY
+
+CHECK: /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch.so
+        libmpi_gtl_cuda.so.0 => /opt/cray/pe/lib64/libmpi_gtl_cuda.so.0 (0x000014f804a16000)
+        libtorch_cuda.so => /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so (0x000014f7e894e000)
+        libcudart.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcudart.so.12 (0x000014f7e7e00000)
+        libcuda.so.1 => /usr/lib64/libcuda.so.1 (0x000014f7e4e4d000)
+        libcupti.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/extras/CUPTI/lib64/libcupti.so.12 (0x000014f7ddde3000)
+        libmpi_gnu_123.so.12 => /opt/cray/pe/lib64/libmpi_gnu_123.so.12 (0x000014f7db609000)
+        libc10_cuda.so => /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libc10_cuda.so (0x000014f7e8109000)
+        libcusparse.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcusparse.so.12 (0x000014f7be400000)
+        libcufft.so.11 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcufft.so.11 (0x000014f7ac600000)
+        libcufile.so.0 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcufile.so.0 (0x000014f7ac306000)
+        libcusparseLt.so.0 => /soft/libraries/cusparselt/libcusparse_lt-linux-x86_64-0.8.1.1_cuda12-archive/lib/libcusparseLt.so.0 (0x000014f797bf7000)
+        libnccl.so.2 => /soft/libraries/nccl/nccl_2.28.3-1+cuda12.9_x86_64/lib/libnccl.so.2 (0x000014f781200000)
+        libcurand.so.10 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcurand.so.10 (0x000014f776a00000)
+        libcublas.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcublas.so.12 (0x000014f770200000)
+        libcublasLt.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcublasLt.so.12 (0x000014f73de00000)
+        libcudnn.so.9 => /soft/libraries/cudnn/cudnn-cuda12-linux-x64-v9.13.0.50/lib/libcudnn.so.9 (0x000014f73da00000)
+        libnvJitLink.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libnvJitLink.so.12 (0x000014f737d7a000)
+CHECK: /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so
+        libmpi_gtl_cuda.so.0 => /opt/cray/pe/lib64/libmpi_gtl_cuda.so.0 (0x0000152674256000)
+        libcupti.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/extras/CUPTI/lib64/libcupti.so.12 (0x000015266cec2000)
+        libcudart.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcudart.so.12 (0x000015266cc00000)
+        libmpi_gnu_123.so.12 => /opt/cray/pe/lib64/libmpi_gnu_123.so.12 (0x000015266a3af000)
+        libcuda.so.1 => /usr/lib64/libcuda.so.1 (0x0000152666ffa000)
+CHECK: /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so
+        libmpi_gtl_cuda.so.0 => /opt/cray/pe/lib64/libmpi_gtl_cuda.so.0 (0x000014ac0e285000)
+        libc10_cuda.so => /soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/torch/lib/libc10_cuda.so (0x000014ac0e1e3000)
+        libcudart.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcudart.so.12 (0x000014ac0de00000)
+        libcusparse.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcusparse.so.12 (0x000014abf0c00000)
+        libcufft.so.11 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcufft.so.11 (0x000014abdee00000)
+        libcufile.so.0 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcufile.so.0 (0x000014abdeb06000)
+        libcusparseLt.so.0 => /soft/libraries/cusparselt/libcusparse_lt-linux-x86_64-0.8.1.1_cuda12-archive/lib/libcusparseLt.so.0 (0x000014abca3f7000)
+        libnccl.so.2 => /soft/libraries/nccl/nccl_2.28.3-1+cuda12.9_x86_64/lib/libnccl.so.2 (0x000014abb3a00000)
+        libcurand.so.10 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcurand.so.10 (0x000014aba9200000)
+        libcublas.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcublas.so.12 (0x000014aba2a00000)
+        libcublasLt.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libcublasLt.so.12 (0x000014ab70600000)
+        libcudnn.so.9 => /soft/libraries/cudnn/cudnn-cuda12-linux-x64-v9.13.0.50/lib/libcudnn.so.9 (0x000014ab70200000)
+        libcuda.so.1 => /usr/lib64/libcuda.so.1 (0x000014ab5e4f1000)
+        libnvJitLink.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/lib64/libnvJitLink.so.12 (0x000014ab5886b000)
+        libcupti.so.12 => /soft/compilers/cudatoolkit/cuda-12.9.1/extras/CUPTI/lib64/libcupti.so.12 (0x000014ab51801000)
+        libmpi_gnu_123.so.12 => /opt/cray/pe/lib64/libmpi_gnu_123.so.12
+        (0x000014ab4f027000)
+
+

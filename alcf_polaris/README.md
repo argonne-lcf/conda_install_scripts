@@ -1,4 +1,133 @@
-# October 2023 to-do
+# Fall 2025 to-do and notes
+
+**TensorFlow Hermetic build info**:
+- https://github.com/tensorflow/tensorflow/commit/d9071b91c4e550e6c984357158c3460346616db5
+- https://github.com/tensorflow/tensorflow/commit/0d2b08d354daddfd7a2d0f91aae56dae01aa82bc
+- https://github.com/tensorflow/tensorflow/blob/master/.bazelrc
+- https://github.com/tensorflow/tensorflow/commit/5c289f5ba22711a296a216100cf9816c6077d85d
+- https://github.com/tensorflow/tensorflow/commit/3f4b2fda6ffe7dfe03c1663ef37f54fc4432cc8b
+- https://github.com/tensorflow/tensorflow/commit/9b5fa66dc65753059cda686b6a5a8f16143bc5e0
+- https://github.com/tensorflow/tensorflow/issues/78846
+- https://github.com/tensorflow/tensorflow/issues/62459
+- https://github.com/jax-ml/jax/issues/23689
+- https://github.com/tensorflow/tensorflow/issues/86405
+- https://github.com/openxla/xla/issues/20915#issuecomment-2566744479
+- https://github.com/openxla/xla/blob/main/docs/hermetic_cuda.md
+- https://github.com/openxla/xla/issues/27528
+- https://openxla.org/xla/hermetic_cuda
+- https://github.com/google-ml-infra/rules_ml_toolchain/tree/main/gpu
+
+**To Do**:
+https://cels-anl.slack.com/archives/C3FU1QXHR/p1759434706730799
+- [ ] PyTorch's DLPack extension compilation? Need to force it to use `CC=/usr/bin/gcc-14 CXX=/usr/bin/g++-14` when compiling. Otherwise it fails
+```
+/soft/applications/conda/2025-09-25/mconda3/lib/python3.12/site-packages/tvm_ffi/_optional_torch_c_dlpack.py: ...
+---> $HOME/.cache/torch_extensions/py312_cu129/c_dlpack/main.cpp
+```
+export them in the modulefile? This also happens in Verl test script--- hard to know when vLLM JITs some things
+
+- [ ] `qstat` not available on Sirius compute node, unlike login nodes. Reported to Cyrus. Need to `export PATH=$PATH:/opt/pbs/bin`, for now. Needed for `ezpz-test`
+- [ ] Hope Ops increases per-user cgroups process limit from 128 to 512 or 1024
+- [ ] Evaluate if this is a bug: vLLM initialization and subsequent calls must be wrapped in a `if __name__ == '__main__':` block. This ensures that the code that spawns new processes is only executed once in the parent process.
+- [ ] Test AWS v1.9.1 plugin, once HPE says that it is validated and recommended to use
+- [x] Update ezpz to https://github.com/saforem2/ezpz/tree/saforem2/tests
+- [ ] Update ezpz again to v0.9.0
+- [x] Confirm that build script `build_monolithic_conda_module.sh` runs completely, first to last line, without error or need for manual intervention and fixes. **yes, as of 5bef5c90cb3**
+- [ ] Get green light to deploy, and check language on ALCF Updates email.
+- [ ] Notify Ops ALCF Sirius Slack channel to sync
+- [ ] Email ALCF media. Also add to `polaris-notify`
+- [ ] Add to https://docs.alcf.anl.gov/polaris/system-updates/
+- [ ] Change `.modulerc.lua` default in two weeks (announce beforehand)
+- [x] Even just running `mpi4py` on two Sirius compute nodes within `ipython`: there is an issue due to missing filesystem mount
+```output
+darshan_library_warning: unable to create log file /lus/grand/logs/darshan/polaris/2025/10/6/felker_python3.12_id21511-1500633_10-6-4864-8027967647074095540.darshan_partial.
+```
+Fix:
+```
+# Darshan fails on Sirius because Grand is not mounted
+❯ module unload darshan
+❯ export DARSHAN_DISABLE=1
+```
+- [ ] **Someday**: find a workaround to NFS write/read/permission errors `~/.cache` etc. also `/home/felker/.config/matplotlib/stylelib/ambivalent` during `ezpz-test`
+- [ ] Port build script to ALCF Sophia
+- [ ] Consider exposing the following libraries (used in the build script) in the modulefile in some capacity:
+  - [ ] NVSHMEM 3.3.9
+  - [ ] `CUTLASS_PATH` (I used the latest main branch; what version?)
+  - [ ] `BASE_PATH`
+  - [ ] cuSPARSELt 0.8.11
+  - [ ] Add more version info to the modulefile's `help()`? SGLang, vLLM, Verl, DS, etc. versions
+- [ ] Clean up the micro PyTorch environments (`2025-10-05-pt`, `2025-10-05-pt-v2`) and old modulefiles
+- [ ] **Explain**: why didnt the following modulefile hotfix work with the original PyTorch build. Or did it, and I just didnt understand the below nuances and limitations?
+```lua
+prepend_path("LD_PRELOAD", pathJoin(os.getenv("CRAY_MPICH_DIR") or "/opt/cray/pe", "lib/libmpi_gtl_cuda.so"))
+```
+- [ ] Fix this: (might have happened after some last minute manual changes to the build?)
+```console
+❯ conda list
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(183): Could not remove or rename /soft/applications/c
+onda/2025-09-25/mconda3/conda-meta/setuptools-80.9.0-pyhff2d567_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(183): Could not remove or rename /soft/applications/conda/2025-09-25/mconda3/conda-meta/numpy-2.3.3-py312h33ff503_0.json.  Please remove this file manually (you may ne
+ed to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(183): Could not remove or rename /soft/applications/c
+onda/2025-09-25/mconda3/conda-meta/numba-0.62.1-py312h907b442_0.json.  Please remove this file manually (you may n
+eed to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(183): Could not remove or rename /soft/applications/c
+onda/2025-09-25/mconda3/conda-meta/cffi-1.17.1-py312h06ac9bb_0.json.  Please remove this file manually (you may ne
+ed to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(183): Could not remove or rename /soft/applications/c
+onda/2025-09-25/mconda3/conda-meta/llvmlite-0.45.1-py312h7424e68_0.json.  Please remove this file manually (you ma
+y need to reboot to free file handles)
+# packages in environment at /soft/applications/conda/2025-09-25/mconda3:
+```
+
+### Fix mpi4py and PyTorch incompatibility
+```bash
+export USE_MPI=1
+BUILD_TEST=0 CUDAHOSTCXX=g++-14 CC=cc CXX=CC LDFLAGS="-L/opt/cray/pe/lib64 -Wl,-rpath,/opt/cray/pe/lib64 -lmpi_gtl_cuda ${LDFLAGS}" python setup.py bdist_wheel 
+```
+
+- I am not sure what (if anything) in the module is broken if you try setting `export MPICH_GPU_SUPPORT_ENABLED=0`, but I am not particularly interested in supporting that use case (e.g. we set it `=1` by default in the modulefile)
+- mpi4py and PyTorch Distributed with MPICH still seem to work, but you might get a performance hit relative to a module built entirely on the non-CUDA aware Cray libraries? The GTL libraries are hard-coded into the linker and loader via rpath. 
+- The plugin’s library is guaranteed to be present regardless of the runtime setting, but I am not sure if MPICH disables the GPU-aware path and avoids the related overhead entirely, in that case
+
+#### References
+PyTorch Distributed only supports CUDA-Aware MPI Ops through OpenMPI: https://github.com/pytorch/pytorch/blob/2883b5ab773daf5861d43ff0b65be49a441ab3f9/torch/csrc/distributed/c10d/ProcessGroupMPI.cpp#L49-L62
+
+Note, `export MPIX_CUDA_AWARE_SUPPORT=1` is likely not enough to trick the PyTorch build, since then it runs `if (MPIX_Query_cuda_support() == 1)`, a function that does not exist in Cray MPICH. It is conditionally imported:
+```c++
+#if defined(OPEN_MPI) && OPEN_MPI
+#include <mpi-ext.h> // Needed for CUDA-aware check
+#endif
+```
+
+https://docs.pytorch.org/docs/stable/distributed.html
+> MPI supports CUDA only if the implementation used to build PyTorch supports it.
+> ...
+> MPI is an optional backend that can **only be included if you build PyTorch from source**. (e.g. building PyTorch on a host that has MPI installed.)
+
+- The PyTorch docs barely even mention CUDA-aware MPI? Needed to look at the source code to find that tidbit about OpenMPI being the only supported distribution. 
+- [2019 ticket from OLCFL Summit](https://code.ornl.gov/summit/mldl-stack/pytorch/-/issues/1) about "CUDA Aware MPI with Pytorch"
+- https://forums.developer.nvidia.com/t/request-for-pytorch-wheel-with-mpi-backend-on-jetson-orin/340949/11
+- https://github.com/pytorch/pytorch/issues/97507
+- [CELS Slack convo](https://cels-anl.slack.com/archives/C3FU1QXHR/p1759769651108389)
+
+#### Original problem in April 2024 build
+This fails:
+```python
+import torch
+from mpi4py import MPI
+comm = MPI.COMM_WORLD
+print(f"I am {comm.rank} of {comm.size}")
+```
+This will not fail:
+```python
+from mpi4py import MPI
+import torch
+comm = MPI.COMM_WORLD
+print(f"I am {comm.rank} of {comm.size}")
+```
+
+## October 2023 to-do
 - [ ] New CUDA Graph + PyTorch issues that did not occur in `2022-09-08` (Lusch)
 ```
 RuntimeError: CUDA error: operation not permitted when stream is capturing

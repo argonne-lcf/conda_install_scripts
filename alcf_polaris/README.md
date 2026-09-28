@@ -7,6 +7,17 @@ DeepSpeed 0.19.7, TE 2.19) was built on Sirius 2026-09-24 with `build_monolithic
 Sirius `/soft/modulefiles/conda/`. Not the default yet; `conda/2025-09-25` still is. Env is read-only
 and world-readable (checked 2026-09-24). All conda modules older than the September 2025 builds were deleted.
 
+**Quick package adds for the next build**
+- [ ] `torchtitan` 0.3.0 (PyPI, 2026-09-03; Python >=3.11). Not in 2026-10-01. Its deps are already in
+  the env except `torch_checkpointing`, `tyro`, `spmd_types==0.2.3`. It caps `datasets<4.8.0` vs 5.0.1
+  in 2026-10-01: install `--no-deps` and check its HF dataloader (leave the cap violated, like click for
+  globus-compute). verl's TorchTitan engine (`model_engine=torchtitan`) is separate and harder: it wants
+  a torchtitan nightly plus torch `>=2.14.0.dev20260625` with the `spmd_types` backend (verl
+  `docs/workers/torchtitan_workers.rst`); untested against our torch 2.14.0 release + vLLM 0.29.0.
+- [x] TRL and `ray[rllib]` (pinned to the installed ray): in both build scripts since 38e5e39; not in 2026-10-01.
+- TorchRL (needs tensordict 0.14, which breaks verl) and OpenRLHF (cp310-cp312 wheels only, hard pins)
+  deliberately left out; see the build script comments.
+
 **To do**
 - [ ] Sync to Polaris: `/soft/applications/conda/2026-10-01/`, `/soft/modulefiles/conda/2026-10-01.lua`,
   `/soft/modulefiles/conda/.modulerc.lua` (decide on `/soft/applications/conda/pkgs/`). The source trees

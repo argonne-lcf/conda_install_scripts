@@ -7,8 +7,21 @@ DeepSpeed 0.19.7, TE 2.19) was built on Sirius 2026-09-24 with `build_monolithic
 Sirius `/soft/modulefiles/conda/`. Not the default yet; `conda/2025-09-25` still is. Env is read-only
 and world-readable (checked 2026-09-24). All conda modules older than the September 2025 builds were deleted.
 
+**Next build: `conda/2026-10-09`** (same versions as 2026-10-01 plus the build-script fixes below; building on Sirius
+from the resumable script, `~/build-2026-10-09.pbs`, log `logs/2026-10-09-sirius-build.out`; tests in
+`tests/sirius-2026-10-09.pbs`).
+- Built 2026-09-29 (job 32737, 5 h 22 min, exit 0, first attempt; `logs/2026-10-09-sirius-build.out`). Env is
+  read-only. The build's own checks: cuda-bindings/cuda-python 13.0.3, CUDA 13.4 wheels removed (`nvidia/cu13/lib` is
+  gone). `pip check` shows only the known residue plus torchtitan's `datasets<4.8.0`.
+- Sirius tests (job 32744, `tests/sirius-2026-10-09.out`, modulefile loaded from a private copy): 2-node harness
+  exit 0; all 18 isolation cases rc=0 (incl. `mcore`, `verl`, `rl`, `titan`); libprobe: every framework maps
+  /soft 13.0.3 cudart/nvrtc/nvJitLink, the only wheel lib left is `nvidia/nvshmem` (intended).
+- [ ] Copy `modulefiles/conda/2026-10-09.lua` to Sirius `/soft/modulefiles/conda/`; sync to Polaris; decide whether it
+  replaces 2026-10-01 in the announcement/default plan (10-01's two known bugs are fixed here).
+
 **Quick package adds for the next build**
-- [ ] `torchtitan` 0.3.0 (PyPI, 2026-09-03; Python >=3.11). Not in 2026-10-01. Its deps are already in
+- [x] `torchtitan` 0.3.0 (both build scripts, `--no-deps`; isolation test `titan` checks its HF dataloader on
+  datasets 5.0.1, passed in a venv on 2026-10-01). Original note: `torchtitan` 0.3.0 (PyPI, 2026-09-03; Python >=3.11). Not in 2026-10-01. Its deps are already in
   the env except `torch_checkpointing`, `tyro`, `spmd_types==0.2.3`. It caps `datasets<4.8.0` vs 5.0.1
   in 2026-10-01: install `--no-deps` and check its HF dataloader (leave the cap violated, like click for
   globus-compute). verl's TorchTitan engine (`model_engine=torchtitan`) is separate and harder: it wants
@@ -31,11 +44,13 @@ and world-readable (checked 2026-09-24). All conda modules older than the Septem
 - [ ] Change the default in `.modulerc.lua` after ~2 weeks of testing.
 - [ ] `conda/2026-10-01-aws-nccl-<ver>` variant: aws-ofi-nccl against NCCL 2.30 / CUDA 13. Until then
   cross-node NCCL runs over TCP sockets (2-node DDP/FSDP slower than 1 node except HSDP).
-- [ ] Next build: uninstall the CUDA 13.4 runtime/compiler wheels that vLLM's `humming-kernels[cu13]`
+- [x] (both build scripts, last pip step; `nvidia-cuda-cccl` kept after all: headers only, and
+  `nvidia-nvshmem-cu13` requires it) Next build: uninstall the CUDA 13.4 runtime/compiler wheels that vLLM's `humming-kernels[cu13]`
   pulls in, and re-test (see below): `pip uninstall -y nvidia-cuda-runtime nvidia-cuda-nvrtc
   nvidia-cuda-nvcc nvidia-cuda-crt nvidia-nvvm nvidia-cuda-cccl`. Keep `nvidia-nvshmem-cu13` (torch's
   only NVSHMEM), `nvidia-cutlass-dsl`, `nvidia-ml-py`.
-- [ ] Next build: `cuda-bindings==13.0.3` pin does not hold; `cuda-python` 13.4.1 (unbounded dep of
+- [x] (both build scripts: `cuda-python==13.0.3` pinned with it before the vLLM constraints file, which now
+  freezes both; asserted at the end) Next build: `cuda-bindings==13.0.3` pin does not hold; `cuda-python` 13.4.1 (unbounded dep of
   flashinfer-python / nvshmem4py-cu13) requires `cuda-bindings~=13.4.1`, env ended at 13.4.3.
 - [ ] `/soft/modulefiles/jax/0.4.26`, `0.4.29-dev` are stale (pre-upgrade); docs no longer point there.
 - [ ] Admin pip installs into the read-only env: use `--no-user`, else pip silently falls back to a user

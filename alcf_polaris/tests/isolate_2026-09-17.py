@@ -64,7 +64,34 @@ def t_verl():
 def t_rl():
     import trl, ray.rllib
     return f"trl {trl.__version__} rllib ok"
-tests = dict(fa=t_fa, fa_after_tf=t_fa_after_tf, te=t_te, ds=t_ds, vllm=t_vllm, compile=t_compile, mpi4jax=t_mpi4jax, ort=t_ort, xgb=t_xgb, mamba=t_mamba, flashinfer=t_flashinfer, gce=t_gce, apex=t_apex, numpyro=t_numpyro, mcore=t_mcore, verl=t_verl, rl=t_rl)
+def t_titan():
+    # torchtitan caps datasets<4.8 and is installed --no-deps next to datasets 5.x: exercise its HF
+    # text dataloader (load_dataset, split_dataset_by_node, streaming state_dict resume) on a local
+    # dataset shaped like its c4_test asset. The tokenizer is a byte-level stub.
+    import json, os, shutil, tempfile, datasets, torchtitan, torchtitan.train  # noqa
+    from datasets import load_dataset
+    from torchtitan.components.tokenizer import BaseTokenizer
+    from torchtitan.hf_datasets import text_datasets as td
+    class Bytes(BaseTokenizer):
+        def encode(self, s, add_bos=True, add_eos=True): return [1]*add_bos + list(s.encode()) + [2]*add_eos
+        def decode(self, ids): return bytes(i for i in ids if i > 2).decode()
+        def get_vocab_size(self): return 259
+    d = tempfile.mkdtemp(prefix="titan-", dir=os.getcwd())
+    with open(f"{d}/train.json", "w") as f:
+        for i in range(64): f.write(json.dumps({"text": f"document {i} " + "lorem ipsum " * (i % 7 + 1)}) + "\n")
+    cfg = td.DATASETS["c4_test"]
+    out = []
+    for name, loader in [("map", lambda p: load_dataset(p, split="train")),
+                         ("stream", lambda p: load_dataset(p, split="train", streaming=True))]:
+        td.DATASETS["c4_test"] = type(cfg)(**{**cfg.__dict__, "path": d, "loader": loader})
+        mk = lambda: td.HuggingFaceTextDataset("c4_test", None, Bytes(), seq_len=32, dp_rank=1, dp_world_size=2)
+        a = mk(); it = iter(a); [next(it) for _ in range(5)]; sd = a.state_dict(); want = next(it)[1]
+        b = mk(); b.load_state_dict(sd); got = next(iter(b))[1]
+        assert (want == got).all(), f"{name}: resume mismatch"
+        out.append(name)
+    td.DATASETS["c4_test"] = cfg; shutil.rmtree(d)
+    return f"torchtitan {torchtitan.__version__} datasets {datasets.__version__} HF dataloader {'+'.join(out)} resume ok"
+tests = dict(fa=t_fa, fa_after_tf=t_fa_after_tf, te=t_te, ds=t_ds, vllm=t_vllm, compile=t_compile, mpi4jax=t_mpi4jax, ort=t_ort, xgb=t_xgb, mamba=t_mamba, flashinfer=t_flashinfer, gce=t_gce, apex=t_apex, numpyro=t_numpyro, mcore=t_mcore, verl=t_verl, rl=t_rl, titan=t_titan)
 try:
     print(f"[{which}] OK", tests[which](), flush=True)
 except Exception as e:

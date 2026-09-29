@@ -1156,6 +1156,14 @@ fi   # end TE (skipped on resume)
 
 pip install pylatexenc qwen-vl-utils
 
+# cuda-bindings tracks the toolkit (13.0.x for cuda-13.0.3); NVSHMEM4Py is tied to the
+# CUDA major. Bump both pins if CUDA_VERSION_FULL changes. cuda-python (the metapackage) is
+# pinned with them: nvshmem4py-cu13 and flashinfer-python only ask for cuda-python>=12/13, so
+# pip took the newest (13.4.1), which requires cuda-bindings~=13.4.1, and conda/2026-10-01
+# ended at cuda-bindings 13.4.3. Installed before the constraints file below so both are frozen
+# for vLLM/FlashInfer/TRL too.
+pip install "cuda-bindings==${CUDA_VERSION_FULL}" "cuda-python==${CUDA_VERSION_FULL}" nvshmem4py-cu${CUDA_VERSION_MAJOR}
+
 # vLLM from source (use_existing_torch.py reuses our PyTorch build so it doesn't
 # pull a binary torch wheel that overrides ours).
 # (Generated outside the resume guard: FlashInfer below uses it too.)
@@ -1172,7 +1180,7 @@ for n in ["torch","torchvision","triton","transformers","tokenizers","numpy","nu
           "jax","jaxlib","jax-cuda13-plugin","jax-cuda13-pjrt","jax-cuda12-plugin","jax-cuda12-pjrt",
           "tensorflow","flash-attn","transformer-engine","transformer-engine-torch","transformer-engine-jax",
           "deepspeed","apex","mpi4py","mpi4jax","h5py","cupy-cuda13x","cupy-cuda12x","xgboost","pyg-lib",
-          "onnx","onnxruntime-gpu","cuda-bindings","cmake","ninja","setuptools",
+          "onnx","onnxruntime-gpu","cuda-bindings","cuda-python","cmake","ninja","setuptools",
           "parsl","globus-compute-endpoint","globus-compute-sdk","dill","multiprocess","fsspec","gcsfs"]:
     try: print(f"{n}=={m.version(n)}")
     except m.PackageNotFoundError: pass
@@ -1229,9 +1237,7 @@ cd $BASE_PATH
 # wheel that took longer to build than the whole of vLLM.
 FLASHINFER_VERSION="0.6.18"
 export FLASHINFER_CUDA_ARCH_LIST="8.0"
-# cuda-bindings tracks the toolkit (13.0.x for cuda-13.0.3); NVSHMEM4Py is tied to the
-# CUDA major. Bump cuda-bindings if CUDA_VERSION_FULL changes.
-pip install "cuda-bindings==${CUDA_VERSION_FULL}" nvshmem4py-cu${CUDA_VERSION_MAJOR}
+# (cuda-bindings / cuda-python / nvshmem4py are pinned before the vLLM constraints file.)
 pip install -c "$VLLM_CONSTRAINTS" "flashinfer-python==${FLASHINFER_VERSION}"
 pip install --no-deps "flashinfer-jit-cache==${FLASHINFER_VERSION}+cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}" \
     --find-links https://flashinfer.ai/whl/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}/flashinfer-jit-cache/
@@ -1301,6 +1307,14 @@ pip install -c "$VLLM_CONSTRAINTS" trl
 # RLlib: an extra of the Ray that vLLM already installed; pin to it so pip adds gymnasium and
 # friends instead of switching Ray versions.
 pip install -c "$VLLM_CONSTRAINTS" "ray[rllib]==$(python -c 'import ray; print(ray.__version__)')"
+# HARDCODE: torchtitan 0.3.0 (2026-09-03; pure Python). --no-deps: it caps datasets<4.8.0 and
+# the env has datasets 5.x (from transformers/evaluate above); its HF text dataloader (streaming
+# load_dataset, split_dataset_by_node, state_dict resume) passes on datasets 5.0.1 (isolation test
+# `titan`), so the cap stays violated like click for globus-compute. Its other deps are in the env
+# except the three below. This is the standalone trainer, not verl's `model_engine=torchtitan`
+# (that wants a torchtitan nightly and a torch nightly with the spmd_types backend).
+pip install -c "$VLLM_CONSTRAINTS" torch_checkpointing tyro "spmd_types==0.2.3"
+pip install --no-deps "torchtitan==0.3.0"
 # TorchRL NOT installed (tested 2026-09-25). 0.14.0 (the torch 2.14 release; cp313 wheel) needs
 # tensordict>=0.14.2,<0.15, overriding verl's tensordict<=0.10.0 pin above. In a venv on top of
 # conda/2026-10-01, verl v0.9.0's own tests: protocol v1 (DataProto) 37/37 pass on both, but
@@ -1315,10 +1329,25 @@ pip install -c "$VLLM_CONSTRAINTS" "ray[rllib]==$(python -c 'import ray; print(r
 # env. Users who need it: a venv on top of this module with its own transformers, or a container.
 # Re-assert the pins that vLLM's runtime deps / verl deps are most likely to have moved.
 pip install --no-deps "transformers==${TRANSFORMERS_VERSION}" "triton==${TRITON_VERSION}" "jax==${JAX_VERSION}" "jaxlib==${JAX_VERSION}"
+
+# CUDA runtime/compiler wheels from vLLM's humming-kernels[cu13] (13.4.x in conda/2026-10-01).
+# They are used, not just installed: torch's _load_global_deps() preloads any nvidia component
+# wheels it finds and JAX's cuda13 plugin prefers them, so every process mapped a 13.4 libcudart
+# and libnvrtc next to /soft's 13.0.3 (tests/libprobe-2026-10-01.out). It worked, but NVRTC 13.4
+# can emit PTX the 580 (CUDA 13.0) driver cannot JIT. Without them everything resolves to
+# $CUDA_HOME (humming-kernels checks CUDA_HOME before the wheels; cuda-bindings' pathfinder falls
+# back to LD_LIBRARY_PATH). Kept: nvidia-cuda-cccl (headers only; nvidia-nvshmem-cu13 requires
+# it), nvidia-nvshmem-cu13 (torch's only NVSHMEM), nvidia-cutlass-dsl, nvidia-ml-py. Last pip
+# step on purpose: nothing after this can pull them back.
+pip uninstall -y nvidia-cuda-runtime nvidia-cuda-nvrtc nvidia-cuda-nvcc nvidia-cuda-crt nvidia-nvvm
 python - <<'EOF'
 import torch, triton, jax, transformers, mpi4jax
 print("torch", torch.__version__, "triton", triton.__version__, "jax", jax.__version__, "transformers", transformers.__version__)
 EOF
+SITE_PACKAGES=$(python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')
+if ls "$SITE_PACKAGES"/nvidia/cu13/lib/lib{cudart,nvrtc,nvvm}.so* 2>/dev/null; then
+    echo "ERROR: CUDA runtime/compiler wheel libs still in nvidia/cu13/lib (listed above)"; exit 1
+fi
 
 echo "Cleaning up"
 chmod -R u+w $DOWNLOAD_PATH/
@@ -1331,7 +1360,7 @@ conda list
 # Expected (metadata-only) complaints: mamba-ssm's tilelang/apache-tvm-ffi pins (see the
 # mamba-ssm block), globus-compute-endpoint/sdk's click<8.2 and psutil<6 (huggingface_hub
 # needs click>=8.4.2, ipython needs psutil>=7), vLLM's numba and setuptools<81 pins, xprof's
-# setuptools<70. Anything on
+# setuptools<70, torchtitan's datasets<4.8.0. Anything on
 # parsl/dill/pyzmq/fsspec means a later install moved a pin.
 pip check || true
 # parsl/globus-compute must match the Ops endpoint env exactly (see the install above).
@@ -1341,6 +1370,13 @@ want = {"parsl": "2026.2.23", "globus-compute-endpoint": "4.9.0", "globus-comput
 got = {k: m.version(k) for k in want}
 print("workflow pins:", got)
 assert got == want, f"workflow pins moved: {got} != {want}"
+EOF
+CUDA_VERSION_FULL=$CUDA_VERSION_FULL python - <<'EOF'
+import importlib.metadata as m, os
+want = os.environ["CUDA_VERSION_FULL"]
+got = {k: m.version(k) for k in ("cuda-bindings", "cuda-python")}
+print("CUDA python pins:", got)
+assert all(v == want for v in got.values()), f"cuda-bindings/cuda-python moved off {want}: {got}"
 EOF
 
 chmod -R a-w $BASE_PATH/

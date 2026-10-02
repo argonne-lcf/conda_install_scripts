@@ -1,0 +1,33 @@
+
+Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".
+
+
+Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with "PrgEnv-gnu/8.7.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-libsci/26.03.0     2) cray-mpich/9.1.0
+
+=== tf_then_triton
+Fatal Python error: Segmentation fault
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/triton/knobs.py", line 15 in <module>
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/triton/runtime/autotuner.py", line 11 in <module>
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/triton/runtime/__init__.py", line 1 in <module>
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/triton/__init__.py", line 8 in <module>
+--- rc=139
+=== jax_then_triton
+OK jax_then_triton compile torch.Size([64]) triton 3.8.0
+--- rc=0
+=== triton_then_tf
+OK triton_then_tf compile torch.Size([64]) triton 3.8.0
+--- rc=0
+=== tf_then_triton_deepbind
+OK tf_then_triton_deepbind compile torch.Size([64]) triton 3.8.0
+--- rc=0
+=== tf_local_then_triton
+OK tf_local_then_triton compile torch.Size([64]) triton 3.8.0
+--- rc=0
+=== tf_local_then_fa
+OK tf_local_then_fa (1, 128, 8, 64)
+--- rc=0
+=== all done

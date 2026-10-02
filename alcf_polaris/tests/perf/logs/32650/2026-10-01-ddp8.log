@@ -1,0 +1,1 @@
+RESULT ddp resnet50 bf16 gpus=8 bs/gpu=128 step_ms=183.4 img/s/gpu=698 img/s_total=5584 peak_mem_GB=5.8

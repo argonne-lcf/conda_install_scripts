@@ -1,0 +1,15 @@
+#!/bin/bash -l
+#PBS -A datascience
+#PBS -q workq
+#PBS -l select=1:ncpus=64:ngpus=4,filesystems=home:tegu,walltime=00:20:00
+#PBS -N llvm-clash-2026-09-17
+#PBS -j oe
+#PBS -o llvm_clash-2026-09-17.out
+cd $PBS_O_WORKDIR
+module use /soft/modulefiles
+module load conda/2026-09-17; conda activate
+export DARSHAN_DISABLE=1 CUDA_VISIBLE_DEVICES=0
+for v in tf_then_triton jax_then_triton triton_then_tf tf_then_triton_deepbind tf_local_then_triton tf_local_then_fa; do
+  echo "=== $v"; python -X faulthandler llvm_clash_2026-09-17.py $v 2>&1 | grep -E '^OK|Fatal Python|Segmentation|File ".*(triton|flash_attn|tensorflow)' | head -6; echo "--- rc=${PIPESTATUS[0]}"
+done
+echo "=== all done"

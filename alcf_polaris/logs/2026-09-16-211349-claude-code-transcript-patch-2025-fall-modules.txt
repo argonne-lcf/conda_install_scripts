@@ -1,0 +1,1074 @@
+ ▐▛███▛█   Claude Code v2.1.273
+▝▜██████▀  Fable 5.1 · Claude Max
+  ▝▝ ▝▝    ~/conda_install_scripts
+
+
+❯ We recently applied a substantial OS upgrade from HPE's HPCM described in     
+    @~/user-guides/docs/polaris/system-updates.md and it broke all of the       
+  September 2025 conda module builds on ALCF Polaris. I am trying to see if the 
+  existing build (built from source from an earlier version of                  
+  @alcf_polaris/build_monolithic_conda_module.sh) is salvegable.                
+                                                                                
+  First issue is that HPCM update removed two HPE-provided modules that the     
+  original module @/soft/modulefiles/conda/2025-09-25.lua loaded, principally   
+  one containing GCC 14.2, gcc-native/14.2. That was replaced by gcc-native/14  
+  which contains 14.3                                                           
+                                                                                
+  I tried simply replacing the modules                                          
+                                                                                
+  ❯ diff 2025-09-25-patch.lua 2025-09-25.lua                                    
+  30c30                                                                         
+  < depends_on("cray-hdf5-parallel/1.14.3.9")                                   
+  ---                                                                           
+  > depends_on("cray-hdf5-parallel/1.14.3.5")                                   
+  32c32                                                                         
+  < depends_on("gcc-native/14")                                                 
+  ---                                                                           
+  > depends_on("gcc-native/14.2")                                               
+  ❯ pwd                                                                         
+  /soft/modulefiles/conda                                                       
+                                                                                
+  But it is not that simple, because the sys-admin controlled A100 GPU driver   
+  version was upgraded from 12.x to:                                            
+                                                                                
+  NVIDIA-SMI 580.65.06              Driver Version: 580.65.06      CUDA         
+  Version: 13.0                                                                 
+                                                                                
+  The gpus become visible on a compute node, after getting an allocation via    
+  PBS job scheduler. See @~/user-guides/ for details on how to interact with    
+  this machine as user. I am using the following qsub command                   
+  qsub -A datascience -q workq -l                                               
+  select=2:ncpus=64:ngpus=4,filesystems=home:tegu,walltime=01:00:00 -I          
+  ⎿  Read ../user-guides/docs/polaris/system-updates.md (241 lines)
+  ⎿  Read alcf_polaris/build_monolithic_conda_module.sh (950 lines)
+  ⎿  Read ../../../soft/modulefiles/conda/2025-09-25.lua (114 lines)
+  ⎿  Listed directory ../user-guides/
+
+● I'll start by checking the current state: what the repo's modified modulefiles
+  already changed, what modules the new PE provides, and what actually breaks
+  when loading the patched module on the login node.
+
+  Ran 6 shell commands (ctrl+o to expand)
+
+● Those three shim symlinks resolved torch, mpi4py, mpi4jax, vLLM, and DeepSpeed
+  on the login node. Now I'll add the HDF5 high-level shim, check
+  TransformerEngine, and then submit a 2-node GPU batch job to test CUDA, NCCL,
+  and CUDA-aware MPI. · summarized
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● Test job 32505 submitted on 2 nodes; waiting for it. Meanwhile checking queue
+  state.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Job is running. Waiting for the background watcher to report.
+
+✻ Cogitated for 15m 5s · done 2:44 AM
+
+❯ show me the job output                                                        
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The NCCL failure was due to my test using the wrong env var (PALS uses
+  PALS_LOCAL_RANKID, not PMI_LOCAL_RANK), causing all 4 ranks to land on GPU 0.
+  Fixing and resubmitting, and checking if the torch MPI-backend CUDA-aware
+  failure predates the upgrade. · summarized
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Background command "Wait for PBS test job to finish" completed (exit code 0)
+
+● The torch MPI-backend failure is pre-existing (README line 244: PyTorch only
+  supports CUDA-aware MPI through OpenMPI). Job 32506 resubmitted with the
+  GPU-affinity fix; waiting on it.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Still all ranks on GPU 0, so that env var isn't set either. Switching the test
+  to derive local rank from an MPI shared-memory communicator split, which
+  needs no launcher env vars.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Local ranks are set correctly, but CUDA_VISIBLE_DEVICES isn't taking effect
+  since GTL initializes the CUDA driver in MPI_Init before it's set. I'll move
+  the export into a per-rank wrapper script, following the documented Polaris
+  pattern. · summarized
+
+  Ran 2 shell commands, wrote 1 memory (ctrl+o to expand)
+
+● The build is salvageable. With your two module edits plus three symlink shims
+  and one env var, everything except h5py passes on 2 compute nodes (job 32508,
+  full log at /home/felker/conda-salvage-test/job.out).
+
+  What passed (8 ranks, 2 nodes, driver 580.65.06): torch 2.8.0 CUDA, NCCL
+  2.28.3 all-reduce across nodes, CUDA-aware mpi4py all-reduce on cupy buffers
+  through the GTL, TensorFlow 2.21 GPU, JAX 0.7.2 GPU, flash-attn,
+  TransformerEngine, DeepSpeed FusedAdam, vLLM import, torch.compile/Triton JIT,
+  mpi4jax.
+
+  Root causes beyond the gcc/hdf5 module renames (all SONAME changes in PE
+  26.03):
+
+  ┌──────────────────────────────┬───────────────────────────┬──────────────┐
+  │  Old name (linked into the   │   New name in PE 26.03    │   Affects    │
+  │            build)            │                           │              │
+  ├──────────────────────────────┼───────────────────────────┼──────────────┤
+  │                              │                           │ libtorch_cpu │
+  │ libmpi_gnu_123.so.12         │ libmpi_gnu.so.12          │ , mpi4py,    │
+  │                              │                           │ h5py,        │
+  │                              │                           │ mpi4jax      │
+  ├──────────────────────────────┼───────────────────────────┼──────────────┤
+  │ libmpi_gtl_cuda.so.0 needs   │ now needs libcudart.so.13 │ everything   │
+  │ libcudart.so.12              │                           │ linking GTL  │
+  ├──────────────────────────────┼───────────────────────────┼──────────────┤
+  │ libhdf5_parallel_gnu_123.so. │ libhdf5_parallel_gnu.so.3 │ h5py         │
+  │ 200 (+ _hl_)                 │ 10                        │              │
+  └──────────────────────────────┴───────────────────────────┴──────────────┘
+
+  The previous PE (cray-mpich 8.1.x) is gone entirely, so there is no fallback
+  module.
+
+  Fixes that worked:
+  1. Shim dir on LD_LIBRARY_PATH with symlinks libmpi_gnu_123.so.12 -> 
+     $CRAY_MPICH_DIR/lib/libmpi_gnu.so.12 and libcudart.so.13 -> /soft/compilers
+     /cudatoolkit/cuda-13.0.1/targets/x86_64-linux/lib/libcudart.so.13. Two
+     cudart runtimes (12.9 for torch, 13.0 for GTL) coexist fine in one process.
+  2. setenv("NVTE_CUDA_INCLUDE_DIR", cuda_home/include) in the modulefile.
+     Without it TransformerEngine 2.7 crashes on the nvidia namespace package's
+     __file__ being None. This is a pre-existing TE bug, not upgrade-related.
+  3. h5py must be rebuilt: the HDF5 shim loads but fails with undefined symbol: 
+     H5E_BADATOM_g (removed in 1.14.3.9). Rebuild is cheap once you chmod u+w
+     the install:
+  module load conda/2025-09-25-patch; conda activate; module load
+  cray-hdf5-parallel
+  CC=cc HDF5_MPI=ON pip install --no-binary=h5py --no-cache-dir
+  --force-reinstall h5py
+
+  Not a regression: torch.distributed's MPI backend rejects CUDA tensors, but
+  your README line 244 documents that PyTorch only supports CUDA-aware MPI with
+  OpenMPI. NCCL is the working path.
+
+  Recommended modulefile changes for 2025-09-25-patch.lua (and the 09-26/09-28
+  variants): replace the scratch shim with a permanent one, e.g.
+  /soft/applications/conda/2025-09-25/pe-26.03-shim/,
+  prepend_path("LD_LIBRARY_PATH", ...) it, and add the NVTE_CUDA_INCLUDE_DIR
+  setenv. Note /usr/bin/gcc-14 is now 14.3.0, so the CC/CXX setenvs in the
+  module still resolve, just to a newer minor.
+
+  Test artifacts (shim, PBS script, test script) are in
+  /home/felker/conda-salvage-test/. Delete when done.
+
+✻ Sautéed for 4m 22s · done 2:50 AM
+
+❯ Successfully built h5py                                                       
+  Installing collected packages: numpy, mpi4py, h5py                            
+    Attempting uninstall: numpy                                                 
+      Found existing installation: numpy 2.2.6                                  
+      Uninstalling numpy-2.2.6:                                                 
+        Successfully uninstalled numpy-2.2.6                                    
+    Attempting uninstall: mpi4py                                                
+      Found existing installation: mpi4py 4.1.0                                 
+      Uninstalling mpi4py-4.1.0:                                                
+        Successfully uninstalled mpi4py-4.1.0                                   
+    Attempting uninstall: h5py                                                  
+      Found existing installation: h5py 3.14.0                                  
+      Uninstalling h5py-3.14.0:                                                 
+        Successfully uninstalled h5py-3.14.0                                    
+  ERROR: pip's dependency resolver does not currently take into account all the 
+  packages that are installed. This behaviour is the source of the following    
+  dependency conflicts.                                                         
+  xgboost 3.2.0.dev0 requires nvidia-nccl-cu12; platform_system == "Linux" and  
+  platform_machine != "aarch64", which is not installed.                        
+  opencv-python-headless 4.12.0.88 requires numpy<2.3.0,>=2; python_version >=  
+  "3.9", but you have numpy 2.5.3 which is incompatible.                        
+  numba 0.61.2 requires numpy<2.3,>=1.24, but you have numpy 2.5.3 which is     
+  incompatible.                                                                 
+  sglang 0.5.3rc0 requires transformers==4.56.1, but you have transformers      
+  4.53.3 which is incompatible.                                                 
+  sglang 0.5.3rc0 requires xgrammar==0.1.24, but you have xgrammar 0.1.19 which 
+  is incompatible.                                                              
+  verl 0.5.0 requires numpy<2.0.0, but you have numpy 2.5.3 which is            
+  incompatible.                                                                 
+  verl 0.5.0 requires tensordict!=0.9.0,<=0.9.1,>=0.8.0, but you have           
+  tensordict 0.10.0 which is incompatible.                                      
+  vllm 0.11.0rc2.dev147+g47b933954.d20251006.cu129 requires                     
+  compressed-tensors==0.11.0, but you have compressed-tensors 0.10.1 which is   
+  incompatible.                                                                 
+  vllm 0.11.0rc2.dev147+g47b933954.d20251006.cu129 requires depyf==0.19.0, but  
+  you have depyf 0.18.0 which is incompatible.                                  
+  vllm 0.11.0rc2.dev147+g47b933954.d20251006.cu129 requires                     
+  lm-format-enforcer==0.11.3, but you have lm-format-enforcer 0.10.12 which is  
+  incompatible.                                                                 
+  vllm 0.11.0rc2.dev147+g47b933954.d20251006.cu129 requires                     
+  outlines_core==0.2.11, but you have outlines-core 0.1.26 which is             
+  incompatible.                                                                 
+  vllm 0.11.0rc2.dev147+g47b933954.d20251006.cu129 requires                     
+  transformers>=4.55.2, but you have transformers 4.53.3 which is incompatible. 
+  vllm 0.11.0rc2.dev147+g47b933954.d20251006.cu129 requires xgrammar==0.1.25;   
+  platform_machine == "x86_64" or platform_machine == "aarch64" or              
+  platform_machine == "arm64", but you have xgrammar 0.1.19 which is            
+  incompatible.                                                                 
+  Successfully installed h5py-3.16.0 mpi4py-4.1.2 numpy-2.5.3                   
+                                                                                
+  add shims to /soft/modulefiles/conda/2025-09-25-patch.lua                     
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● Fixing the fallout from the h5py rebuild: my pip command missed --no-deps, so
+  it swapped mpi4py for a broken PyPI wheel and bumped numpy to a version numba
+  and opencv reject. Restoring both packages now. · summarized
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The repair to the shared install was blocked by the permission classifier, so
+  I'll verify the modulefile change and hand you the repair command.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Shims are installed and the modulefile is updated. Torch, h5py (parallel, HDF5
+  1.14.3.9), and TransformerEngine all import cleanly through
+  conda/2025-09-25-patch now.
+
+  What changed
+  - New dir /soft/applications/conda/2025-09-25/pe-26.03-shim/ with
+    libmpi_gnu_123.so.12 and libcudart.so.13 symlinks plus a README explaining
+    why. The HDF5 shims are no longer needed since h5py was rebuilt.
+  - /soft/modulefiles/conda/2025-09-25-patch.lua (after the CUPTI line):
+    prepend_path for the shim dir and setenv("NVTE_CUDA_INCLUDE_DIR", ...), both
+    commented.
+
+  Two things your h5py rebuild broke, and I could not fix them because the
+  permission classifier blocked writes to the shared install. The pip command I
+  gave you was missing --no-deps, so it also pulled in:
+  - mpi4py 4.1.2 as the PyPI manylinux wheel. It links generic libmpi.so.12 /
+    libmpi.so.40 and now fails to import at all.
+  - numpy 2.5.3, which numba (needs <2.3) and opencv reject.
+
+  Run this to restore both:
+
+  module use /soft/modulefiles; module load conda/2025-09-25-patch; conda
+  activate
+  pip install --no-deps --no-cache-dir "numpy==2.2.6"
+  MPICC="cc -shared -target-accel=nvidia80" pip install --no-deps
+  --force-reinstall --no-cache-dir --no-binary=mpi4py "mpi4py==4.1.0"
+  python -c "from mpi4py import MPI; import numba, cv2; 
+  print(MPI.Get_library_version()[:40])"
+
+  The last line should print MPI VERSION : CRAY MPICH version 9.1.0. Then rerun
+  qsub /home/felker/conda-salvage-test/job.pbs for the 2-node GPU/NCCL check
+  (all 11 tests passed before the h5py rebuild). The other pip-check warnings in
+  your output (sglang, verl, vllm pins) predate today and are documented in the
+  repo README.
+
+✻ Brewed for 3m 28s · done 5:24 AM
+
+✻ Allowed Restore numpy 2.2.6 and source-built mpi4py against Cray MPICH, then verify
+
+❯ ❯ qsub -A datascience -q workq -l                                             
+  select=2:ncpus=64:ngpus=4,filesystems=home:tegu,walltime=01:00:00 -I          
+  qsub: waiting for job 32511.sirius-pbs-0001.hsn.cm.sirius.alcf.anl.gov to     
+  start                                                                         
+  qsub: job 32511.sirius-pbs-0001.hsn.cm.sirius.alcf.anl.gov ready              
+                                                                                
+  Enter passphrase for /home/felker/.ssh/id_ed25519:                            
+  Identity added: /home/felker/.ssh/id_rsa (felker@sirius-uan-0002)             
+  ❯ module use /soft/modulefiles; module load conda/2025-09-25-patch; conda     
+  activate                                                                      
+                                                                                
+  Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".           
+                                                                                
+  Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with                    
+  "PrgEnv-gnu/8.7.0".                                                           
+                                                                                
+  Due to MODULEPATH changes, the following have been reloaded:                  
+  1. cray-libsci/26.03.0     2) cray-mpich/9.1.0                                
+                                                                                
+  ❯ python -c "from mpi4py import MPI; import numba, cv2;                       
+  print(MPI.Get_library_version()[:40])"                                        
+  MPI VERSION    : CRAY MPICH version 9.1.                                      
+  darshan_library_warning: unable to create log file                            
+  /lus/grand/logs/darshan/polaris/2026/9/16/felker_python_id32511-3587369_9-16- 
+  19738-5175276577413776555.darshan_partial.                                    
+  ❯ module unload darshan                                                       
+  ❯ python -c "from mpi4py import MPI; import numba, cv2;                       
+  print(MPI.Get_library_version()[:40])"                                        
+  MPI VERSION    : CRAY MPICH version 9.1.                                      
+  darshan_library_warning: unable to create log file                            
+  /lus/grand/logs/darshan/polaris/2026/9/16/felker_python_id32511-3588009_9-16- 
+  19752-12113501336431401942.darshan_partial.                                   
+  ❯ export DARSHAN_DISABLE=1                                                    
+                                                                                
+  ❯ python -c "from mpi4py import MPI; import numba, cv2;                       
+  print(MPI.Get_library_version()[:40])"                                        
+  MPI VERSION    : CRAY MPICH version 9.1.                                      
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Everything passes. You had already restored numpy 2.2.6 and the source-built
+  mpi4py 4.1.0 (now linked to Cray MPICH 9.1.0 and the GTL), so I did not rerun
+  the pip commands. The 2-node GPU job with the updated conda/2025-09-25-patch
+  module (job 32512) passed all tests: torch CUDA on 8 ranks, NCCL all-reduce
+  across nodes, CUDA-aware mpi4py, TensorFlow, JAX, flash-attn,
+  TransformerEngine, DeepSpeed, vLLM, torch.compile, mpi4jax.
+
+  The darshan warning is harmless and pre-existing. mpi4py, h5py, and
+  libtorch_cpu were linked against libdarshan.so at build time by the Cray cc
+  wrapper, so unloading the module or DARSHAN_DISABLE has no effect. It
+  complains only because /lus/grand/logs/darshan does not exist on this test
+  system. Build with module unload darshan next time if you want it gone.
+
+  Final state of the salvage:
+  - /soft/modulefiles/conda/2025-09-25-patch.lua: gcc-native/14,
+    cray-hdf5-parallel/1.14.3.9, shim dir on LD_LIBRARY_PATH,
+    NVTE_CUDA_INCLUDE_DIR set.
+  - /soft/applications/conda/2025-09-25/pe-26.03-shim/: libmpi_gnu_123.so.12 and
+    libcudart.so.13 symlinks plus README.
+  - Rebuilt in the env: h5py 3.16.0 (HDF5 1.14.3.9, MPI on), mpi4py 4.1.0 from
+    source.
+
+  The same three edits apply to the 2025-09-26 and 2025-09-28 modules if you
+  want those salvaged too. Test artifacts remain in
+  /home/felker/conda-salvage-test/.
+
+✻ Churned for 2m 18s · done 5:31 AM
+❯ youll notice I greatly simpliified /soft/modulefiles/conda. move the changes  
+  in 2025-09-25-patch.lua to the 3x original 2025-09-25.lua                     
+
+  Ran 5 shell commands (ctrl+o to expand)
+
+● The load works; my previous check piped module load through grep, which ran it
+  in a subshell so nothing persisted. Rerunning the verification properly.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Done. All three 2025-09-25 modulefiles now carry the four changes, and
+  2025-09-25-patch.lua is deleted.
+
+  Each of 2025-09-25.lua, 2025-09-25-aws-nccl-1.6.0.lua, and
+  2025-09-25-aws-nccl-1.9.1.lua got:
+  - cray-hdf5-parallel/1.14.3.5 to 1.14.3.9
+  - gcc-native/14.2 to gcc-native/14
+  - prepend_path of pe-26.03-shim/ on LD_LIBRARY_PATH, after the CUPTI line
+  - setenv("NVTE_CUDA_INCLUDE_DIR", ...)
+
+  Verified in fresh login shells: module load conda (default resolves to
+  2025-09-25) and both aws-nccl variants load the right gcc/hdf5 modules, put
+  the shim dir on the path, set the NVTE var, and import torch, h5py,
+  TransformerEngine, and mpi4py cleanly.
+
+  One note: module avail conda still lists the deleted patch, 09-26, and xalt
+  modules because Lmod's spider cache is stale. It clears on its own, or module 
+  --ignore_cache avail shows the true state. The 2025-09-28 modulefiles are
+  untouched and still reference the removed gcc-native/14.2 and hdf5 1.14.3.5.
+
+✻ Cogitated for 3m 44s · done 5:43 AM
+
+❯ lets apply similar patches and shims to the 2025-09-28 3x modulefiles; then   
+  remind me to how to run the h5py reinstall (correctly this time), and i will  
+  do that manually                                                              
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Same breakage pattern in 09-28. Applying the identical edits and shim dir.
+
+● API Error: Connection lost mid-response. The response above may be 
+  incomplete.
+
+✻ Worked for 34s · done 5:44 AM
+
+❯ retry                                                                         
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Patches applied; only my grep regex broke. Verifying the three modules load
+  and import.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● All three 2025-09-28 modulefiles are patched and verified: gcc-native/14, hdf5
+  1.14.3.9, shim dir on LD_LIBRARY_PATH, NVTE_CUDA_INCLUDE_DIR set. torch,
+  TransformerEngine, and mpi4py import cleanly. Shim dir created at
+  /soft/applications/conda/2025-09-28/pe-26.03-shim/ with the same README.
+
+  Only h5py remains, as expected. Rebuild it (the --no-deps flag is what was
+  missing last time; it keeps pip from replacing mpi4py with the PyPI wheel and
+  bumping numpy):
+
+  module use /soft/modulefiles
+  module load conda/2025-09-28; conda activate
+  chmod -R u+w
+  /soft/applications/conda/2025-09-28/mconda3/lib/python3.12/site-packages
+  CC=cc HDF5_MPI=ON pip install --no-deps --no-binary=h5py --no-cache-dir
+  --force-reinstall h5py
+  python -c "import h5py; from mpi4py import MPI; import numpy, numba, cv2; 
+  print(h5py.__version__, h5py.version.hdf5_version, h5py.get_config().mpi, 
+  numpy.__version__, MPI.Get_library_version()[:45])"
+  chmod -R a-w
+  /soft/applications/conda/2025-09-28/mconda3/lib/python3.12/site-packages
+
+  Expected output: h5py 3.16.0, HDF5 1.14.3.9, True, numpy 2.2.6, CRAY MPICH 
+  version 9.1.0. Consider module unload darshan before the pip step so the new
+  h5py is not linked against libdarshan.
+
+✻ Worked for 2m 7s · done 5:46 AM
+
+❯ ❯ ssh sirius                                                                  
+  Last login: Wed Sep 16 05:27:35 2026 from bastion-03.alcf.anl.gov             
+  ❯ qsub -A datascience -q workq -l                                             
+  select=2:ncpus=64:ngpus=4,filesystems=home:tegu,walltime=01:00:00 -I          
+  qsub: waiting for job 32514.sirius-pbs-0001.hsn.cm.sirius.alcf.anl.gov to     
+  start                                                                         
+  qsub: job 32514.sirius-pbs-0001.hsn.cm.sirius.alcf.anl.gov ready              
+                                                                                
+  Enter passphrase for /home/felker/.ssh/id_ed25519:                            
+  Identity added: /home/felker/.ssh/id_rsa (felker@sirius-uan-0002)             
+  ❯ module use /soft/modulefiles; module load conda/2025-09-28; conda activate  
+                                                                                
+  Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".           
+                                                                                
+  Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with                    
+  "PrgEnv-gnu/8.7.0".                                                           
+                                                                                
+  Due to MODULEPATH changes, the following have been reloaded:                  
+  1. cray-libsci/26.03.0     2) cray-mpich/9.1.0                                
+                                                                                
+  ❯ CC=cc HDF5_MPI=ON pip install --no-deps --no-binary=h5py --no-cache-dir     
+  --force-reinstall h5py                                                        
+  Collecting h5py                                                               
+    Downloading h5py-3.16.0.tar.gz (446 kB)                                     
+    Installing build dependencies ... done                                      
+    Getting requirements to build wheel ... done                                
+    Installing backend dependencies ... done                                    
+    Preparing metadata (pyproject.toml) ... done                                
+  Building wheels for collected packages: h5py                                  
+    Building wheel for h5py (pyproject.toml) ... done                           
+    Created wheel for h5py: filename=h5py-3.16.0-cp312-cp312-linux_x86_64.whl   
+  size=2351776                                                                  
+  sha256=13684c9947fe1c5d85dabe0b43b939ca7ad286b464b174fa21572fd91c9789aa       
+    Stored in directory: /var/tmp/pbs.32514.sirius-pbs-0001.hsn.cm.sirius.alcf. 
+  anl.gov/pip-ephem-wheel-cache-1jx7nmh7/wheels/42/78/ee/e78c7059ae6582680eb78b 
+  26cf22bea130a51a709674118ca8                                                  
+  Successfully built h5py                                                       
+  Installing collected packages: h5py                                           
+    Attempting uninstall: h5py                                                  
+      Found existing installation: h5py 3.15.1                                  
+      Uninstalling h5py-3.15.1:                                                 
+        Successfully uninstalled h5py-3.15.1                                    
+  Successfully installed h5py-3.16.0                                            
+                                                                                
+  [notice] A new release of pip is available: 25.3 -> 26.2.1                    
+  [notice] To update, run: pip install --upgrade pip                            
+  ❯ pip install --upgrade pip                                                   
+  Requirement already satisfied: pip in                                         
+  /soft/applications/conda/2025-09-28/mconda3/lib/python3.12/site-packages      
+  (25.3)                                                                        
+  Collecting pip                                                                
+    Downloading pip-26.2.1-py3-none-any.whl.metadata (4.6 kB)                   
+  Downloading pip-26.2.1-py3-none-any.whl (1.8 MB)                              
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 53.0 MB/s  0:00:00     
+  Installing collected packages: pip                                            
+    Attempting uninstall: pip                                                   
+      Found existing installation: pip 25.3                                     
+      Uninstalling pip-25.3:                                                    
+        Successfully uninstalled pip-25.3                                       
+  Successfully installed pip-26.2.1                                             
+  ❯ python -c "import h5py; from mpi4py import MPI; import numpy, numba, cv2;   
+  print(h5py.__version__,  h5py.version.hdf5_version, h5py.get_config().mpi,    
+  numpy.__version__, MPI.Get_library_version()[:45])"                           
+  MPICH ERROR [Rank unknown] [Wed Sep 16 05:49:47 2026] [x3200c0s13b0n0] -      
+  Abort(-1): MPIDI_CRAY_init: GPU_SUPPORT_ENABLED is requested, but GTL library 
+  is not linked                                                                 
+   (Other MPI error)                                                            
+                                                                                
+  ❯ hostname                                                                    
+  x3200c0s13b0n0                                                                
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● Cause found: the rebuilt h5py links Cray MPICH without the GTL. When h5py is
+  imported before mpi4py or torch, libmpi loads first with no GTL present, and
+  MPI_Init then aborts under MPICH_GPU_SUPPORT_ENABLED=1. Confirmed on a compute
+  node: h5py-first fails, mpi4py-first or torch-first works, and h5py-first
+  with the GTL preloaded works.
+
+  The original build script had craype-accel-nvidia80 loaded, so cc linked the
+  GTL into h5py. My rebuild command omitted that. Same latent defect exists in
+  the 09-25 h5py you rebuilt earlier.
+
+  Rebuild h5py again in both envs with the GTL linked:
+
+  module use /soft/modulefiles
+  module load conda/2025-09-28; conda activate      # then repeat with 
+  conda/2025-09-25
+  module load craype-accel-nvidia80
+  CC=cc HDF5_MPI=ON pip install --no-deps --no-binary=h5py --no-cache-dir
+  --force-reinstall h5py
+  ldd $CONDA_PREFIX/lib/python3.12/site-packages/h5py/h5.cpython-312-x86_64-linu
+  x-gnu.so | grep gtl
+  python -c "import h5py; from mpi4py import MPI; import numpy, numba, cv2; 
+  print(h5py.__version__, h5py.version.hdf5_version, h5py.get_config().mpi, 
+  numpy.__version__, MPI.Get_library_version()[:45])"
+
+  The ldd line must show libmpi_gtl_cuda.so.0. Expected final line: h5py 3.16.0,
+  HDF5 1.14.3.9, True, numpy 2.2.6, CRAY MPICH 9.1.0.
+
+  Note pip is now 26.2.1 in the 09-28 env from your upgrade. It should be
+  harmless, but the 09-25 env is still on 25.3, so the two envs now differ.
+
+✻ Brewed for 1m 44s · done 5:52 AM
+
+❯ fyi, you have to run export CRAY_ACCEL_TARGET="nvidia80"                      
+  export CRAY_TCMALLOC_MEMFS_FORCE="1"                                          
+  export CRAYPE_LINK_TYPE="dynamic"                                             
+  export CRAY_ACCEL_VENDOR="nvidia"                                             
+  export CRAY_CPU_TARGET="x86-64"                                               
+   as a manual version of "module load craype-accel-nvidia80" due to a silly    
+  cray module incompatibility they enforce                                      
+
+  Ran 1 shell command, wrote 1 memory (ctrl+o to expand)
+
+● Noted and saved to memory. Corrected rebuild, for each of the two envs:
+
+  module use /soft/modulefiles
+  module load conda/2025-09-28; conda activate      # then repeat with 
+  conda/2025-09-25
+  export CRAY_ACCEL_TARGET="nvidia80"
+  export CRAY_TCMALLOC_MEMFS_FORCE="1"
+  export CRAYPE_LINK_TYPE="dynamic"
+  export CRAY_ACCEL_VENDOR="nvidia"
+  export CRAY_CPU_TARGET="x86-64"
+  CC=cc HDF5_MPI=ON pip install --no-deps --no-binary=h5py --no-cache-dir
+  --force-reinstall h5py
+  ldd $CONDA_PREFIX/lib/python3.12/site-packages/h5py/h5.cpython-312-x86_64-linu
+  x-gnu.so | grep gtl
+  python -c "import h5py; from mpi4py import MPI; import numpy, numba, cv2; 
+  print(h5py.__version__, h5py.version.hdf5_version, h5py.get_config().mpi, 
+  numpy.__version__, MPI.Get_library_version()[:45])"
+
+  The ldd line must show libmpi_gtl_cuda.so.0, and the h5py-first import in the
+  last line is exactly the order that aborted before, so it doubles as the
+  regression check.
+
+✻ Sautéed for 18s · done 5:56 AM
+
+❯ ❯ export CRAY_ACCEL_TARGET="nvidia80"                                         
+  ❯ export CRAY_TCMALLOC_MEMFS_FORCE="1"                                        
+  ❯ export CRAYPE_LINK_TYPE="dynamic"                                           
+  ❯ export CRAY_ACCEL_VENDOR="nvidia"                                           
+  ❯ export CRAY_CPU_TARGET="x86-64"                                             
+  ❯ CC=cc HDF5_MPI=ON pip install --no-deps --no-binary=h5py --no-cache-dir     
+  --force-reinstall h5py                                                        
+  Collecting h5py                                                               
+    Downloading h5py-3.16.0.tar.gz (446 kB)                                     
+    Installing build dependencies ... done                                      
+    Getting requirements to build wheel ... done                                
+    Installing backend dependencies ... done                                    
+    Preparing metadata (pyproject.toml) ... done                                
+  Building wheels for collected packages: h5py                                  
+    Building wheel for h5py (pyproject.toml) ... done                           
+    Created wheel for h5py: filename=h5py-3.16.0-cp312-cp312-linux_x86_64.whl   
+  size=2356028                                                                  
+  sha256=da5fc4f16b823ad141d4b0879e74cbbb2a4090f95c1cc9f5112dba03e2db5db8       
+    Stored in directory: /var/tmp/pbs.32514.sirius-pbs-0001.hsn.cm.sirius.alcf. 
+  anl.gov/pip-ephem-wheel-cache-0ng0uk0x/wheels/42/78/ee/e78c7059ae6582680eb78b 
+  26cf22bea130a51a709674118ca8                                                  
+  Successfully built h5py                                                       
+  Installing collected packages: h5py                                           
+    Attempting uninstall: h5py                                                  
+      Found existing installation: h5py 3.16.0                                  
+      Uninstalling h5py-3.16.0:                                                 
+        Successfully uninstalled h5py-3.16.0                                    
+  Successfully installed h5py-3.16.0                                            
+  ❯ ldd $CONDA_PREFIX/lib/python3.12/site-packages/h5py/h5.cpython-312-x86_64-l 
+  inux-gnu.so | grep gtl                                                        
+      libmpi_gtl_cuda.so.0 => /opt/cray/pe/lib64/libmpi_gtl_cuda.so.0           
+  (0x000014e417411000)                                                          
+  ❯ python -c "import h5py; from mpi4py import MPI; import numpy, numba, cv2;   
+  print(h5py.__version__,  h5py.version.hdf5_version, h5py.get_config().mpi,    
+  numpy.__version__, MPI.Get_library_version()[:45])"                           
+  3.16.0 1.14.3 True 2.2.6 MPI VERSION    : CRAY MPICH version 9.1.0.794        
+  darshan_library_warning: unable to create log file                            
+  /lus/grand/logs/darshan/polaris/2026/9/16/felker_python_id32514-3660536_9-16- 
+  21443-1955908055862766666.darshan_partial.                                    
+  ❯ export DARSHAN_DISABLE=1                                                    
+                                                                                
+  ❯ module unload darshan                                                       
+
+● 09-28 is fixed: h5py links the GTL and the h5py-first import order now works.
+  Running the full 2-node GPU/NCCL test against conda/2025-09-28 for
+  confirmation, with the scratch shim and NVTE lines removed from the job script
+  since the modulefile now provides them.
+
+  Ran 1 shell command (ctrl+o to expand)
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ ❯ export CRAY_ACCEL_TARGET="nvidia80"                                         
+  ❯ export CRAY_TCMALLOC_MEMFS_FORCE="1"                                        
+  ❯ export CRAYPE_LINK_TYPE="dynamic"                                           
+  ❯ export CRAY_ACCEL_VENDOR="nvidia"                                           
+  ❯ export CRAY_CPU_TARGET="x86-64"                                             
+  ❯ CC=cc HDF5_MPI=ON pip install --no-deps --no-binary=h5py --no-cache-dir     
+  --force-reinstall h5py                                                        
+  Collecting h5py                                                               
+    Downloading h5py-3.16.0.tar.gz (446 kB)                                     
+    Installing build dependencies ... done                                      
+    Getting requirements to build wheel ... done                                
+    Installing backend dependencies ... done                                    
+    Preparing metadata (pyproject.toml) ... done                                
+  Building wheels for collected packages: h5py                                  
+    Building wheel for h5py (pyproject.toml) ... done                           
+    Created wheel for h5py: filename=h5py-3.16.0-cp312-cp312-linux_x86_64.whl   
+  size=2356028                                                                  
+  sha256=da5fc4f16b823ad141d4b0879e74cbbb2a4090f95c1cc9f5112dba03e2db5db8       
+    Stored in directory: /var/tmp/pbs.32514.sirius-pbs-0001.hsn.cm.sirius.alcf. 
+  anl.gov/pip-ephem-wheel-cache-0ng0uk0x/wheels/42/78/ee/e78c7059ae6582680eb78b 
+  26cf22bea130a51a709674118ca8                                                  
+  Successfully built h5py                                                       
+  Installing collected packages: h5py                                           
+    Attempting uninstall: h5py                                                  
+      Found existing installation: h5py 3.16.0                                  
+      Uninstalling h5py-3.16.0:                                                 
+        Successfully uninstalled h5py-3.16.0                                    
+  Successfully installed h5py-3.16.0                                            
+  ❯ ldd $CONDA_PREFIX/lib/python3.12/site-packages/h5py/h5.cpython-312-x86_64-l 
+  inux-gnu.so | grep gtl                                                        
+      libmpi_gtl_cuda.so.0 => /opt/cray/pe/lib64/libmpi_gtl_cuda.so.0           
+  (0x000014e417411000)                                                          
+  ❯ python -c "import h5py; from mpi4py import MPI; import numpy, numba, cv2;   
+  print(h5py.__version__,  h5py.version.hdf5_version, h5py.get_config().mpi,    
+  numpy.__version__, MPI.Get_library_version()[:45])"                           
+  3.16.0 1.14.3 True 2.2.6 MPI VERSION    : CRAY MPICH version 9.1.0.794        
+  darshan_library_warning: unable to create log file                            
+  /lus/grand/logs/darshan/polaris/2026/9/16/felker_python_id32514-3660536_9-16- 
+  21443-1955908055862766666.darshan_partial.                                    
+  ❯ export DARSHAN_DISABLE=1                                                    
+                                                                                
+  ❯ module unload darshan                                                       
+
+● The 09-28 h5py rebuild is correct: the GTL is linked, h5py-first import works,
+  numpy stayed at 2.2.6, mpi4py is the Cray build.
+
+  Remaining item: the 09-25 env still has the earlier h5py build without the
+  GTL, so it has the same import-order abort. Repeat the identical sequence
+  there:
+
+  module load conda/2025-09-25; conda activate
+  # same five CRAY_* exports
+  CC=cc HDF5_MPI=ON pip install --no-deps --no-binary=h5py --no-cache-dir
+  --force-reinstall h5py
+  ldd $CONDA_PREFIX/lib/python3.12/site-packages/h5py/h5.cpython-312-x86_64-linu
+  x-gnu.so | grep gtl
+
+  On darshan: the warning comes from libdarshan.so linked into torch, mpi4py,
+  and now h5py by the cc wrapper, so unloading the module has no effect.
+  DARSHAN_DISABLE=1 should silence it on the next Python run. To keep it out of
+  future rebuilds, module unload darshan before the pip step.
+
+  If you want, say the word and I'll submit the 2-node GPU/NCCL test job against
+  conda/2025-09-28.
+
+✻ Brewed for 7s · done 6:09 AM
+
+❯ I fixed 2025-09-25. removed write permissions from 9/28, and currently        
+  removing them for 9/25. test multinode functionality on both for me please    
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● I'll resubmit 09-25 to include the h5py check, and confirm whether the two
+  failures in 09-28 are pre-existing version mismatches rather than caused by
+  the upgrade. · summarized
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Both modules pass multinode testing on 2 nodes, 8 ranks (jobs 32520 and
+  32519).
+
+  conda/2025-09-25: all 13 checks pass. torch CUDA, NCCL 2.28.3 all-reduce
+  across nodes, CUDA-aware mpi4py on cupy buffers, h5py 3.16.0 parallel MPI-IO
+  write and read with h5py imported before mpi4py, TensorFlow, JAX, flash-attn,
+  TransformerEngine, DeepSpeed, vLLM, torch.compile, mpi4jax.
+
+  conda/2025-09-28: same 11 upgrade-relevant checks pass, including h5py
+  parallel MPI-IO. Two failures are pre-existing package mismatches in that
+  build, dated 2025-10-26 and unrelated to the OS upgrade:
+  - torch.compile fails: triton 3.5.0 removed triton_key, which torch 2.8.0's
+    inductor imports. torch 2.8 pairs with triton 3.4.0, which is what 09-25
+    has.
+  - mpi4jax import fails: jax 0.8.0 removed jax.interpreters.mlir.custom_call,
+    which mpi4jax 0.8.1 uses. 09-25 has jax 0.7.2.
+
+  If you want 09-28 to match 09-25 on those two, it needs pip install --no-deps 
+  triton==3.4.0 and a jax downgrade to 0.7.2 (jaxlib and the jax-cuda plugins
+  too), which would mean reopening write permissions.
+
+  Full logs: /home/felker/conda-salvage-test/job-2025-09-25.out and
+  job-2025-09-28.out. The test dir can be deleted when you are done with it.
+
+✻ Cooked for 4m 45s · done 6:14 AM
+
+❯ search the build logs in @alcf_polaris/logs/ to confirm that version          
+  difference from the original builds                                           
+  ⎿  Listed directory alcf_polaris/logs/
+  Searched for 1 pattern, ran 1 shell command (ctrl+o to expand)
+
+● Confirmed. The build logs show the 09-28 build shipped those versions from day
+  one, so both failures predate the OS upgrade.
+
+  ┌──────────────┬───────────────────────┬─────────────────┐
+  │   Package    │ 09-24/09-25 build log │ 09-28 build log │
+  ├──────────────┼───────────────────────┼─────────────────┤
+  │ triton       │ 3.4.0                 │ 3.5.0           │
+  ├──────────────┼───────────────────────┼─────────────────┤
+  │ jax / jaxlib │ 0.7.2                 │ 0.8.0           │
+  ├──────────────┼───────────────────────┼─────────────────┤
+  │ mpi4jax      │ 0.8.1.post1           │ 0.8.1.post1     │
+  ├──────────────┼───────────────────────┼─────────────────┤
+  │ torch        │ 2.8.0                 │ 2.8.0           │
+  └──────────────┴───────────────────────┴─────────────────┘
+
+  Details from alcf_polaris/logs/2025-09-28-sirius-build.out:
+  - The unpinned pip install triton step installed 3.5.0 at line 57974, and it
+    was reinstalled at line 122548. Triton 3.5.0 released on 2025-10-15, between
+    the two builds, and dropped triton_key.
+  - The unpinned pip install --upgrade "jax[cuda12_local]" step installed 0.8.0
+    at line 135427. JAX 0.8.0 released 2025-10-15 and removed
+    jax.interpreters.mlir.custom_call.
+  - mpi4jax built fine at build time in both logs, since the breakage is only at
+    import.
+
+  The 09-24 and 09-29 end-to-end logs, plus the conda list dump at the end of
+  each log, show 3.4.0 and 0.7.2 for the earlier build. So 09-28 was built four
+  days later with two unpinned dependencies that had just moved past what torch
+  2.8.0 and mpi4jax support. The build script's pip install triton and pip 
+  install --upgrade "jax[...]" lines are the two spots to pin if you rebuild.
+
+✻ Cogitated for 49s · done 6:16 AM
+
+❯ draft a short commit msg describing this discrepancy, and why i would keep    
+  the 9/25 module as the default                                                
+
+● polaris: keep conda/2025-09-25 as default; 09-28 has broken triton/jax pins
+
+  The 2025-09-28 build picked up unpinned triton 3.5.0 and jax 0.8.0
+  (both released 2025-10-15, between the two builds; see logs/2025-09-28-
+  sirius-build.out lines 57974 and 135427). Consequences, confirmed on
+  2 nodes after the Aug 2026 PE 26.03 upgrade:
+
+    - torch.compile fails: torch 2.8.0's inductor imports triton_key,
+      removed in triton 3.5.0 (torch 2.8 pairs with triton 3.4.0)
+    - mpi4jax fails to import: jax.interpreters.mlir.custom_call was
+      removed in jax 0.8.0
+
+  The 2025-09-25 build (triton 3.4.0, jax 0.7.2) passes every multinode
+  check: NCCL, CUDA-aware MPI, parallel h5py, TF, JAX, TE, DeepSpeed,
+  vLLM, torch.compile, mpi4jax. Leave it as the default in .modulerc.lua.
+
+  Both modules otherwise salvaged post-upgrade via gcc-native/14,
+  cray-hdf5-parallel/1.14.3.9, a pe-26.03-shim/ dir (libmpi_gnu_123.so.12
+  and libcudart.so.13 SONAME symlinks), NVTE_CUDA_INCLUDE_DIR, and an
+  h5py rebuild with the GTL linked.
+
+✻ Worked for 8s · done 6:18 AM
+
+❯ how to refresh the lmod cache? the old modules still appear under module      
+  avail                                                                         
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Fixed. There is no system-wide spider cache on this machine; the stale entries
+  came from your per-user cache at ~/.cache/lmod/spiderT.*, which Lmod had
+  written this morning before the deletions and keeps for 24 hours. I deleted it
+  and module avail conda now shows only the six real modules, with 2025-09-25
+  marked default.
+
+  For future refreshes, either of these works:
+
+  rm ~/.cache/lmod/spiderT.*        # force a rebuild on next module command
+  module --ignore_cache avail conda # one-off, leaves the cache alone
+
+  Other users who ran module avail today will see the stale list until their own
+  cache ages out or they do the same. Note .modulerc.lua still has
+  hide_modulefile("2025-09-25-aws-nccl-1.9.1"), yet it is shown above, so that
+  directive is apparently not taking effect.
+
+✻ Crunched for 38s · done 6:23 AM
+
+❯ the hide modulefile functions in @/soft/modulefiles/conda/.modulefile.rc not  
+  working?                                                                      
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Found the issue: I was passing a bare version string, but Lmod's
+  hide_modulefile() needs the absolute path and hide_version() needs the full
+  module name. Testing the corrected fix now. · summarized
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Fixed. The two hide_modulefile("2025-09-25-aws-nccl-1.9.1") lines were
+  silently no-ops: in Lmod that function expects the modulefile's absolute path,
+  and hide_version() is the one that takes a full module name. A bare version
+  string matched neither, so nothing was hidden.
+
+  /soft/modulefiles/conda/.modulerc.lua now reads:
+
+  module_version("conda/2025-09-25", "default")
+  -- module_version("conda/2025-09-28", "default")
+  hide_version("conda/2025-09-25-aws-nccl-1.9.1")
+  hide_version("conda/2025-09-28-aws-nccl-1.9.1")
+
+  Verified after clearing the spider cache: plain module avail conda lists only
+  the four intended modules, --show_hidden reveals both 1.9.1 variants, and
+  loading a hidden one by name still works.
+
+  The same mistake is in the repo copy under alcf_polaris/modulefiles/conda/ if
+  you keep a .modulerc.lua there. A backup of the original is at
+  /tmp/claude-30041/modulerc.bak.
+
+✻ Brewed for 1m 17s · done 6:25 AM
+
+❯ fix the version in /soft ... and the one in this repo, commit and push        
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The /soft copy is already fixed; only the repo copy differs. Syncing it,
+  committing, and pushing.
+
+● Bash(cp /soft/modulefiles/conda/.modulerc.lua
+      alcf_polaris/modulefiles/conda/.modulerc.lua && git add
+      alcf_polaris/modulefiles/conda/.modulerc.lua && git commit -q -…)
+  ⎿  773a112 polaris: fix .modulerc.lua hide directives (hide_version, full
+      module name)
+     0
+  ⎿  Updated alcf_polaris/modulefiles/conda/.modulerc.lua (+2 -2)
+      1  module_version("conda/2025-09-25", "default")
+      2  -- module_version("conda/2025-09-28", "default")
+      3 -hide_modulefile("2025-09-25-aws-nccl-1.9.1")                    
+      4 -hide_modulefile("2025-09-28-aws-nccl-1.9.1")                    
+      3 +hide_version("conda/2025-09-25-aws-nccl-1.9.1")                 
+      4 +hide_version("conda/2025-09-28-aws-nccl-1.9.1")                 
+
+● Done. Commit 773a112 pushed to origin/master.
+
+  The /soft copy was already corrected in the previous step, so this only synced
+  the repo copy of alcf_polaris/modulefiles/conda/.modulerc.lua to match it.
+  The six .lua modulefiles in the repo were already identical to /soft, and the
+  working tree is clean.
+
+✻ Cooked for 30s · done 6:27 AM
+
+❯ what do you suggest we save to memory and claude.md now that we are done      
+  here. Next, I am going to start a fresh session to build a brand new module   
+  from scratch on Sirius using the latest pytorch etc                           
+
+  Listed 1 directory (ctrl+o to expand)
+
+● No CLAUDE.md exists yet in the repo or your home. Here is what I'd split
+  between the two, based on what actually cost time today.
+
+  CLAUDE.md (repo-level, durable facts about the machine and workflow that any
+  session needs):
+  - Polaris/Sirius environment as of PE 26.03: SLES 15 SP7, cray-mpich 9.1.0,
+    driver 580 / CUDA 13.0, gcc-native/14 is 14.3.0,
+    cray-hdf5-parallel/1.14.3.9. Cray MPICH libs are now libmpi_gnu.so.12 with
+    no gcc suffix.
+  - module load craype-accel-nvidia80 fails under PrgEnv-gnu. Export the five
+    CRAY_ACCEL_*/CRAYPE_LINK_TYPE vars instead before any cc-linked build.
+    Anything that loads libmpi must link the GTL, or MPI_Init aborts when that
+    lib is imported first.
+  - Any pip reinstall inside a shared env must use --no-deps. Without it, pip
+    swapped mpi4py for the PyPI wheel and bumped numpy.
+  - module unload darshan before builds, otherwise cc links libdarshan into
+    every extension.
+  - How to test: submit a batch job rather than interactive qsub. Per-rank
+    CUDA_VISIBLE_DEVICES must be set in a wrapper script from PALS_LOCAL_RANKID
+    before Python starts, because the GTL initializes the CUDA driver inside
+    MPI_Init. The reusable harness is in ~/conda-salvage-test/ and is worth
+    moving into the repo under alcf_polaris/tests/.
+  - Lmod: user spider cache is ~/.cache/lmod/spiderT.*, and .modulerc.lua hiding
+    needs hide_version("conda/<name>").
+  - Shell quirk for this session tool: module needs bash -lc, and piping module 
+    load through grep runs it in a subshell.
+  - For the build script: pin triton to the version torch ships with, pin jax to
+    what mpi4jax supports, and build h5py after exporting the GTL vars. Those
+    three unpinned lines produced the 09-28 breakage.
+
+  Memory (update the existing salvage note, add one new note):
+  - Update the salvage note with the outcome: both 09-25 and 09-28 salvaged and
+    verified 2026-09-16, shim dirs live at
+    /soft/applications/conda/<date>/pe-26.03-shim/, h5py rebuilt with GTL, 09-25
+    stays default because 09-28 shipped triton 3.5.0 and jax 0.8.0.
+  - New feedback note: you prefer to run pip and permission changes on /soft
+    yourself, and want commands handed to you rather than executed. Also that
+    you review test job output directly, so full logs should be pointed to
+    rather than summarized away.
+
+  Not worth saving: anything already in the commit history or README, such as
+  the SONAME rename table or the per-file modulefile edits.
+
+  For the new from-scratch build, the CLAUDE.md pinning and GTL-linking guidance
+  matters most, since the build script's pip install triton and jax lines are
+  still unpinned and module load craype-accel-nvidia80 at line 42 will still
+  fail.
+
+  Say the word and I will write both files.
+
+✻ Crunched for 52s · done 9:12 PM
+
+❯ do it                                                                         
+
+● Write(CLAUDE.md)
+  ⎿  Wrote 74 lines to CLAUDE.md
+       1 # conda_install_scripts
+       3 Build scripts and Lmod modulefiles for the ALCF `conda` modules 
+         (PyTorch, TensorFlow,
+         test system Sirius.
+         is/modulefiles/conda/`
+       6 and are hand-synced to `/soft/modulefiles/conda/`; keep the two 
+       7 
+       8 ## Machine facts (Sirius/Polaris, PE 26.03, since the 2026-08-19
+       9 
+         3.0 driver API).
+     … +110 lines (ctrl+o to expand)
+
+● Bash(mkdir -p alcf_polaris/tests && cp ~/conda-salvage-test/gpu_test.py
+      ~/conda-salvage-test/gpu_wrap.sh alcf_polaris/tests/ && sed -e
+      's|conda/2025-09-25-patch|cond…)
+  ⎿  #!/bin/bash -l
+     #PBS -A datascience
+     #PBS -q workq
+     … +16 lines (ctrl+o to expand)
+  ⎿  Created alcf_polaris/tests/README.md (+15 -0)
+       1 +# Module smoke test (2 nodes, 8 ranks)                         
+       2 +                                                               
+       3 +Checks torch CUDA, NCCL all-reduce across nodes, CUDA-aware mpi
+         +4py (cupy), parallel h5py                                      
+       4 +MPI-IO (h5py imported before mpi4py on purpose: GTL regression 
+         +check), TensorFlow, JAX,                                       
+       5 +flash-attn, TransformerEngine, DeepSpeed, vLLM, torch.compile, 
+         +mpi4jax.                                                       
+       6 +                                                               
+       7 +```                                                            
+       8 +cd alcf_polaris/tests          # must be on a shared filesystem
+       9 +sed -i 's|module load conda/.*;|module load conda/<date>;|' job
+         +.pbs                                                           
+      10 +qsub job.pbs && tail -f job.out                                
+      11 +```                                                            
+      12 +                                                               
+      13 +`gpu_wrap.sh` sets `CUDA_VISIBLE_DEVICES` from `PALS_LOCAL_RANK
+         +ID` before Python starts;                                      
+      14 +this must not be done inside Python (the GTL initializes CUDA d
+         +uring MPI_Init).                                               
+      15 +The torch.distributed MPI-backend check is expected to FAIL (no
+         + CUDA-aware support with Cray MPICH).                          
+  ⎿  Created alcf_polaris/tests/gpu_test.py (+110 -0)
+        1 +import os, sys, socket, traceback                             
+        2 +import h5py  # deliberately before mpi4py: regression check fo
+          +r GTL-less h5py abort                                         
+        3 +from mpi4py import MPI                                        
+        4 +comm = MPI.COMM_WORLD; rank, size = comm.rank, comm.size      
+        5 +host = socket.gethostname()                                   
+        6 +def log(*a):                                                  
+        7 +    print(f"[rank {rank} {host}]", *a, flush=True)            
+        8 +def section(name, fn):                                        
+        9 +    try:                                                      
+       10 +        r = fn(); log(name, "OK", r if r is not None else "") 
+       11 +    except Exception as e:                                    
+       12 +        log(name, "FAIL", repr(e));                           
+       13 +        if rank == 0: traceback.print_exc()                   
+       14 +                                                              
+       15 +log("MPI lib:", MPI.Get_library_version().strip().splitlines()
+          +[0][:70], "size", size)                                       
+       16 +local_rank = comm.Split_type(MPI.COMM_TYPE_SHARED).rank       
+       17 +log("local_rank", local_rank, "PALS_LOCAL_RANKID=", os.environ
+          +.get("PALS_LOCAL_RANKID"))                                    
+       18 +log("CVD=", os.environ.get("CUDA_VISIBLE_DEVICES"))           
+       19 +                                                              
+       20 +def t_torch():                                                
+       21 +    import torch                                              
+       22 +    assert torch.cuda.is_available()                          
+       23 +    d = torch.device("cuda")                                  
+       24 +    a = torch.randn(1024,1024, device=d); b = (a@a).sum().item
+          +()                                                            
+       25 +    return f"torch {torch.__version__} cuda {torch.version.cud
+          +a} dev {torch.cuda.get_device_name(0)} sum={b:.1f}"           
+       26 +section("torch.cuda", t_torch)                                
+       27 +                                                              
+       28 +def t_cupy_mpi():                                             
+       29 +    import cupy as cp                                         
+       30 +    x = cp.ones(1000, dtype=cp.float32); y = cp.empty_like(x) 
+       31 +    comm.Allreduce(x, y, op=MPI.SUM)   # CUDA-aware MPI throug
+          +h GTL                                                         
+       32 +    assert float(y[0]) == size                                
+       33 +    return f"cupy {cp.__version__} GPU allreduce sum={float(y[
+          +0])}"                                                         
+       34 +section("mpi4py CUDA-aware allreduce (cupy)", t_cupy_mpi)     
+       35 +                                                              
+       36 +def t_torch_dist():                                           
+       37 +    import torch, torch.distributed as dist                   
+       38 +    master = comm.bcast(host if rank == 0 else None, root=0)  
+       39 +    os.environ.update(MASTER_ADDR=master, MASTER_PORT="29517",
+          + RANK=str(rank), WORLD_SIZE=str(size))                        
+       40 +    dist.init_process_group("nccl", rank=rank, world_size=size
+          +, device_id=torch.device("cuda:0"))                           
+     … 70 more lines (ctrl+o to expand)
+  ⎿  Created alcf_polaris/tests/gpu_wrap.sh (+3 -0)
+      1 +#!/bin/bash                                                     
+      2 +export CUDA_VISIBLE_DEVICES=$PALS_LOCAL_RANKID                  
+      3 +exec "$@"                                                       
+  ⎿  Created alcf_polaris/tests/job.pbs (+17 -0)
+       1 +#!/bin/bash -l                                                 
+       2 +#PBS -A datascience                                            
+       3 +#PBS -q workq                                                  
+       4 +#PBS -l select=2:ncpus=64:ngpus=4,filesystems=home:tegu,walltim
+         +e=00:20:00                                                     
+       5 +#PBS -N conda-test                                             
+       6 +#PBS -j oe                                                     
+       7 +#PBS -o job.out                                                
+       8 +cd $PBS_O_WORKDIR                                              
+       9 +module use /soft/modulefiles                                   
+      10 +module load conda/2025-09-25; conda activate                   
+      11 +export MPICH_GPU_SUPPORT_ENABLED=1                             
+      12 +export DARSHAN_DISABLE=1                                       
+      13 +nvidia-smi --query-gpu=name,driver_version --format=csv | head 
+         +-2                                                             
+      14 +module list 2>&1 | grep -E "conda|gcc|mpich|hdf5"              
+      15 +echo "=== 8 ranks / 2 nodes ==="                               
+      16 +NCCL_DEBUG=WARN mpiexec -n 8 --ppn 4 ./gpu_wrap.sh python gpu_t
+         +est.py                                                         
+      17 +echo "exit=$?"                                                 
+
+● Now the memory updates: revise the salvage note with the outcome and add the
+  workflow-preference note.
+
+  Ran 1 shell command, wrote 2 memories (ctrl+o to expand)
+
+● Done. Written and staged, not committed, since you said commit only when
+  asked.
+
+  Repo (staged):
+  - CLAUDE.md: machine facts for PE 26.03, build rules (GTL env exports,
+    --no-deps, darshan unload, triton/jax pinning, NVTE), how to test, Lmod
+    quirks, and your workflow preferences.
+  - alcf_polaris/tests/: the 2-node harness generalized from
+    ~/conda-salvage-test/ (job.pbs, gpu_test.py, gpu_wrap.sh, README). Paths use
+    $PBS_O_WORKDIR; edit the module load conda/<date> line per target.
+
+  Memory (three notes, index rewritten):
+  - Salvage note updated with the final outcome, why 09-25 stays default, and
+    the two build-script issues the next session must fix first.
+  - The craype-accel workaround note from earlier.
+  - New feedback note: you run /soft mutations yourself and want commands plus
+    expected output.
+
+  To commit: git commit -m "polaris: add CLAUDE.md and 2-node module test 
+  harness". ~/conda-salvage-test/ can be deleted now that the harness is in the
+  repo.
+
+  For the fresh build session, the two things to change in
+  build_monolithic_conda_module.sh before running are the craype-accel-nvidia80
+  load at line 42 and the unpinned pip install triton and jax[cuda12_local]
+  lines, both now recorded in CLAUDE.md.
+
+✻ Worked for 1m 16s · done 9:13 PM

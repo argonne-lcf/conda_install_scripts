@@ -1,0 +1,46 @@
+#!/bin/bash -l
+#PBS -A datascience
+#PBS -q debug
+#PBS -l select=2:ncpus=64:ngpus=4,filesystems=home:grand,walltime=01:00:00
+#PBS -N conda-perf
+#PBS -j oe
+#PBS -o perf-2026-09-17.out
+# conda/2026-09-17 (torch 2.14 / CUDA 13.0 / NCCL 2.30.7 / vLLM 0.29 / Ray 2.58) perf on 2x4 A100.
+cd $PBS_O_WORKDIR
+J=${PBS_JOBID%%.*}; L=logs/$J; mkdir -p $L
+export TMPDIR=/tmp   # ray AF_UNIX socket paths exceed 107 bytes under PBS's TMPDIR
+export MPICH_GPU_SUPPORT_ENABLED=1 DARSHAN_DISABLE=1 HF_HUB_OFFLINE=1
+export USE_TF=0 RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES=1
+export MODEL=${MODEL:-Qwen/Qwen2.5-7B-Instruct}
+ulimit -c 0
+W=../gpu_wrap.sh
+echo "=== $(date) nodes: $(sort -u $PBS_NODEFILE | tr '\n' ' ') logs: $L"
+ddp() { for n in "$@"; do ppn=$(( n < 4 ? n : 4 )); f=$L/$M-ddp$n.log; mpiexec -n $n --ppn $ppn $W python perf_ddp.py > $f 2>&1; grep -hE "RESULT|Traceback|Error|died|Using network" $f | sort -u | tail -4; done; }
+fsdp() { local f=$L/$M-fsdp$1$2.log; mpiexec -n $1 --ppn 4 $W python perf_fsdp.py $2 > $f 2>&1; grep -hE "RESULT|Traceback|Error|died|Using network" $f | sort -u | tail -4; }
+vl() { local f=$L/$M-vllm-$3-tp$1pp$2.log; python perf_vllm.py --model $MODEL --tp $1 --pp $2 --backend $3 "${@:4}" > $f 2>&1; grep -hE "RESULT|engine init|sample:|Traceback|Error" $f | tail -6; }
+ray_up() {
+  HEAD_IP=$(hostname -i | awk '{print $1}'); export VLLM_HOST_IP=$HEAD_IP RAY_ADDRESS=$HEAD_IP:6379
+  ray start --head --node-ip-address=$HEAD_IP --port=6379 --num-gpus=4 --num-cpus=32 --include-dashboard=false --temp-dir=/tmp/ray_$USER > $L/$M-ray-head.log 2>&1
+  for h in $(sort -u $PBS_NODEFILE | grep -v $(hostname)); do mpiexec -n 1 --ppn 1 --hosts $h ./ray_node.sh $HEAD_IP:6379 > $L/$M-ray-$h.log 2>&1 & done
+  for i in $(seq 30); do ray status 2>/dev/null | grep -q "8.0 GPU" && break; sleep 5; done
+  ray status 2>&1 | grep -E "GPU|Error"
+}
+ray_down() { ray stop >/dev/null 2>&1; wait; sleep 5; }
+
+module use /soft/modulefiles; module load conda/2026-09-17; conda activate
+python -c "import torch,vllm,ray,transformers; print('torch',torch.__version__,'nccl',torch.cuda.nccl.version(),'vllm',vllm.__version__,'ray',ray.__version__,'transformers',transformers.__version__)"
+
+echo "##### A. default module (no NCCL net plugin -> cross-node over TCP sockets) #####"
+( M=def; export NCCL_DEBUG=INFO NCCL_DEBUG_SUBSYS=INIT
+  echo "=== DDP ResNet-50: 1, 4, 8 GPUs ==="; ddp 1 4 8
+  echo "=== FSDP2 GPT-1.4B: 4, 8, 8 HSDP ==="; fsdp 4; fsdp 8; fsdp 8 --hsdp
+  echo "=== vLLM 1 node TP=4 (mp) ==="; vl 4 1 mp
+)
+
+echo "##### B. multinode vLLM over Ray (default module) #####"
+( M=def
+  echo "=== Ray cluster ==="; ray_up
+  echo "=== vLLM 2 nodes TP=4 PP=2 (ray) ==="; vl 4 2 ray
+  ray_down
+)
+echo "=== done $(date)"

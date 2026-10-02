@@ -1,0 +1,13 @@
+diff --git a/aten/src/ATen/cudnn/cudnn-wrapper.h b/aten/src/ATen/cudnn/cudnn-wrapper.h
+index 0358b15c117..65ef4d6a0a0 100644
+--- a/aten/src/ATen/cudnn/cudnn-wrapper.h
++++ b/aten/src/ATen/cudnn/cudnn-wrapper.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+-#include <cudnn.h>
++//#include <cudnn.h>
++#include </soft/libraries/cudnn/cudnn-11-linux-x64-v8.6.0.163/include/cudnn.h>
+ 
+ #define STRINGIFY(x) #x
+ #define STRING(x) STRINGIFY(x)

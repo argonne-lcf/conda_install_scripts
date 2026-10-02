@@ -1,0 +1,250 @@
+conda/2026-09-17 on Sirius: build attempt log
+=============================================
+
+Target: /soft/applications/conda/2026-09-17 (CUDA 13.0.3, TF 2.21.0, torch 2.14.0, Python 3.13)
+Script: alcf_polaris/build_monolithic_conda_module.sh, run as PBS job on one Sirius compute node
+        (workq, 64 cores, 4x A100-40GB, 24 h walltime), resumed in place after each fix.
+Logs:   alcf_polaris/logs/2026-09-17-sirius-build.attempt<N>-<tag>.out
+Date:   2026-09-17 (02:15 -> 15:22 UTC build; harness passed ~20:00 UTC)
+
+Attempt  Job    Died at                         Cause / change made before the next attempt
+-------  -----  ------------------------------  -----------------------------------------------------------------
+ 1       32540  TF bazel (python_version_repo)  Miniforge 26.7.2 installs Python 3.14.7; TF 2.21.0 only has
+                                                requirements_lock files for 3.10-3.13.
+                                                -> conda install python=3.13 in base right after Miniforge;
+                                                   hard-fail if the interpreter is not 3.13. Build dir wiped.
+
+ 2       32541  TF bazel fetch (llvm-raw)       Proxy "Premature EOF" downloading llvm-project (~200 MB).
+                                                -> bazel build wrapped in a 3-try loop with
+                                                   --experimental_repository_downloader_retries=5. Build dir wiped.
+
+ 3       32542  git clone h5py                  TF 2.21.0 and torch 2.14.0 wheels built (~2.7 h), mpi4py built
+                                                with the GTL; then "SSL_read: unexpected eof" on the h5py clone.
+                                                -> Script made resumable: skip Miniforge/bazel installers and the
+                                                   TF/torch builds when their artifacts exist; every git clone goes
+                                                   through gclone() (wipe partial dir, 5 tries); git-based pip
+                                                   installs retried. Also fixed: tensorflow-datasets had downgraded
+                                                   setuptools to 69.5.1 (torch needs >=77) and pulled
+                                                   ruamel-yaml 0.19.1 (conda needs <0.19) -> both restored.
+                                                Build dir kept from here on.
+
+ 4       32543  h5py GTL tripwire               h5py built fine; my ldd check ran with cwd inside the h5py source
+                                                checkout, so `import h5py` hit the source tree.
+                                                -> cd $BASE_PATH before the check.
+
+ 5       32544  pip install torch_scatter       PyG index for torch 2.14+cu130 ships only pyg_lib; torch_scatter /
+                                                torch_sparse / torch_cluster / torch_spline_conv are discontinued,
+                                                pip fell back to an sdist that cannot see torch.
+                                                -> install pyg_lib only, --no-deps --only-binary.
+
+ 6       32545  ln -s sitecustomize.py          Resume-only: PyModuleSnooper symlink already existed.
+                                                -> ln -sf.
+
+ 7       32546  flash-attn compile              "fatal error: compare: No such file". gcc-native/14 provides
+                                                gcc/g++ but no `c++`, so the Sophia-era `unset CC CXX` let
+                                                setuptools/nvcc pick SUSE /usr/bin/c++ 7.5.
+                                                -> flash-attn, mamba-ssm, TE and vLLM subshells export
+                                                   CC/CXX/CUDAHOSTCXX=gcc-14 (like every other extension build).
+                                                   torchvision gets BUILD_VERSION=0.29.0 (was 0.29.0a0+sha).
+
+ 8       32547  flash-attn nvcc                 nvcc now used -ccbin gcc-14 but still failed: torch 2.14's
+                                                cpp_extension requires C++20 (c10 uses std::strong_ordering) and
+                                                flash-attn 2.8.3.post1 hard-codes -std=c++17 for nvcc.
+                                                -> pip_sdist_cxx20(): download sdist, rewrite -std=c++17 to c++20,
+                                                   install from the patched tree. Applied to flash-attn and
+                                                   mamba-ssm 2.3.2.post1 (same hard-code).
+
+ 9       32548  xgboost pip install             flash-attn built (~1 h). xgboost 3.5-dev moved python-package to
+                                                scikit-build-core; "Unrecognized options in config-settings:
+                                                use_cuda use_nccl use_dlopen_nccl".
+                                                -> single pip build with --config-settings cmake.define.USE_CUDA=ON,
+                                                   USE_NCCL, USE_DLOPEN_NCCL, NCCL_ROOT, CUDA arch, compilers;
+                                                   separate cmake+ninja step removed.
+
+10       32549  (killed by me at start)         Would have re-spent an hour rebuilding flash-attn on resume.
+                                                -> pip_sdist_cxx20 skips when the exact version is already installed.
+
+11       32550  DeepSpeed evoformer_attn op     xgboost and CUTLASS built. DeepSpeed 0.19.6 op_builder/builder.py
+                                                picks -std=c++20 for nvcc only when
+                                                `cuda_major == 12 and cuda_minor >= 5`, so CUDA 13.0 fell to c++17:
+                                                "#error C++20 or later compatible compiler is required".
+                                                -> sed the test to `(cuda_major, cuda_minor) >= (12, 5)` after clone.
+
+12       32551  (killed by me, wrongly)         "Could not determine CMake version ... No module named 'cmake'"
+                                                from inside xgboost's isolated build env. Root: attempt 11's
+                                                `pip install deepspeed-kernels` pulled the PyPI cmake wheel, which
+                                                overwrote conda's bin/cmake with a Python shim. The message in the
+                                                isolated env is benign (scikit-build-core fetches its own cmake),
+                                                but I killed the job on it.
+                                                -> deepspeed-kernels installed --no-deps; repair_cmake() guard
+                                                   (uninstall pip cmake, force-reinstall conda cmake if broken).
+
+13       32553  TransformerEngine metadata      DeepSpeed, apex, Megatron-DeepSpeed, JAX 0.11.1 (cuda13 plugin),
+                                                numpyro, mpi4jax (import check OK), mamba-ssm + causal-conv1d all
+                                                built. TE 2.19: "nvidia-cudnn-frontend is required to build
+                                                Transformer Engine".
+                                                -> pip install --no-deps nvidia-cudnn-frontend before TE.
+
+14       32554  (killed by me at 30 min)        Each resume was re-spending ~1.5 h rebuilding xgboost, CUTLASS,
+                                                DeepSpeed and apex before reaching TE.
+                                                -> have_pkg() resume guards for torchvision, xgboost, falkon,
+                                                   CUTLASS, DeepSpeed, apex, numpyro, mpi4jax.
+
+15       32555  TE metadata                     "Could not locate NCCL core (nccl.h + libnccl.so). Set NCCL_HOME".
+                                                -> export NCCL_HOME=$NCCL_BASE (NVTE_NCCL_HOME is the old name).
+
+16       32556  TE nccl_ep make                 TE builds its NCCL EP (expert-parallel, Hopper+) extension by
+                                                default; its bare `make` cannot find cuda.h.
+                                                -> NVTE_WITH_NCCL_EP=0, NVTE_CUDA_ARCHS=80, $CUDA_HOME/include on CPATH.
+
+17       32557  TE CMake (cuDNN)                "Could not find cudnn_LIBRARY": CUDNN_PATH was exported inside the
+                                                CUTLASS block, which resume now skips.
+                                                -> CUDNN_PATH/CUDNN_HOME/CUDACXX exported outside the guard and
+                                                   again in the TE subshell.
+
+18       32558  TE CMake (NCCL)                 common/CMakeLists.txt does find_path(NCCL_INCLUDE_DIR ... REQUIRED)
+                                                with hints limited to site-packages/nvidia/nccl, /opt/nvidia/nccl,
+                                                /usr/local/nccl; setup.py only passes it when NCCL EP is on.
+                                                -> NVTE_CMAKE_EXTRA_ARGS="-DNCCL_INCLUDE_DIR=... -DNCCL_LIBRARY=...".
+
+19       32559  (killed by me after 3 h)        TE 2.19 built (~45 min). vLLM v0.29.0 was alive but running
+                                                `ninja -j 2` (vLLM uses MAX_JOBS/NVCC_THREADS = 4/2) with no log
+                                                output for 2.5 h. The Sophia MAX_JOBS=4 was a /soft-disk limit;
+                                                here TMPDIR is node-local (/var/tmp/pbs.<jobid>, ~250 GB) and the
+                                                node has 512 GB.
+                                                -> vLLM MAX_JOBS=32 / CMAKE_BUILD_PARALLEL_LEVEL=32; flash-attn,
+                                                   mamba-ssm, TE to 16. ~/.ccache max_size 5 GB -> 40 GB so the
+                                                   already-compiled objects replay instead of evicting.
+
+20       32560  (killed by me at start)         Would have rebuilt TE for lack of a resume guard.
+                                                -> have_pkg() guards for transformer_engine, vllm, flashinfer, verl.
+
+21       32561  --- exit 0 (14:55 UTC) ---      vLLM built in 9m38s at -j32 with ccache; verl 0.9.0 installed;
+                                                final pins verified (torch 2.14.0, triton 3.8.0, jax 0.11.1,
+                                                transformers 5.10.4); globus-compute-endpoint 4.9.0 + parsl
+                                                2026.02.23 import OK. Two side effects of vLLM's uv resolve:
+                                                it installed flashinfer-python 0.6.18 from PyPI (so the from-source
+                                                FlashInfer block was skipped) and swapped numpy 2.5.3 -> 2.4.6.
+                                                -> Post-install fixup block added: flashinfer-jit-cache 0.6.18+cu130
+                                                   (AOT kernels, from flashinfer.ai index; no flashinfer-cubin
+                                                   exists for >= 0.6.10), stale torchvision a0 wheel removed;
+                                                   script chmod's the tree back to u+w when resuming a finished build.
+
+22       32562  --- exit 0 (15:21 UTC) ---      Fixup resume: flashinfer 0.6.18 + jit-cache OK; conda step put
+                                                numpy back to 2.5.3 (numba 0.67). pip check residue (all metadata
+                                                only): tensorflow h5py<3.15 vs 3.17.dev; mamba-ssm tilelang==0.1.8 /
+                                                apache-tvm-ffi<=0.1.9 vs vLLM's 0.1.12 / 0.1.11; globus-compute-sdk
+                                                dill==0.3.9, psutil<6, click<8.2; vllm setuptools<81; xprof
+                                                setuptools<70; vcs-versioning packaging>=26.2.
+
+Post-build testing
+------------------
+Harness run 1  32566  2-node gpu_test.py: torch.cuda, CUDA-aware mpi4py (cupy), NCCL 2.30.7 allreduce over 8
+                      ranks, torch MPI backend, TF GPU, JAX GPU all OK; rank 0 then died with SIGSEGV in the
+                      flash-attn section (core dump). gdb: crash in libtriton.so static initializer
+                      (llvm::DebugCounter DenseMap) during dlopen from `import triton`.
+Isolation      32573  Each remaining test in its own process: flash-attn, TE, DeepSpeed FusedAdam, vLLM import,
+                      torch.compile, mpi4jax, onnxruntime (TensorrtExecutionProvider present), xgboost GPU,
+                      mamba-ssm, flashinfer, globus endpoint all OK. Only "TF+JAX first, then flash-attn" crashed.
+Import order   32574  tf->triton: SIGSEGV. jax->triton: OK. triton->tf: OK. tf->(RTLD_DEEPBIND)triton: OK.
+                      tf forced RTLD_LOCAL -> triton: OK. tf+jax forced local -> flash-attn: OK.
+                      Cause: TF's pywrap_dlopen_global_flags.py loads _pywrap_tensorflow_internal RTLD_GLOBAL,
+                      exposing the ~12.5k LLVM symbols in libtensorflow_framework.so.2; triton 3.8's libtriton.so
+                      exports ~24k LLVM symbols (3.4 in conda/2025-09-25 exported one), so its static initializers
+                      bind to TF's LLVM. TF's own docstring says the hook is only for static builds; ours ships
+                      libtensorflow_framework.so.2.
+                      Fix: delete tensorflow/python/pywrap_dlopen_global_flags.py (+ pyc) from the env; script
+                      now does this right after installing the TF wheel.
+Harness run 2  32575  Full 2-node harness: exit 0, every section OK on all 8 ranks
+                      (alcf_polaris/logs/2026-09-17-harness-2node.out).
+
+Other things done on /soft during this work
+-------------------------------------------
+/soft/libraries/cudnn:      extracted cudnn-cuda13-linux-x64-v9.{17.1.4,18.1.3,19.1.2,21.1.3,23.2.1,24.1.1,26.0.51}
+/soft/libraries/nvshmem:    extracted libnvshmem-linux-x86_64-3.{5.21,6.5,7.2}_cuda13-archive
+/soft/libraries/cusparselt: extracted libcusparse_lt-linux-x86_64-0.9.{0.3,1.1}_cuda13-archive
+/soft/libraries/nccl:       extracted nccl_2.30.4-1+cuda13.2, nccl_2.30.7-1+cuda13.3, nccl_2.31.2-1+cuda13.4
+                            (last one renamed from NVIDIA's new nccl-nccl-stable-cuda-13-linux-x86_64-... name)
+/soft/libraries/trt:        extracted TensorRT-10.{14.1.48,15.1.29,16.1.11} and 11.{0.0.114,1.0.106,2.1.2,3.0.99}
+                            into the TensorRT-<ver>.Linux.x86_64-gnu.cuda-<X> schema (11.x from Enterprise .tar.zst)
+All source tarballs removed after verification.
+/soft/modulefiles/conda:    2026-09-17.lua installed (default still conda/2025-09-25).
+
+Assessment (2026-09-22): biggest changes, uncertain choices, what to drop
+=========================================================================
+
+Biggest changes to the script, in order of blast radius
+-------------------------------------------------------
+1. CUDA 13.0.3 with cuDNN 9.26 / NCCL 2.30.7. Deliberate, and the harness validates it, but it is
+   the one change that touches every binary in the env.
+2. torch 2.14 moved the goalposts: PEP 517 build only, and every extension must compile as C++20.
+   That single fact caused attempts 7, 8 and 11 and forced the gcc-14 pin, the pip_sdist_cxx20 sed
+   patch, and the DeepSpeed builder sed.
+3. Deleting TF's pywrap_dlopen_global_flags.py. Not a build change, an edit to the installed TF
+   package, but without it TF and anything triton-based cannot share a process.
+4. The script grew a resume/retry layer (17 guards, gclone, repair_cmake, have_pkg). It is what
+   made 22 attempts survivable in a day, but it is ~200 lines of machinery a from-scratch run never
+   exercises.
+5. vLLM build parallelism 4 -> 32 and the TE 2.19 knob set (NCCL_HOME, NVTE_WITH_NCCL_EP=0,
+   CUDNN_PATH, NVTE_CMAKE_EXTRA_ARGS).
+
+Choices flagged as uncertain, most to least
+-------------------------------------------
+- Rewriting -std=c++17 -> c++20 inside flash-attn's and mamba-ssm's sdists. Upstream has never
+  tested that combination. Both pass a one-shot forward smoke test, nothing more.
+- vLLM v0.29.0 compiled against torch 2.14 when it pins 2.13.0; use_existing_torch.py leaves the
+  tree dirty so it reports as 0.29.1.dev0+... Only `import vllm` is tested; no model was served.
+- The TF hook deletion. Sound by TF's own docstring, but the wheel in wheels/ and the installed
+  package now differ.
+- What vLLM's uv resolve did to the env: replaced conda numpy/numba with pip ones (conda then put
+  numpy 2.5.3 back, so `conda list` shows both), moved tilelang and apache-tvm-ffi past mamba-ssm's
+  pins, and substituted PyPI flashinfer-python for the source build.
+- Installed but never exercised for real use: onnxruntime's TRT provider (only listed), the Globus endpoint (imports, but
+  three of its hard pins are violated), tensorflow_probability 0.25 (a 2024 release under TF 2.21 /
+  Keras 3, never imported by any test), onnx-tf (effectively dead upstream).
+- Unpinned master checkouts for h5py (3.17.dev0, violates TF's <3.15), xgboost (3.5.0-dev),
+  cutlass, apex, numpyro, DeepHyper. A reproducibility hole, not a correctness one.
+
+Recommendation: drop things
+---------------------------
+The mess concentrated in the torch-extension ecosystem that hand-rolls its own nvcc flags.
+
+  Drop                        Why
+  --------------------------  ----------------------------------------------------------------------
+  mamba-ssm + causal-conv1d   Needed the sdist patch; hard-pins tilelang/apache-tvm-ffi that vLLM
+                              immediately breaks; niche user base.
+  verl                        Installed --no-deps, and its transformers<5.11 is the only reason the
+                              whole env is held at 5.10.4. Removing it lets transformers float.
+  apex                        NVIDIA has deprecated it; Megatron-LM and TE carry the fused ops now.
+                              Slow to build, no known users.
+  Megatron-DeepSpeed          Unpinned git master of a stale fork.
+  onnx-tf, tensorflow_probability
+                              Unmaintained against TF 2.21; likely broken and never tested.
+  (DeepSpeed evoformer op)    Considered dropping; keep it. It is the DS4Sci_EvoformerAttention kernel
+                              OpenFold uses, still maintained upstream (fix landed 2026-03-13), and it
+                              built cleanly once the C++20 patch was in.
+
+Keep flash-attn: it is the messiest but also the most requested
+(attn_implementation="flash_attention_2" everywhere), and the patch is now a one-liner that either
+compiles or does not. If it bites again on torch 2.15, the fallback is the mjun0812 prebuilt wheels.
+
+Two cheap hardening items regardless: pin h5py, xgboost, cutlass and numpyro to release tags, and
+add --no-deps plus explicit dep lists around vLLM so its resolver cannot rewrite the env.
+
+Options from here: make those cuts in the script and run one more resume so the live env matches
+(removals are pip uninstalls, a few minutes), or leave the env as-is and apply the trimmed script
+on Polaris.
+
+Applied 2026-09-22 (hardening only; no packages dropped yet)
+-------------------------------------------------------------
+- h5py -> 3.14.0, xgboost -> v3.4.2, CUTLASS -> v4.8.0, numpyro -> 0.22.0, with version-aware
+  resume guards (have_pkg_ver / git describe) so a resume rebuilds them.
+- vLLM: pip instead of uv; `pip install . --no-build-isolation --no-deps`, then its
+  requirements/cuda.txt (torch*, numba, flashinfer, cutlass-dsl, quack, torchcodec,
+  PyNvVideoCodec lines stripped) installed under a constraints file generated from the env
+  (torch, triton, transformers, numpy, numba, jax*, tensorflow, flash-attn, TE, DeepSpeed,
+  mpi4py, h5py, cupy, xgboost, ...). SETUPTOOLS_SCM_PRETEND_VERSION=0.29.0 for a clean version.
+- FlashInfer: from-source block replaced by pinned wheels (flashinfer-python 0.6.18 under the
+  same constraints + flashinfer-jit-cache 0.6.18+cu130).
+- Fixup block now removes the duplicate pip numpy/numba/llvmlite records and force-reinstalls
+  conda's, instead of just printing them.

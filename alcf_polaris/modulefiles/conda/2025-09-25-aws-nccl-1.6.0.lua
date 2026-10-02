@@ -27,10 +27,20 @@ whatis("URL: https://docs.conda.io/projects/conda/en/latest/user-guide/getting-s
 
 depends_on("PrgEnv-gnu")
 depends_on("craype-x86-milan")
-depends_on("cray-hdf5-parallel/1.14.3.5")
+depends_on("cray-hdf5-parallel/1.14.3.9")
 depends_on("cudnn/9.13.0")
+depends_on("gcc-native/14")
 
-local conda_dir = "/soft/applications/conda/2025-09-25/mconda3"
+-- helps when vLLM JIT compiles things:
+setenv("CC","/usr/bin/gcc-14")
+setenv("CXX","/usr/bin/g++-14")
+
+setenv("TORCH_CUDA_ARCH_LIST","8.0")
+setenv("FLASHINFER_CUDA_ARCH_LIST","8.0")
+
+local base_path = "/soft/applications/conda/2025-09-25/"
+setenv("BASE_PATH",base_path)
+local conda_dir = pathJoin(base_path,"mconda3")
 local funcs = "conda __conda_activate __conda_hashr __conda_reactivate"
 local home = os.getenv("HOME")
 
@@ -63,6 +73,15 @@ prepend_path("PATH",pathJoin(cuda_home,"bin/"))
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"lib64/"))
 -- CUPTI:
 prepend_path("LD_LIBRARY_PATH",pathJoin(cuda_home,"extras/CUPTI/lib64/"))
+
+-- PE 26.03 (Aug 2026 HPCM upgrade) SONAME shims: cray-mpich 9.1.0 renamed
+-- libmpi_gnu_123.so.12 -> libmpi_gnu.so.12, and libmpi_gtl_cuda.so.0 now needs
+-- libcudart.so.13. See pe-26.03-shim/README.
+prepend_path("LD_LIBRARY_PATH",pathJoin(base_path,"pe-26.03-shim/"))
+
+-- TransformerEngine 2.7 import crashes (Path(nvidia.__file__) on a namespace pkg)
+-- unless this is set; short-circuits its nvidia-cuda-runtime pip-package probe.
+setenv("NVTE_CUDA_INCLUDE_DIR",pathJoin(cuda_home,"include/"))
 
 -- DeepSpeed libaio
 setenv("CFLAGS","-I" .. pathJoin(conda_dir,"include/"))
@@ -117,7 +136,6 @@ execute{cmd="for i in $(seq ${CONDA_SHLVL:=0}); do conda deactivate; done; pre="
 
 -- Prevent from being loaded with another system python or conda environment
 family("python")
-unload("xalt")
 
 -- hotfix for PyTorch picking up non-GTL libmpi_gnu_123.so.12, if imported before mpi4py
 -- prepend_path("LD_PRELOAD", pathJoin(os.getenv("CRAY_MPICH_DIR") or "/opt/cray/pe", "lib/libmpi_gtl_cuda.so"))

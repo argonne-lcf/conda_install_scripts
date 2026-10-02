@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -A datascience
+#PBS -q workq
+#PBS -l select=1:ncpus=64:ngpus=4,filesystems=home:tegu,walltime=00:20:00
+#PBS -N conda-libprobe
+#PBS -j oe
+#PBS -o libprobe-2026-10-01.out
+cd $PBS_O_WORKDIR
+module use /soft/modulefiles
+module load conda/2026-10-01; conda activate
+export DARSHAN_DISABLE=1 CUDA_VISIBLE_DEVICES=0
+for t in torch jax cupy te flashinfer vllm; do
+  echo "=== $t"; python libprobe.py $t 2>&1 | grep -E '^\[|Error|error' | tail -30; echo "--- rc=${PIPESTATUS[0]}"
+done

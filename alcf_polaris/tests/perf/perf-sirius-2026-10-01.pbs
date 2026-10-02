@@ -1,0 +1,29 @@
+#!/bin/bash -l
+#PBS -A datascience
+#PBS -q workq
+#PBS -l select=2:ncpus=64:ngpus=4,filesystems=home:tegu,walltime=01:00:00
+#PBS -N conda-perf-sirius
+#PBS -j oe
+#PBS -o perf-sirius-2026-10-01.out
+# Pre-sync regression check on Sirius: synthetic DDP/FSDP2 (no model download), conda/2026-10-01
+# vs conda/2026-09-17 on the same two nodes. Absolute numbers are not comparable to the Polaris
+# table in README.md; the 10-01 / 09-17 ratio is what matters.
+cd $PBS_O_WORKDIR
+J=${PBS_JOBID%%.*}; L=logs/$J; mkdir -p $L
+export MPICH_GPU_SUPPORT_ENABLED=1 DARSHAN_DISABLE=1 USE_TF=0
+ulimit -c 0
+W=../gpu_wrap.sh
+echo "=== $(date) nodes: $(sort -u $PBS_NODEFILE | tr '\n' ' ') logs: $L"
+ddp() { for n in "$@"; do ppn=$(( n < 4 ? n : 4 )); f=$L/$M-ddp$n.log; mpiexec -n $n --ppn $ppn $W python perf_ddp.py > $f 2>&1; grep -hE "RESULT|Traceback|Error|died" $f | sort -u | tail -4; done; }
+fsdp() { local f=$L/$M-fsdp$1$2.log; mpiexec -n $1 --ppn 4 $W python perf_fsdp.py $2 > $f 2>&1; grep -hE "RESULT|Traceback|Error|died" $f | sort -u | tail -4; }
+
+module use /soft/modulefiles
+for M in 2026-10-01 2026-09-17; do
+  echo "##### conda/$M #####"
+  ( module load conda/$M >/dev/null 2>&1; conda activate
+    python -c "import torch; print('torch', torch.__version__, 'nccl', torch.cuda.nccl.version())"
+    echo "=== DDP ResNet-50: 1, 4, 8 GPUs ==="; ddp 1 4 8
+    echo "=== FSDP2 GPT-1.4B: 4, 8, 8 HSDP ==="; fsdp 4; fsdp 8; fsdp 8 --hsdp
+  )
+done
+echo "=== done $(date)"

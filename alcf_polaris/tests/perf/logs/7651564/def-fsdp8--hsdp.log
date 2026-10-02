@@ -1,0 +1,1162 @@
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.253<0>
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.253<0> [1]hsn1:10.201.1.43<0> [2]hsn0:10.201.1.49<0>
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO [Rank 0] ncclCommInitRankConfig comm 0x561e40febd30 rank 0 nranks 8 cudaDev 0 nvmlDev 0 busId 7000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity = 24-31,56-63 ; CPU affinity = 0).
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Rank 0: 3 Net devices
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Rank 0: 0 CollNet devices
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO comm 0x561e40febd30 rank 0 nRanks 8 nNodes 2 localRanks 4 localRank 0 MNNVL 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 00/04 : 0 2 1 5 4 6 7 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 01/04 : 0 2 3 7 4 6 5 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 02/04 : 0 2 1 5 4 6 7 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 03/04 : 0 2 3 7 4 6 5 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Trees [0] -1/-1/-1->0->2 [1] 3/-1/-1->0->1 [2] -1/-1/-1->0->2 [3] 3/-1/-1->0->1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Tuning P2P operations with maxx3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.253<0>
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.253<0> [1]hsn1:10.201.1.43<0> [2]hsn0:10.201.1.49<0>
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO [Rank 2] ncclCommInitRankConfig comm 0x556b1a30fdd0 rank 2 nranks 8 cudaDev 0 nvmlDev 2 busId 85000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 2 is empty, ignoring. (GPU affinity = 8-15,40-47 ; CPU affinity = 2).
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Rank 2: 3 Net devices
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Rank 2: 0 CollNet devices
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO comm 0x556b1a30fdd0 rank 2 nRanks 8 nNodes 2 localRanks 4 localRank 2 MNNVL 0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Trees [0] 0/-1/-1->2->1 [1] -1/-1/-1->2->3 [2] 0/-1/-1->2->1 [3] -1/-1/-1->2->3
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 8
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066768:1066969 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 2
+x3001c0s19b0n0:1066768:1066965 [0] x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.251<0>
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.251<0> [1]hsn1:10.201.1.56<0> [2]hsn0:10.201.1.51<0>
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO [Rank 7] ncclCommInitRankConfig comm 0x55a4371666d0 rank 7 nranks 8 cudaDev 0 nvmlDev 3 busId c7000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 3 is 3. (GPU affinity = 0-7,32-39 ; CPU affinity = 3).
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Rank 7: 3 Net devices
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Rank 7: 0 CollNet devices
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO comm 0x55a4371666d0 rank 7 nRanks 8 nNodes 2 localRanks 4 localRank 3 MNNVL 0
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Trees [0] 5/-1/-1->7->3 [1] 6/-1/-1->7->4 [2] 5/3/-1->7->-1 [3] 6/-1/-1->7->4
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 8
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188536:2188678 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188677 [0] NCCL INFO [Proxy x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.253<0>
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.253<0> [1]hsn1:10.201.1.43<0> [2]hsn0:10.201.1.49<0>
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO [Rank 3] ncclCommInitRankConfig comm 0x556d54f93070 rank 3 nranks 8 cudaDev 0 nvmlDev 3 busId c7000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 3 is 3. (GPU affinity = 0-7,32-39 ; CPU affinity = 3).
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Rank 3: 3 Net devices
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Rank 3: 0 CollNet devices
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO comm 0x556d54f93070 rank 3 nRanks 8 nNodes 2 localRanks 4 localRank 3 MNNVL 0
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Trees [0] 1/7/-1->3->-1 [1] 2/-1/-1->3->0 [2] 1/-1/-1->3->7 [3] 2/-1/-1->3->0
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 8
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066769:1066966 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1066964 [0] NCCL INFO [Proxy x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.253<0>
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.253<0> [1]hsn1:10.201.1.43<0> [2]hsn0:10.201.1.49<0>
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO [Rank 1] ncclCommInitRankConfig comm 0x558bf7e4ee90 rank 1 nranks 8 cudaDev 0 nvmlDev 1 busId 46000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity = 16-23,48-55 ; CPU affinity = 1).
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Rank 1: 3 Net devices
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Rank 1: 0 CollNet devices
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO comm 0x558bf7e4ee90 rank 1 nRanks 8 nNodes 2 localRanks 4 localRank 1 MNNVL 0
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Trees [0] 2/-1/-1->1->3 [1] 0/5/-1->1->-1 [2] 2/-1/-1->1->3 [3] 0/-1/-1->1->5
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 8
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066767:1066971 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1066968 [0] Nx3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.251<0>
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.251<0> [1]hsn1:10.201.1.56<0> [2]hsn0:10.201.1.51<0>
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO [Rank 5] ncclCommInitRankConfig comm 0x55a23c964160 rank 5 nranks 8 cudaDev 0 nvmlDev 1 busId 46000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity = 16-23,48-55 ; CPU affinity = 1).
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Rank 5: 3 Net devices
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Rank 5: 0 CollNet devices
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO comm 0x55a23c964160 rank 5 nRanks 8 nNodes 2 localRanks 4 localRank 1 MNNVL 0
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Trees [0] 6/-1/-1->5->7 [1] 4/-1/-1->5->1 [2] 6/-1/-1->5->7 [3] 4/1/-1->5->-1
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 8
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188534:2188683 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188680 [0] Nx3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.251<0>
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.251<0> [1]hsn1:10.201.1.56<0> [2]hsn0:10.201.1.51<0>
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO [Rank 6] ncclCommInitRankConfig comm 0x55a4480d1d60 rank 6 nranks 8 cudaDev 0 nvmlDev 2 busId 85000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 2 is empty, ignoring. (GPU affinity = 8-15,40-47 ; CPU affinity = 2).
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Rank 6: 3 Net devices
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Rank 6: 0 CollNet devices
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO comm 0x55a4480d1d60 rank 6 nRanks 8 nNodes 2 localRanks 4 localRank 2 MNNVL 0
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Trees [0] 4/-1/-1->6->5 [1] -1/-1/-1->6->7 [2] 4/-1/-1->6->5 [3] -1/-1/-1->6->7
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 8
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188535:2188682 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 2
+x3001c0s19b1n0:2188535:2188679 [0] x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO cudaDriverVersion 13000
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Stack size limit (unlimited) is unsafe; will use 8192KB for newly launched threads
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NCCL version 2.30.7+cuda13.3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NCCL git version HEAD a5187fa2e
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Count not open libibverbs.so
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NET/IB : No device found.
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NET/IB : Using [RO]; OOB bond0:10.140.56.251<0>
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Failed to initialize NET plugin IB
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NET/Socket : Using [0]bond0:10.140.56.251<0> [1]hsn1:10.201.1.56<0> [2]hsn0:10.201.1.51<0>
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclOsDlopen(libnccl-rma.so) failed: libnccl-rma.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO RMA/Plugin: Could not find: libnccl-rma.so
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO RMA/Plugin: Failed to load external plugin libnccl-rma.so, dlHandle: (nil), ncclRma: (nil)
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO GIN/Plugin: Failed to load external plugin libnccl-gin.so, dlHandle: (nil), ncclGin: (nil)
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO [Rank 4] ncclCommInitRankConfig comm 0x56539f0684a0 rank 4 nranks 8 cudaDev 0 nvmlDev 0 busId 7000 commId 0x118bb7bc7abbb904 - Init START
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity = 24-31,56-63 ; CPU affinity = 0).
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Rank 4: 3 Net devices
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Rank 4: 0 CollNet devices
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO comm 0x56539f0684a0 rank 4 nRanks 8 nNodes 2 localRanks 4 localRank 0 MNNVL 0
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Trees [0] -1/-1/-1->4->6 [1] 7/-1/-1->4->5 [2] -1/-1/-1->4->6 [3] 7/-1/-1->4->5
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 8
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188533:2188684 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+x3001c0s19b1n0:2188533:2188681 [0] P2pPeers = 8
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066766:1066970 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+x3001c0s19b0n0:1066766:1066967 [0] NCCL INFO [Proxy Service] Device 0 CPU core 0
+x3001c0s19b0n0:1066766:1066967 [0] NCCL INFO proxy listening socket at 10.140.56.253<50627>
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO CC Off, workFifoBytes 1048576
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclCommInitRankConfig comm 0x561e40febd30 rank 0 nranks 8 cudaDev 0 nvmlDev 0 busId 7000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 8 total 0.26 (kernels 0.12, alloc 0.04, bootstrap 0.06, allgathers 0.00, topo 0.03, graphs 0.00, connections 0.01, rest 0.00)
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclCommSplit comm 0x561e47ee8770 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 7000 parent 0x561e40febd30 childCount 1 color 0 key 0- Init START
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity = 24-31,56-63 ; CPU affinity = 0).
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Rank 0: 3 Net devices
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Rank 0: 0 CollNet devices
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO comm 0x561e47ee8770 rank 0 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 00/04 : 0 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 01/04 : 0 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 02/04 : 0 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 03/04 : 0 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1 [2] -1/-1/-1->0->1 [3] -1/-1/-1->0->1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066766:1066987 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+x3001c0s19b0n0:1066766:1066986 [0] NCCL INFO [Proxy Service] Device 0 CPU core 0
+x3001c0s19b0n0:1066766:1066986 [0] NCCL INFO proxy listening socket at 10.140.56.253<44691>
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 4 p2p channels per peer
+x3001c0s19b0n0:1066766NCCL INFO [Proxy Service] Device 0 CPU core 2
+x3001c0s19b0n0:1066768:1066965 [0] NCCL INFO proxy listening socket at 10.140.56.253<50635>
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclCommInitRankConfig comm 0x556b1a30fdd0 rank 2 nranks 8 cudaDev 0 nvmlDev 2 busId 85000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 2 nranks 8 total 0.26 (kernels 0.12, alloc 0.05, bootstrap 0.04, allgathers 0.00, topo 0.04, graphs 0.00, connections 0.01, rest 0.00)
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclCommSplit comm 0x556b2120d2d0 rank 0 nranks 2 cudaDev 0 nvmlDev 2 busId 85000 parent 0x556b1a30fdd0 childCount 1 color 2 key 0- Init START
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 2 is empty, ignoring. (GPU affinity = 8-15,40-47 ; CPU affinity = 2).
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Rank 0: 3 Net devices
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Rank 0: 0 CollNet devices
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO comm 0x556b2120d2d0 rank 0 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 00/04 : 0 1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 01/04 : 0 1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 02/04 : 0 1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 03/04 : 0 1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1 [2] -1/-1/-1->0->1 [3] -1/-1/-1->0->1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066768:1066983 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 2
+x3001c0s19b0n0:1066768:1066982 [0] NCCL INFO [Proxy Service] Device 0 CPU core 2
+x3001c0s19b0n0:1066768:1066982 [0] NCCL INFO proxy listening socket at 10.140.56.253<49719>
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 4 p2p channels per peer
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO CC Off, workFifoBytes 1048576
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclCommSplit comm 0x556b2120d2d0 rank 0 nranks 2 cudaDev 0 nvmlDev 2 busId 85000 parent 0x556b1a30fdd0 childCount 1 color 2 key 0 - Init COMPLETE
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Init timings - ncclCommSplit: rank 0 nranks 2 total 0.02 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections Service] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1066964 [0] NCCL INFO proxy listening socket at 10.140.56.253<43737>
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclCommInitRankConfig comm 0x556d54f93070 rank 3 nranks 8 cudaDev 0 nvmlDev 3 busId c7000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 3 nranks 8 total 0.26 (kernels 0.12, alloc 0.05, bootstrap 0.04, allgathers 0.00, topo 0.03, graphs 0.00, connections 0.01, rest 0.00)
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclCommSplit comm 0x556d5be90a30 rank 0 nranks 2 cudaDev 0 nvmlDev 3 busId c7000 parent 0x556d54f93070 childCount 1 color 3 key 0- Init START
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 3 is 3. (GPU affinity = 0-7,32-39 ; CPU affinity = 3).
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Rank 0: 3 Net devices
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Rank 0: 0 CollNet devices
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO comm 0x556d5be90a30 rank 0 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 00/02 : 0 1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 01/02 : 0 1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] -1/-1/-1->0->1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066769:1066981 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO CC Off, workFifoBytes 1048576
+x3001c0s19b0n0:1066769:1066980 [0] NCCL INFO [Proxy Service] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1066980 [0] NCCL INFO proxy listening socket at 10.140.56.253<37241>
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclCommSplit comm 0x556d5be90a30 rank 0 nranks 2 cudaDev 0 nvmlDev 3 busId c7000 parent 0x556d54f93070 childCount 1 color 3 key 0 - Init COMPLETE
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Init timings - ncclCommSplit: rank 0 nranks 2 total 0.02 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066769:10667CCL INFO [Proxy Service] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1066968 [0] NCCL INFO proxy listening socket at 10.140.56.253<37713>
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclCommInitRankConfig comm 0x558bf7e4ee90 rank 1 nranks 8 cudaDev 0 nvmlDev 1 busId 46000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 8 total 0.26 (kernels 0.12, alloc 0.05, bootstrap 0.04, allgathers 0.00, topo 0.03, graphs 0.00, connections 0.01, rest 0.00)
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclCommSplit comm 0x558bfed4c370 rank 0 nranks 2 cudaDev 0 nvmlDev 1 busId 46000 parent 0x558bf7e4ee90 childCount 1 color 1 key 0- Init START
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity = 16-23,48-55 ; CPU affinity = 1).
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Rank 0: 3 Net devices
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Rank 0: 0 CollNet devices
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO comm 0x558bfed4c370 rank 0 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 00/02 : 0 1
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 01/02 : 0 1
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] -1/-1/-1->0->1
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066767:1066985 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1066984 [0] NCCL INFO [Proxy Service] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1066984 [0] NCCL INFO proxy listening socket at 10.140.56.253<58123>
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO CC Off, workFifoBytes 1048576
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclCommSplit comm 0x558bfed4c370 rank 0 nranks 2 cudaDev 0 nvmlDev 1 busId 46000 parent 0x558bf7e4ee90 childCount 1 color 1 key 0 - Init COMPLETE
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Init timings - ncclCommSplit: rank 0 nranks 2 total 0.02 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Assigned NET plugin Socket to cNCCL INFO [Proxy Service] Device 0 CPU core 0
+x3001c0s19b1n0:2188533:2188681 [0] NCCL INFO proxy listening socket at 10.140.56.251<35147>
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclCommInitRankConfig comm 0x56539f0684a0 rank 4 nranks 8 cudaDev 0 nvmlDev 0 busId 7000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 4 nranks 8 total 0.25 (kernels 0.12, alloc 0.04, bootstrap 0.05, allgathers 0.01, topo 0.03, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclCommSplit comm 0x5653a5f654c0 rank 1 nranks 2 cudaDev 0 nvmlDev 0 busId 7000 parent 0x56539f0684a0 childCount 1 color 0 key 1- Init START
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity = 24-31,56-63 ; CPU affinity = 0).
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Rank 1: 3 Net devices
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Rank 1: 0 CollNet devices
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO comm 0x5653a5f654c0 rank 1 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] -1/-1/-1->1->0 [2] 0/-1/-1->1->-1 [3] 0/-1/-1->1->-1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188533:2188700 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+x3001c0s19b1n0:2188533:2188699 [0] NCCL INFO [Proxy Service] Device 0 CPU core 0
+x3001c0s19b1n0:2188533:2188699 [0] NCCL INFO proxy listening socket at 10.140.56.251<44087>
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 4 p2p channels per peer
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclCommSplit comm 0x5653a5f654c0 rank 1 nranks 2 cudaDev 0 nvmlDev 0 busId 7000 parent 0x56539f0684a0 childCount 1 color 0 key 1 - Init COMPLETE
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Init timings - ncclCommSplit: rank 1 nranks 2 total 0.02 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclCommSplit comm 0x5653a6597f70 rank 0 nranks 4 cudaDev 0 nvmlDeCCL INFO [Proxy Service] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188680 [0] NCCL INFO proxy listening socket at 10.140.56.251<58113>
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclCommInitRankConfig comm 0x55a23c964160 rank 5 nranks 8 cudaDev 0 nvmlDev 1 busId 46000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 5 nranks 8 total 0.25 (kernels 0.12, alloc 0.04, bootstrap 0.05, allgathers 0.01, topo 0.03, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclCommSplit comm 0x55a243860cd0 rank 1 nranks 2 cudaDev 0 nvmlDev 1 busId 46000 parent 0x55a23c964160 childCount 1 color 1 key 1- Init START
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity = 16-23,48-55 ; CPU affinity = 1).
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Rank 1: 3 Net devices
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Rank 1: 0 CollNet devices
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO comm 0x55a243860cd0 rank 1 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] 0/-1/-1->1->-1
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188534:2188698 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188697 [0] NCCL INFO [Proxy Service] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188697 [0] NCCL INFO proxy listening socket at 10.140.56.251<53515>
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclCommSplit comm 0x55a243860cd0 rank 1 nranks 2 cudaDev 0 nvmlDev 1 busId 46000 parent 0x55a23c964160 childCount 1 color 1 key 1 - Init COMPLETE
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Init timings - ncclCommSplit: rank 1 nranks 2 total 0.02 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclCommSplit comm 0x55a243daae10 rank 1 nranks 4 cudaDev 0 nvmlDev 1 busId 46000 parent 0x55a23c96416NCCL INFO [Proxy Service] Device 0 CPU core 2
+x3001c0s19b1n0:2188535:2188679 [0] NCCL INFO proxy listening socket at 10.140.56.251<51745>
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclCommInitRankConfig comm 0x55a4480d1d60 rank 6 nranks 8 cudaDev 0 nvmlDev 2 busId 85000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 6 nranks 8 total 0.25 (kernels 0.12, alloc 0.04, bootstrap 0.05, allgathers 0.01, topo 0.03, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclCommSplit comm 0x55a44efcf100 rank 1 nranks 2 cudaDev 0 nvmlDev 2 busId 85000 parent 0x55a4480d1d60 childCount 1 color 2 key 1- Init START
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 2 is empty, ignoring. (GPU affinity = 8-15,40-47 ; CPU affinity = 2).
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Rank 1: 3 Net devices
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Rank 1: 0 CollNet devices
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO comm 0x55a44efcf100 rank 1 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] -1/-1/-1->1->0 [2] 0/-1/-1->1->-1 [3] 0/-1/-1->1->-1
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188535:2188696 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 2
+x3001c0s19b1n0:2188535:2188695 [0] NCCL INFO [Proxy Service] Device 0 CPU core 2
+x3001c0s19b1n0:2188535:2188695 [0] NCCL INFO proxy listening socket at 10.140.56.251<51435>
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 4 p2p channels per peer
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclCommSplit comm 0x55a44efcf100 rank 1 nranks 2 cudaDev 0 nvmlDev 2 busId 85000 parent 0x55a4480d1d60 childCount 1 color 2 key 1 - Init COMPLETE
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Init timings - ncclCommSplit: rank 1 nranks 2 total 0.02 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclCommSplit comm 0x55a44f601db0 rank 2 nranks 4 cudaDev 0 nvmlService] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188677 [0] NCCL INFO proxy listening socket at 10.140.56.251<32933>
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO 4 coll channels, 4 collnet channels, 0 nvls channels, 4 p2p channels, 2 p2p channels per peer
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclCommInitRankConfig comm 0x55a4371666d0 rank 7 nranks 8 cudaDev 0 nvmlDev 3 busId c7000 commId 0x118bb7bc7abbb904 - Init COMPLETE
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 7 nranks 8 total 0.26 (kernels 0.12, alloc 0.04, bootstrap 0.06, allgathers 0.01, topo 0.03, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclCommSplit comm 0x55a43e063c90 rank 1 nranks 2 cudaDev 0 nvmlDev 3 busId c7000 parent 0x55a4371666d0 childCount 1 color 3 key 1- Init START
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 3 is 3. (GPU affinity = 0-7,32-39 ; CPU affinity = 3).
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Rank 1: 3 Net devices
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Rank 1: 0 CollNet devices
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO comm 0x55a43e063c90 rank 1 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] 0/-1/-1->1->-1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO P2P Chunksize set to 131072
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b1n0:2188536:2188694 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclCommSplit comm 0x55a43e063c90 rank 1 nranks 2 cudaDev 0 nvmlDev 3 busId c7000 parent 0x55a4371666d0 childCount 1 color 3 key 1 - Init COMPLETE
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Init timings - ncclCommSplit: rank 1 nranks 2 total 0.01 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b1n0:2188536:2188693 [0] NCCL INFO [Proxy Service] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188693 [0] NCCL INFO proxy listening socket at 10.140.56.251<34689>
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclCommSplit comm 0x55a43e5addd0 rank 3 nranks 4 cudaDev 0 nvmlDev 3 busId c7000 parent 0x55a4371666d0 childCount 2 color 4 key 3- In:1066766 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, cuMemGdrSupport 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO CC Off, workFifoBytes 1048576
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclCommSplit comm 0x561e47ee8770 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 7000 parent 0x561e40febd30 childCount 1 color 0 key 0 - Init COMPLETE
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Init timings - ncclCommSplit: rank 0 nranks 2 total 0.02 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclCommSplit comm 0x561e4851cc90 rank 0 nranks 4 cudaDev 0 nvmlDev 0 busId 7000 parent 0x561e40febd30 childCount 2 color 0 key 0- Init START
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity = 24-31,56-63 ; CPU affinity = 0).
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Rank 0: 3 Net devices
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Rank 0: 0 CollNet devices
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO comm 0x561e4851cc90 rank 0 nRanks 4 nNodes 1 localRanks 4 localRank 0 MNNVL 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 00/24 : 0 3 1 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 01/24 : 0 3 2 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 02/24 : 0 1 2 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 03/24 : 0 1 3 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 04/24 : 0 2 3 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 05/24 : 0 2 1 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 06/24 : 0 3 1 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 07/24 : 0 3 2 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 08/24 : 0 1 2 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 09/24 : 0 1 3 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 10/24 : 0 2 3 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 11/24 : 0 2 1 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 12/24 : 0 3 1 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 13/24 : 0 3 2 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 14/24 : 0 1 2 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 15/24 : 0 1 3 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 16/24 : 0 2 3 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 17/24 : 0 2 1 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 18/24 : 0 3 1 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 19/24 : 0 3 2 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 20/24 : 0 1 2 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 21/24 : 0 1 3 2
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 22/24 : 0 2 3 1
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 23/24 : 0 2 1 3
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Trees [0] 3/-1/-1->0->-1 [1] 3/-1/-1->0->-1 [2] 3/-1/-1->0->-1 [3] 3/-1/-1->0->-1 [4] 1/-1/-1->0->-1 [5] 1/-1/-1->0->-1 [6] 1/-1/-1->0->-1 [7] 1/-1/-1->0->-1 [8] 2/-1/-1->0->3 [9] 2/-1/-1->0->3 [10] 2/-1/-1->0->3 [11] 2/-1/-1->0->3 [12] 3/-1/-1->0->-1 [13] 3/-1/-1->0->-1 [14] 3/-1/-1->0->-1 [15] 3/-1/-1->0->-1 [16] 1/-1/-1->0->-1 [17] 1/-1/-1->0->-1 [18] 1/-1/-1->0->-1 [19] 1/-1/-1->0->-1 [20] 2/-1/-1->0->3 [21] 2/-1/-1->0->3 [22] 2/-1/-1->0->3 [23] 2/-1/-1->0->3
+x3001c0s19b0n0:1066766:1066766 [0] NCCLv 0 busId 7000 parent 0x56539f0684a0 childCount 2 color 4 key 0- Init START
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity = 24-31,56-63 ; CPU affinity = 0).
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Rank 0: 3 Net devices
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Rank 0: 0 CollNet devices
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Local Net device counts across ranks: min 3 max 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO comm 0x5653a6597f70 rank 0 nRanks 4 nNodes 1 localRanks 4 localRank 0 MNNVL 0
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 00/24 : 0 3 1 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 01/24 : 0 3 2 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 02/24 : 0 1 2 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 03/24 : 0 1 3 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 04/24 : 0 2 3 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 05/24 : 0 2 1 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 06/24 : 0 3 1 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 07/24 : 0 3 2 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 08/24 : 0 1 2 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 09/24 : 0 1 3 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 10/24 : 0 2 3 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 11/24 : 0 2 1 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 12/24 : 0 3 1 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 13/24 : 0 3 2 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 14/24 : 0 1 2 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 15/24 : 0 1 3 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 16/24 : 0 2 3 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 17/24 : 0 2 1 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 18/24 : 0 3 1 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 19/24 : 0 3 2 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 20/24 : 0 1 2 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 21/24 : 0 1 3 2
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 22/24 : 0 2 3 1
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 23/24 : 0 2 1 3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Trees [0] 3/-1/-1->0->-1 [1] 3/-1/-1->0->-1 [2] 3/-1/-1->0->-1 [3] 3/-1/-1->0->-1 [4] 1/-1/-1->0->-1 [5] 1/-1/-1->0->-1 [6] 1/-1/-1->0->-1 [7] 1/-1/-1->0->-1 [8] 2/-1/-1->0->3 [9] 2/-1/-1->0->3 [10] 2/-1/-1->0->3 [11] 2/-1/-1->0->3 [12] 3/-1/-1->0->-1 [13] 3/-1/-1->0->-1 [14] 3/-1/-1->0->-1 [15] 3/-1/-1->0->-1 [16] 1/-1/-1->0->-1 [17] 1/-1/-1->0->-1 [18] 1/-1/-1->0->-1 [19] 1/-1/-1->0->-1 [20] 2/-1/-1->0->3 [21] 2/-1/-1->0->3 [22] 2/-1/-1->0->3 [23] 2/-1/-1->0->3
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO P2P Chunksize set to 524288
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188533:2188712 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+x3001c0s19b1n0:2188533:2188711 [0] NCCL INFO [Proxy Service] Device 0 CPU core 0
+x3001c0s19b1n0:2188533:2188711 [0] NCCL INFO proxy listening socket at 10.140.56.251<37089>
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO CC Off, workFifoBytes 1048576
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO ncclCommSplit comm 0x5653a6597f70 rank 0 nranks 4 cudaDev 0 nvmlDev 0 busId 7000 parent 0x56539f0684a0 childCount 2 color 4 key 0 - Init COMPLETE
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Init timings - ncclCommSplit: rank 0 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 00.00, rest 0.00)
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Initialized NET plugin Socket
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Assigned NET plugin Socket to comm
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclCommSplit comm 0x556b2183ff80 rank 2 nranks 4 cudaDev 0 nvmlDev 2 busId 85000 parent 0x556b1a30fdd0 childCount 2 color 0 key 2- Init START
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 2 is empty, ignoring. (GPU affinity = 8-15,40-47 ; CPU affinity = 2).
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Rank 2: 3 Net devices
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Rank 2: 0 CollNet devices
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO comm 0x556b2183ff80 rank 2 nRanks 4 nNodes 1 localRanks 4 localRank 2 MNNVL 0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Trees [0] -1/-1/-1->2->1 [1] -1/-1/-1->2->1 [2] -1/-1/-1->2->1 [3] -1/-1/-1->2->1 [4] -1/-1/-1->2->3 [5] -1/-1/-1->2->3 [6] -1/-1/-1->2->3 [7] -1/-1/-1->2->3 [8] 1/-1/-1->2->0 [9] 1/-1/-1->2->0 [10] 1/-1/-1->2->0 [11] 1/-1/-1->2->0 [12] -1/-1/-1->2->1 [13] -1/-1/-1->2->1 [14] -1/-1/-1->2->1 [15] -1/-1/-1->2->1 [16] -1/-1/-1->2->3 [17] -1/-1/-1->2->3 [18] -1/-1/-1->2->3 [19] -1/-1/-1->2->3 [20] 1/-1/-1->2->0 [21] 1/-1/-1->2->0 [22] 1/-1/-1->2->0 [23] 1/-1/-1->2->0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO P2P Chunksize set to 524288
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066768:1066999 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 2
+x3001c0s19b0n0:1066768:1066997 [0] NCCL INFO [Proxy Service] Device 0 CPU core 2
+x3001c0s19b0n0:1066768:1066997 [0] NCCL INFO proxy listening socket at 10.140.56.253<34461>
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO ncclCommSplit comm 0x556b2183ff80 rank 2 nranks 4 cudaDev 0 nvmlDev 2 busId 85000 parent 0x556b1a30fdd0 childCount 2 color 0 key 2 - Init COMPLETE
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Init timings - ncclCommSplit: rank 2 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 0.01)
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 02/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 04/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 08/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 10/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 14/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 16/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 20/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 22/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 00/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 03/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 06/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 09/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 12/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 15/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [69 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclCommSplit comm 0x556d5c3dab70 rank 3 nranks 4 cudaDev 0 nvmlDev 3 busId c7000 parent 0x556d54f93070 childCount 2 color 0 key 3- Init START
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 3 is 3. (GPU affinity = 0-7,32-39 ; CPU affinity = 3).
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Rank 3: 3 Net devices
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Rank 3: 0 CollNet devices
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO comm 0x556d5c3dab70 rank 3 nRanks 4 nNodes 1 localRanks 4 localRank 3 MNNVL 0
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Trees [0] 1/-1/-1->3->0 [1] 1/-1/-1->3->0 [2] 1/-1/-1->3->0 [3] 1/-1/-1->3->0 [4] 2/-1/-1->3->1 [5] 2/-1/-1->3->1 [6] 2/-1/-1->3->1 [7] 2/-1/-1->3->1 [8] 0/-1/-1->3->-1 [9] 0/-1/-1->3->-1 [10] 0/-1/-1->3->-1 [11] 0/-1/-1->3->-1 [12] 1/-1/-1->3->0 [13] 1/-1/-1->3->0 [14] 1/-1/-1->3->0 [15] 1/-1/-1->3->0 [16] 2/-1/-1->3->1 [17] 2/-1/-1->3->1 [18] 2/-1/-1->3->1 [19] 2/-1/-1->3->1 [20] 0/-1/-1->3->-1 [21] 0/-1/-1->3->-1 [22] 0/-1/-1->3->-1 [23] 0/-1/-1->3->-1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO P2P Chunksize set to 524288
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066769:1067003 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1067002 [0] NCCL INFO [Proxy Service] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1067002 [0] NCCL INFO proxy listening socket at 10.140.56.253<60409>
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO ncclCommSplit comm 0x556d5c3dab70 rank 3 nranks 4 cudaDev 0 nvmlDev 3 busId c7000 parent 0x556d54f93070 childCount 2 color 0 key 3 - Init COMPLETE
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Init timings - ncclCommSplit: rank 3 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 0.01)
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 02/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 05/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 08/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 11/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 14/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 17/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 20/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 23/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 00/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 04/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 06/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 10/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 12/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 16/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 18/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 22/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 01/0 : 3[3] -> 2[2omm
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO RMA/Plugin: Failed to initialize any plugin
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO GIN/Plugin: Failed to initialize any GIN plugin
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclCommSplit comm 0x558bff2964b0 rank 1 nranks 4 cudaDev 0 nvmlDev 1 busId 46000 parent 0x558bf7e4ee90 childCount 2 color 0 key 1- Init START
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity = 16-23,48-55 ; CPU affinity = 1).
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Rank 1: 3 Net devices
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Rank 1: 0 CollNet devices
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO comm 0x558bff2964b0 rank 1 nRanks 4 nNodes 1 localRanks 4 localRank 1 MNNVL 0
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Trees [0] 2/-1/-1->1->3 [1] 2/-1/-1->1->3 [2] 2/-1/-1->1->3 [3] 2/-1/-1->1->3 [4] 3/-1/-1->1->0 [5] 3/-1/-1->1->0 [6] 3/-1/-1->1->0 [7] 3/-1/-1->1->0 [8] -1/-1/-1->1->2 [9] -1/-1/-1->1->2 [10] -1/-1/-1->1->2 [11] -1/-1/-1->1->2 [12] 2/-1/-1->1->3 [13] 2/-1/-1->1->3 [14] 2/-1/-1->1->3 [15] 2/-1/-1->1->3 [16] 3/-1/-1->1->0 [17] 3/-1/-1->1->0 [18] 3/-1/-1->1->0 [19] 3/-1/-1->1->0 [20] -1/-1/-1->1->2 [21] -1/-1/-1->1->2 [22] -1/-1/-1->1->2 [23] -1/-1/-1->1->2
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO P2P Chunksize set to 524288
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066767:1066998 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1066996 [0] NCCL INFO [Proxy Service] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1066996 [0] NCCL INFO proxy listening socket at 10.140.56.253<34973>
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO ncclCommSplit comm 0x558bff2964b0 rank 1 nranks 4 cudaDev 0 nvmlDev 1 busId 46000 parent 0x558bf7e4ee90 childCount 2 color 0 key 1 - Init COMPLETE
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Init timings - ncclCommSplit: rank 1 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 0.01)
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 00/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 02/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 06/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 08/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 12/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 14/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 18/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 20/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 03/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 05/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 09/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 11/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 15/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 17/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 21/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 23/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:0 childCount 2 color 4 key 1- Init START
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity = 16-23,48-55 ; CPU affinity = 1).
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Rank 1: 3 Net devices
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Rank 1: 0 CollNet devices
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO comm 0x55a243daae10 rank 1 nRanks 4 nNodes 1 localRanks 4 localRank 1 MNNVL 0
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Trees [0] 2/-1/-1->1->3 [1] 2/-1/-1->1->3 [2] 2/-1/-1->1->3 [3] 2/-1/-1->1->3 [4] 3/-1/-1->1->0 [5] 3/-1/-1->1->0 [6] 3/-1/-1->1->0 [7] 3/-1/-1->1->0 [8] -1/-1/-1->1->2 [9] -1/-1/-1->1->2 [10] -1/-1/-1->1->2 [11] -1/-1/-1->1->2 [12] 2/-1/-1->1->3 [13] 2/-1/-1->1->3 [14] 2/-1/-1->1->3 [15] 2/-1/-1->1->3 [16] 3/-1/-1->1->0 [17] 3/-1/-1->1->0 [18] 3/-1/-1->1->0 [19] 3/-1/-1->1->0 [20] -1/-1/-1->1->2 [21] -1/-1/-1->1->2 [22] -1/-1/-1->1->2 [23] -1/-1/-1->1->2
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO P2P Chunksize set to 524288
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188534:2188715 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188713 [0] NCCL INFO [Proxy Service] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188713 [0] NCCL INFO proxy listening socket at 10.140.56.251<37769>
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO ncclCommSplit comm 0x55a243daae10 rank 1 nranks 4 cudaDev 0 nvmlDev 1 busId 46000 parent 0x55a23c964160 childCount 2 color 4 key 1 - Init COMPLETE
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Init timings - ncclCommSplit: rank 1 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 0.01)
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 00/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 02/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 06/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 08/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 12/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 14/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 18/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 20/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 03/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 05/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 09/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 11/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 15/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 17/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 21/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 23/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 01/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 04/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 07/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 10/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 1it START
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 3 is 3. (GPU affinity = 0-7,32-39 ; CPU affinity = 3).
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Rank 3: 3 Net devices
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Rank 3: 0 CollNet devices
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO comm 0x55a43e5addd0 rank 3 nRanks 4 nNodes 1 localRanks 4 localRank 3 MNNVL 0
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Trees [0] 1/-1/-1->3->0 [1] 1/-1/-1->3->0 [2] 1/-1/-1->3->0 [3] 1/-1/-1->3->0 [4] 2/-1/-1->3->1 [5] 2/-1/-1->3->1 [6] 2/-1/-1->3->1 [7] 2/-1/-1->3->1 [8] 0/-1/-1->3->-1 [9] 0/-1/-1->3->-1 [10] 0/-1/-1->3->-1 [11] 0/-1/-1->3->-1 [12] 1/-1/-1->3->0 [13] 1/-1/-1->3->0 [14] 1/-1/-1->3->0 [15] 1/-1/-1->3->0 [16] 2/-1/-1->3->1 [17] 2/-1/-1->3->1 [18] 2/-1/-1->3->1 [19] 2/-1/-1->3->1 [20] 0/-1/-1->3->-1 [21] 0/-1/-1->3->-1 [22] 0/-1/-1->3->-1 [23] 0/-1/-1->3->-1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO P2P Chunksize set to 524288
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188536:2188710 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188709 [0] NCCL INFO [Proxy Service] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188709 [0] NCCL INFO proxy listening socket at 10.140.56.251<57511>
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO ncclCommSplit comm 0x55a43e5addd0 rank 3 nranks 4 cudaDev 0 nvmlDev 3 busId c7000 parent 0x55a4371666d0 childCount 2 color 4 key 3 - Init COMPLETE
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Init timings - ncclCommSplit: rank 3 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 0.01)
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 02/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 05/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 08/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 11/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 14/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 17/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 20/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 23/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 00/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 04/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 06/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 10/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 12/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 16/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 18/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 22/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 01/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 03/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 07/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 09/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 13/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19Dev 2 busId 85000 parent 0x55a4480d1d60 childCount 2 color 4 key 2- Init START
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 2 is empty, ignoring. (GPU affinity = 8-15,40-47 ; CPU affinity = 2).
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO NVLS multicast support is not available on dev 0
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Rank 2: 3 Net devices
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Rank 2: 0 CollNet devices
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO comm 0x55a44f601db0 rank 2 nRanks 4 nNodes 1 localRanks 4 localRank 2 MNNVL 0
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Trees [0] -1/-1/-1->2->1 [1] -1/-1/-1->2->1 [2] -1/-1/-1->2->1 [3] -1/-1/-1->2->1 [4] -1/-1/-1->2->3 [5] -1/-1/-1->2->3 [6] -1/-1/-1->2->3 [7] -1/-1/-1->2->3 [8] 1/-1/-1->2->0 [9] 1/-1/-1->2->0 [10] 1/-1/-1->2->0 [11] 1/-1/-1->2->0 [12] -1/-1/-1->2->1 [13] -1/-1/-1->2->1 [14] -1/-1/-1->2->1 [15] -1/-1/-1->2->1 [16] -1/-1/-1->2->3 [17] -1/-1/-1->2->3 [18] -1/-1/-1->2->3 [19] -1/-1/-1->2->3 [20] 1/-1/-1->2->0 [21] 1/-1/-1->2->0 [22] 1/-1/-1->2->0 [23] 1/-1/-1->2->0
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO P2P Chunksize set to 524288
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b1n0:2188535:2188716 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 2
+x3001c0s19b1n0:2188535:2188714 [0] NCCL INFO [Proxy Service] Device 0 CPU core 2
+x3001c0s19b1n0:2188535:2188714 [0] NCCL INFO proxy listening socket at 10.140.56.251<47175>
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO ncclCommSplit comm 0x55a44f601db0 rank 2 nranks 4 cudaDev 0 nvmlDev 2 busId 85000 parent 0x55a4480d1d60 childCount 2 color 4 key 2 - Init COMPLETE
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Init timings - ncclCommSplit: rank 2 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 0.01)
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 02/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 04/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 08/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 10/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 14/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 16/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 20/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 22/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 00/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 03/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 06/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 09/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 12/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 15/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 18/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 21/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 01/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 05/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 07/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 11/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s1 INFO P2P Chunksize set to 524288
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+x3001c0s19b0n0:1066766:1067001 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 0
+x3001c0s19b0n0:1066766:1067000 [0] NCCL INFO [Proxy Service] Device 0 CPU core 0
+x3001c0s19b0n0:1066766:1067000 [0] NCCL INFO proxy listening socket at 10.140.56.253<59867>
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO 24 coll channels, 24 collnet channels, 0 nvls channels, 32 p2p channels, 8 p2p channels per peer
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO CC Off, workFifoBytes 1048576
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO ncclCommSplit comm 0x561e4851cc90 rank 0 nranks 4 cudaDev 0 nvmlDev 0 busId 7000 parent 0x561e40febd30 childCount 2 color 0 key 0 - Init COMPLETE
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Init timings - ncclCommSplit: rank 0 nranks 4 total 0.06 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.02, rest 0.01)
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 08/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 09/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 14/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 15/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 20/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 21/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 04/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 05/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 10/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 11/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 16/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 17/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 22/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 23/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 00/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 01/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 06/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 07/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 12/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 13/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 18/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 19/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Channel 00/0 : 1[0] -> 0[0] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066766:1067011 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 0
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Channel 01/0 : 1[0] -> 0[0] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Channel 02/0 : 1[0] -> 0[0] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Channel 03/0 : 1[0] -> 0[0] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[0] [send] via NET/Socket/1
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFRESULT hsdp gpt params=1.42B gpus=8 bs/gpu=4 seq=1024 step_ms=2633 tok/s/gpu=1556 tok/s_total=12447 TFLOPS/gpu=14 peak_mem_GB=13.1 loss=0.03
+O Channel 01/0 : 0[0] -> 1[0] [send] via NET/Socket/2
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[0] [send] via NET/Socket/1
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[0] [send] via NET/Socket/2
+x3001c0s19b0n0:1066766:1067004 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 00/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 02/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 01/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Channel 03/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066766:1066766 [0] NCCL INFO Connected all trees
+.01)
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Symmetric VA size=40GB
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 08/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 09/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 14/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 15/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 20/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 21/0 : 0[0] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 04/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 05/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 10/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 11/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 16/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 17/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 22/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 23/0 : 0[0] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 00/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 01/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 06/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 07/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 12/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 13/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 18/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 19/0 : 0[0] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b1n0:2188533:2188722 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 0
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[0] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[0] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[0] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[0] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 00/0 : 1[0] -> 0[0] [send] via NET/Socket/1
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 01/0 : 1[0] -> 0[0] [send] via NET/Socket/2
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 02/0 : 1[0] -> 0[0] [send] via NET/Socket/1
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Channel 03/0 : 1[0] -> 0[0] [send] via NET/Socket/2
+x3001c0s19b1n0:2188533:2188719 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 01/0 : 4[0] -> 5[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 03/0 : 4[0] -> 5[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 00/0 : 4[0] -> 6[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 02/0 : 4[0] -> 6[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 01/0 : 4[0] -> 7[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Channel 03/0 : 4[0] -> 7[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Connected all trees
+0] NCCL INFO Channel 18/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 21/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 01/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 05/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 07/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 11/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 13/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 17/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 19/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 23/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b0n0:1066768:1067009 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 2
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 00/0 : 1[2] -> 0[2] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 01/0 : 1[2] -> 0[2] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 02/0 : 1[2] -> 0[2] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 03/0 : 1[2] -> 0[2] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 00/0 : 0[2] -> 1[2] [send] via NET/Socket/1
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 01/0 : 0[2] -> 1[2] [send] via NET/Socket/2
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 02/0 : 0[2] -> 1[2] [send] via NET/Socket/1
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Channel 03/0 : 0[2] -> 1[2] [send] via NET/Socket/2
+x3001c0s19b0n0:1066768:1067007 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 01/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 03/0 : 2[2] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 00/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 02/0 : 2[2] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 00/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Channel 02/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066768:1066768 [0] NCCL INFO Connected all trees
+b1n0:2188536:2188536 [0] NCCL INFO Channel 15/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 19/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 21/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b1n0:2188536:2188724 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188717 [0] NCCL INFO Channel 00/0 : 0[3] -> 1[3] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188717 [0] NCCL INFO Channel 01/0 : 0[3] -> 1[3] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188717 [0] NCCL INFO Channel 00/0 : 1[3] -> 0[3] [send] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188717 [0] NCCL INFO Channel 01/0 : 1[3] -> 0[3] [send] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188717 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b1n0:2188536:2189090 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 3
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 00/0 : 3[3] -> 7[3] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 02/0 : 3[3] -> 7[3] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 00/0 : 7[3] -> 3[3] [send] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 02/0 : 7[3] -> 3[3] [send] via NET/Socket/1
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 01/0 : 7[3] -> 4[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 03/0 : 7[3] -> 4[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 00/0 : 7[3] -> 5[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 02/0 : 7[3] -> 5[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 01/0 : 7[3] -> 6[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Channel 03/0 : 7[3] -> 6[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Connected all trees
+] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 03/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 07/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 09/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 13/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 15/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 19/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 21/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b0n0:1066769:1067005 [0] NCCL INFO Channel 00/0 : 1[3] -> 0[3] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066769:1067010 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1067005 [0] NCCL INFO Channel 01/0 : 1[3] -> 0[3] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066769:1067005 [0] NCCL INFO Channel 00/0 : 0[3] -> 1[3] [send] via NET/Socket/1
+x3001c0s19b0n0:1066769:1067005 [0] NCCL INFO Channel 01/0 : 0[3] -> 1[3] [send] via NET/Socket/1
+x3001c0s19b0n0:1066769:1067005 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b0n0:1066769:1067378 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 3
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 00/0 : 7[3] -> 3[3] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 02/0 : 7[3] -> 3[3] [receive] via NET/Socket/1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 00/0 : 3[3] -> 7[3] [send] via NET/Socket/1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 02/0 : 3[3] -> 7[3] [send] via NET/Socket/1
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 01/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 03/0 : 3[3] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 00/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 02/0 : 3[3] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 01/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Channel 03/0 : 3[3] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066769:1066769 [0] NCCL INFO Connected all trees
+9b1n0:2188535:2188535 [0] NCCL INFO Channel 13/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 17/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 19/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 23/0 : 2[2] -> 1[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b1n0:2188535:2188721 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 2
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 00/0 : 0[2] -> 1[2] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 01/0 : 0[2] -> 1[2] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 02/0 : 0[2] -> 1[2] [receive] via NET/Socket/1
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 03/0 : 0[2] -> 1[2] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 00/0 : 1[2] -> 0[2] [send] via NET/Socket/1
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 01/0 : 1[2] -> 0[2] [send] via NET/Socket/2
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 02/0 : 1[2] -> 0[2] [send] via NET/Socket/1
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Channel 03/0 : 1[2] -> 0[2] [send] via NET/Socket/2
+x3001c0s19b1n0:2188535:2188720 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 01/0 : 6[2] -> 7[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 03/0 : 6[2] -> 7[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 00/0 : 6[2] -> 4[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 02/0 : 6[2] -> 4[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 00/0 : 6[2] -> 5[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Channel 02/0 : 6[2] -> 5[1] via P2P/CUMEM/read
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Connected all trees
+1066767 [0] NCCL INFO Channel 01/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 04/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 07/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 10/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 13/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 16/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 19/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 22/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b0n0:1066767:1067008 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1067006 [0] NCCL INFO Channel 00/0 : 1[1] -> 0[1] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066767:1067006 [0] NCCL INFO Channel 01/0 : 1[1] -> 0[1] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066767:1067006 [0] NCCL INFO Channel 00/0 : 0[1] -> 1[1] [send] via NET/Socket/2
+x3001c0s19b0n0:1066767:1067006 [0] NCCL INFO Channel 01/0 : 0[1] -> 1[1] [send] via NET/Socket/2
+x3001c0s19b0n0:1066767:1067006 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 00/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 02/0 : 1[1] -> 2[2] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 00/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 02/0 : 1[1] -> 3[3] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1067377 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 1
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 01/0 : 5[1] -> 1[1] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 03/0 : 5[1] -> 1[1] [receive] via NET/Socket/2
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 01/0 : 1[1] -> 5[1] [send] via NET/Socket/2
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 03/0 : 1[1] -> 5[1] [send] via NET/Socket/2
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 01/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Channel 03/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b0n0:1066767:1066767 [0] NCCL INFO Connected all trees
+3/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 16/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 19/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 22/0 : 1[1] -> 0[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+x3001c0s19b1n0:2188534:2188723 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188718 [0] NCCL INFO Channel 00/0 : 0[1] -> 1[1] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188718 [0] NCCL INFO Channel 01/0 : 0[1] -> 1[1] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188718 [0] NCCL INFO Channel 00/0 : 1[1] -> 0[1] [send] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188718 [0] NCCL INFO Channel 01/0 : 1[1] -> 0[1] [send] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188718 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 00/0 : 5[1] -> 6[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 02/0 : 5[1] -> 6[2] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 00/0 : 5[1] -> 7[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 02/0 : 5[1] -> 7[3] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2189089 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 1
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 01/0 : 1[1] -> 5[1] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 03/0 : 1[1] -> 5[1] [receive] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 01/0 : 5[1] -> 1[1] [send] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 03/0 : 5[1] -> 1[1] [send] via NET/Socket/2
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 01/0 : 5[1] -> 4[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Channel 03/0 : 5[1] -> 4[0] via P2P/CUMEM/read
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Connected all trees

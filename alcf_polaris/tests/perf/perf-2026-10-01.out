@@ -1,0 +1,51 @@
+=== Thu Sep 24 09:57:33 PM UTC 2026 nodes: x3001c0s19b0n0.hsn.cm.polaris.alcf.anl.gov x3001c0s19b1n0.hsn.cm.polaris.alcf.anl.gov  logs: logs/7651564
+
+Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".
+
+
+Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with "PrgEnv-gnu/8.7.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-libsci/26.03.0     2) cray-mpich/9.1.0
+
+W0924 21:57:41.745000 1064172 site-packages/torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W0924 21:57:41.745000 1064172 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0924 21:57:41.746000 1064172 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+torch 2.14.0 nccl (2, 30, 7) vllm 0.29.0 ray 2.58.0 transformers 5.10.4
+##### A. default module (no NCCL net plugin -> cross-node over TCP sockets) #####
+=== DDP ResNet-50: 1, 4, 8 GPUs ===
+RESULT ddp resnet50 bf16 gpus=1 bs/gpu=128 step_ms=68.2 img/s/gpu=1878 img/s_total=1878 peak_mem_GB=5.6
+x3001c0s19b0n0:1064671:1064671 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1064672:1064672 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1064673:1064673 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1064674:1064674 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2186728:2186728 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2186729:2186729 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2186729:2187250 [0] RESULT ddp resnet50 bf16 gpus=8 bs/gpu=128 step_ms=168.1 img/s/gpu=761 img/s_total=6092 peak_mem_GB=5.8
+x3001c0s19b1n0:2186730:2186730 [0] NCCL INFO Using network Socket
+=== FSDP2 GPT-1.4B: 4, 8, 8 HSDP ===
+x3001c0s19b0n0:1065318:1065318 [0] NCCL INFRESULT fsdp2 gpt params=1.42B gpus=4 bs/gpu=4 seq=1024 step_ms=225 tok/s/gpu=18215 tok/s_total=72860 TFLOPS/gpu=166 peak_mem_GB=13.1 loss=0.03
+x3001c0s19b0n0:1065319:1065319 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1065320:1065320 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:1065321:1065321 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2187269:2187269 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2187270:2187270 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2187271:2187271 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2187271:2187416 [0] NCCL INFO [Proxy RESULT fsdp2 gpt params=1.42B gpus=8 bs/gpu=4 seq=1024 step_ms=6377 tok/s/gpu=642 tok/s_total=5138 TFLOPS/gpu=6 peak_mem_GB=11.1 loss=0.03
+x3001c0s19b1n0:2188533:2188533 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188534:2188534 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188535:2188535 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:2188536:2188536 [0] NCCL INFO Using network Socket
+=== vLLM 1 node TP=4 (mp) ===
+engine init 62s
+RESULT vllm Qwen/Qwen2.5-7B-Instruct backend=mp tp=4 pp=1 reqs=512 time_s=5.7 gen_tok/s=22850 total_tok/s=30853 req/s=89.26
+sample: To determine how much Janet makes every day at the farmers' market, we need to follow these steps:  1. Calculate the total number of eggs laid by the ducks each day. 2. Subtract the number of eggs Jan
+##### B. multinode vLLM over Ray (default module) #####
+=== Ray cluster ===
+ 0.0/8.0 GPU
+=== vLLM 2 nodes TP=4 PP=2 (ray) ===
+engine init 224s
+RESULT vllm Qwen/Qwen2.5-7B-Instruct backend=ray tp=4 pp=2 reqs=512 time_s=20.8 gen_tok/s=6295 total_tok/s=8499 req/s=24.59
+sample: To determine how much Janet makes every day at the farmers' market, we need to follow these steps:  1. Calculate the total number of eggs laid by the ducks per day. 2. Subtract the number of eggs Jane
+=== done Thu Sep 24 10:12:10 PM UTC 2026

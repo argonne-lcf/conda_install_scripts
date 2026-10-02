@@ -1,0 +1,90 @@
+
+Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".
+
+
+Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with "PrgEnv-gnu/8.7.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-libsci/26.03.0     2) cray-mpich/9.1.0
+
+=== fa
+[fa] OK flash_attn 2.8.3.post1 out (1, 128, 8, 64)
+--- rc=0
+=== fa_after_tf
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/_dynamo/convert_frame.py", line 62 in <module>
+  File "<frozen importlib._bootstrap>", line 488 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 1023 in exec_module
+  File "<frozen importlib._bootstrap>", line 935 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1331 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1360 in _find_and_load
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/_dynamo/aot_compile.py", line 17 in <module>
+  File "<frozen importlib._bootstrap>", line 488 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 1023 in exec_module
+  File "<frozen importlib._bootstrap>", line 935 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1331 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1360 in _find_and_load
+  File "<frozen importlib._bootstrap>", line 488 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1423 in _handle_fromlist
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/_dynamo/__init__.py", line 13 in <module>
+  File "<frozen importlib._bootstrap>", line 488 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 1023 in exec_module
+  File "<frozen importlib._bootstrap>", line 935 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1331 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1360 in _find_and_load
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/_compile.py", line 47 in inner
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/_library/custom_ops.py", line 442 in backend_impl
+  File "/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/_ops.py", line 925 in redispatch
+
+Extension modules: numpy._core._multiarray_umath, numpy.linalg._umath_linalg, google._upb._message, _brotli, backports.zstd._zstd, chardet.pipeline.ascii, chardet.pipeline.escape, chardet.pipeline.language, chardet.models, chardet._kernel, chardet.pipeline.magic, chardet.pipeline.structural, chardet.pipeline.postprocess, chardet.pipeline.confusion, chardet.pipeline.statistical, chardet.pipeline.utf8, chardet.pipeline.utf1632, chardet.pipeline.validity, chardet.pipeline.orchestrator, simplejson._speedups, requests.packages.chardet.pipeline.ascii, requests.packages.chardet.pipeline.escape, requests.packages.chardet.pipeline.language, requests.packages.chardet.models, requests.packages.chardet._kernel, requests.packages.chardet.pipeline.magic, requests.packages.chardet.pipeline.structural, requests.packages.chardet.pipeline.postprocess, requests.packages.chardet.pipeline.confusion, requests.packages.chardet.pipeline.statistical, requests.packages.chardet.pipeline.utf8, requests.packages.chardet.pipeline.utf1632, requests.packages.chardet.pipeline.validity, requests.packages.chardet.pipeline.orchestrator, h5py._errors, h5py.defs, h5py._objects, h5py.h5, h5py.utils, h5py.h5t, h5py.h5s, h5py.h5ac, h5py.h5p, h5py.h5r, h5py._npystrings, h5py._proxy, h5py._conv, h5py.h5z, h5py.h5a, h5py.h5d, h5py.h5ds, h5py.h5g, h5py.h5i, h5py.h5o, h5py.h5f, h5py.h5fd, h5py.h5pl, h5py.h5l, h5py._selector, cython.cimports.libc.math, _cyutility, scipy._cyutility, scipy._lib._ccallback_c, scipy.sparse._sparsetools, numpy.random._common, numpy.random.bit_generator, numpy.random._bounded_integers, numpy.random._pcg64, numpy.random._generator, numpy.random._mt19937, numpy.random._philox, numpy.random._sfc64, numpy.random.mtrand, _csparsetools, scipy.sparse._csparsetools, jaxlib.cpu_feature_guard, PIL._imaging, psutil._psutil_linux, pyarrow.lib, pandas._libs._cyutility, pandas._libs.tslibs.ccalendar, pandas._libs.tslibs.np_datetime, pandas._libs.tslibs.dtypes, pandas._libs.tslibs.base, pandas._libs.tslibs.nattype, pandas._libs.tslibs.timezones, pandas._libs.properties, pandas._libs.tslibs.fields, pandas._libs.tslibs.timedeltas, pandas._libs.tslibs.tzconversion, pandas._libs.tslibs.timestamps, pandas._libs.tslibs.offsets, pandas._libs.tslibs.strptime, pandas._libs.tslibs.parsing, pandas._libs.tslibs.conversion, pandas._libs.tslibs.period, pandas._libs.tslibs.vectorized, pandas._libs.ops_dispatch, pandas._libs.missing, pandas._libs.hashtable, pandas._libs.algos, pandas._libs.interval, pandas._libs.lib, pyarrow._compute, pandas._libs.ops, pandas._libs.hashing, pandas._libs.arrays, pandas._libs.tslib, pandas._libs.sparse, pandas._libs.internals, pandas._libs.indexing, pandas._libs.index, pandas._libs.writers, pandas._libs.join, pandas._libs.window.aggregations, pandas._libs.window.indexers, pandas._libs.reshape, pandas._libs.groupby, pandas._libs.json, pandas._libs.parsers, pandas._libs.testing, kiwisolver._cext, sklearn.__check_build._check_build, lz4._version, lz4.frame._frame, scipy.special._ufuncs_cxx, scipy.linalg._fblas, scipy.linalg._flapack, scipy.linalg._batched_linalg, scipy.linalg._cythonized_array_utils, scipy.linalg._solve_toeplitz, scipy.linalg._internal_matfuncs, scipy.linalg._linalg_pythran, scipy.linalg.cython_blas, scipy.linalg.cython_lapack, scipy.linalg._decomp_update, scipy.special._ellip_harm_2, scipy.special._special_ufuncs, scipy.special._gufuncs, scipy.special._ufuncs, scipy.special._specfun, scipy.special._comb, scipy.sparse.linalg._dsolve._superlu, scipy.sparse.linalg._eigen.arpack._arpacklib, scipy.sparse.linalg._propack, scipy.spatial._ckdtree, scipy.spatial._hausdorff, scipy.spatial._distance_wrap, scipy._lib.messagestream, scipy.spatial._qhull, scipy.spatial._voronoi, scipy.spatial.transform._rotation_cy, scipy.spatial.transform._rigid_transform_cy, scipy.optimize._group_columns, scipy.optimize._trlib._trlib, scipy.optimize._lbfgsb, _moduleTNC, scipy.optimize._moduleTNC, scipy.optimize._slsqplib, scipy.optimize._minpack, scipy.optimize._lsq.givens_elimination, scipy.optimize._zeros, scipy._lib._uarray._uarray, scipy.linalg._decomp_interpolative, scipy.optimize._bglu_dense, scipy.optimize._lsap, scipy.optimize._direct, scipy.integrate._odepack, scipy.integrate._quadpack, scipy.integrate._vode, scipy.integrate._dop, scipy.interpolate._fitpack, scipy.interpolate._dierckx, scipy.interpolate._ppoly, scipy.interpolate._interpnd, scipy.interpolate._rbfinterp_pythran, scipy.interpolate._rgi_cython, scipy.special.cython_special, scipy.stats._stats, scipy.stats._biasedurn, scipy.stats._levy_stable.levyst, scipy.stats._stats_pythran, scipy.stats._ansari_swilk_statistics, scipy.sparse.csgraph._tools, scipy.sparse.csgraph._shortest_path, scipy.sparse.csgraph._traversal, scipy.sparse.csgraph._min_spanning_tree, scipy.sparse.csgraph._flow, scipy.sparse.csgraph._matching, scipy.sparse.csgraph._reordering, scipy.stats._sobol, scipy.stats._qmc_cy, scipy.stats._rcont.rcont, scipy.stats._qmvnt_cy, scipy.ndimage._nd_image, scipy.ndimage._rank_filter_1d, _ni_label, scipy.ndimage._ni_label, sklearn._cyutility, sklearn.utils._isfinite, sklearn.utils.sparsefuncs_fast, sklearn.utils.murmurhash, sklearn.utils._openmp_helpers, torch._C, torch._C._dynamo.autograd_compiler, torch._C._dynamo.eval_frame, torch._C._dynamo.guards, torch._C._dynamo.utils, torch._C._fft, torch._C._linalg, torch._C._nested, torch._C._nn, torch._C._sparse, torch._C._special, cuda.bindings._internal.utils, cuda.bindings._internal.driver, cuda.bindings.cydriver, cuda.bindings.driver, cuda.bindings._internal.runtime_ptds, cuda.bindings._internal.runtime, cuda.bindings.cyruntime, cuda.bindings.runtime (total: 222)
+--- rc=139
+=== te
+W0917 19:22:08.932000 4020829 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0917 19:22:08.933000 4020829 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0917 19:22:08.933000 4020829 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+W0917 19:22:08.936000 4020829 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0917 19:22:08.937000 4020829 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0917 19:22:08.937000 4020829 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+W0917 19:22:08.942000 4020829 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0917 19:22:08.942000 4020829 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0917 19:22:08.942000 4020829 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+W0917 19:22:08.945000 4020829 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0917 19:22:08.945000 4020829 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0917 19:22:08.945000 4020829 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/transformer_engine/jax/sharding.py:23: DeprecationWarning: jax.interpreters.pxla.thread_resources is deprecated as of JAX v0.8.2. Please switch to using `with jax.set_mesh(mesh)` instead of `with mesh:` and then use `jax.sharding.get_abstract_mesh()` to get the current mesh.
+  _PXLA_THREAD_RESOURCES = pxla.thread_resources
+[te] OK TE linear (8, 64)
+--- rc=0
+=== ds
+[ds] OK deepspeed 0.19.6+c7cc64a90 FusedAdam ok
+--- rc=0
+=== vllm
+W0917 19:23:07.040000 4023571 site-packages/torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W0917 19:23:07.040000 4023571 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0917 19:23:07.040000 4023571 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+[vllm] OK vllm 0.29.1.dev0+g98dff2a81.d20260917
+--- rc=0
+=== compile
+[compile] OK torch.compile/triton torch.Size([64])
+--- rc=0
+=== mpi4jax
+[mpi4jax] OK mpi4jax import ok
+--- rc=0
+=== ort
+[ort] OK onnxruntime 1.30.0 ['TensorrtExecutionProvider', 'CUDAExecutionProvider', 'CPUExecutionProvider']
+--- rc=0
+=== xgb
+[xgb] OK xgboost 3.5.0-dev gpu hist ok
+--- rc=0
+=== mamba
+[mamba] OK mamba_ssm out (1, 16, 64)
+--- rc=0
+=== flashinfer
+[flashinfer] OK flashinfer 0.6.18
+--- rc=0
+=== gce
+[gce] OK gce 4.9.0 parsl 2026.02.23
+--- rc=0
+=== all done

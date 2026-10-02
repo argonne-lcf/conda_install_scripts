@@ -1,0 +1,17 @@
+#!/bin/bash -l
+#PBS -A datascience
+#PBS -q workq
+#PBS -l select=2:ncpus=64:ngpus=4,filesystems=home:tegu,walltime=00:20:00
+#PBS -N conda-test
+#PBS -j oe
+#PBS -o job.out
+cd $PBS_O_WORKDIR
+module use /soft/modulefiles
+module load conda/2025-09-25; conda activate
+export MPICH_GPU_SUPPORT_ENABLED=1
+export DARSHAN_DISABLE=1
+nvidia-smi --query-gpu=name,driver_version --format=csv | head -2
+module list 2>&1 | grep -E "conda|gcc|mpich|hdf5"
+echo "=== 8 ranks / 2 nodes ==="
+NCCL_DEBUG=WARN mpiexec -n 8 --ppn 4 ./gpu_wrap.sh python gpu_test.py
+echo "exit=$?"

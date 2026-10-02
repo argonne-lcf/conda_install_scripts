@@ -1,0 +1,1 @@
+RESULT hsdp gpt params=1.42B gpus=8 bs/gpu=4 seq=1024 step_ms=2781 tok/s/gpu=1473 tok/s_total=11783 TFLOPS/gpu=13 peak_mem_GB=13.1 loss=0.03

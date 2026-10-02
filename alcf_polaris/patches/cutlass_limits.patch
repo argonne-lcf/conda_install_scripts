@@ -1,0 +1,22 @@
+diff --git a/include/cutlass/platform/platform.h b/include/cutlass/platform/platform.h
+index 4e8ee96f..9cc24103 100644
+--- a/include/cutlass/platform/platform.h
++++ b/include/cutlass/platform/platform.h
+@@ -29,6 +29,8 @@
+  *
+  **************************************************************************************************/
+ 
++#include <limits>
++
+ #pragma once
+ 
+ /**
+@@ -55,7 +57,7 @@
+  *   (2) Re-implementations of STL functions and types:
+  *       - C++ features that need the \p __device__ annotation.  These are
+  *         placed into the \p platform namespace.
+- *           - \p abs 
++ *           - \p abs
+  *           - \p plus
+  *           - \p less
+  *           - \p greater

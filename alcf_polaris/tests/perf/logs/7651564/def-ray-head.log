@@ -1,0 +1,18 @@
+[2026-09-24 22:05:38,586 W 1069628 1069628] network_util.cc:330: Failed to determine local IP via external connectivity to: 8.8.8.8:53, [2001:4860:4860::8888]:53, falling back to hostname resolution
+2026-09-24 22:05:38,568	INFO usage_lib.py:474 -- Usage stats collection is enabled by default without user confirmation because this terminal is detected to be non-interactive. To disable this, add `--disable-usage-stats` to the command that starts the cluster, or run the following command: `ray disable-usage-stats` before starting the cluster. See https://docs.ray.io/en/master/cluster/usage-stats.html for more details.
+2026-09-24 22:05:38,588	INFO scripts.py:1042 -- [37mLocal node IP[39m: [1m10.201.1.43[22m
+2026-09-24 22:05:45,486	SUCC scripts.py:1081 -- [32m--------------------[39m
+2026-09-24 22:05:45,487	SUCC scripts.py:1082 -- [32mRay runtime started.[39m
+2026-09-24 22:05:45,487	SUCC scripts.py:1083 -- [32m--------------------[39m
+2026-09-24 22:05:45,487	INFO scripts.py:1085 -- [36mNext steps[39m
+2026-09-24 22:05:45,487	INFO cli_output_helpers.py:16 -- [2mNote: The following commands are intended for use on[22m
+2026-09-24 22:05:45,487	INFO cli_output_helpers.py:17 -- [2mthe head node or within the cluster network.[22m
+2026-09-24 22:05:45,487	INFO scripts.py:1089 -- To add another node to this Ray cluster, run
+2026-09-24 22:05:45,487	INFO scripts.py:1092 -- [1m  ray start --address='10.201.1.43:6379'[22m
+2026-09-24 22:05:45,487	INFO scripts.py:1103 -- To connect to this Ray cluster:
+2026-09-24 22:05:45,487	INFO scripts.py:1105 -- [35mimport[39m[26m ray
+2026-09-24 22:05:45,487	INFO scripts.py:1106 -- ray[35m.[39m[26minit(_node_ip_address[35m=[39m[26m[33m'10.201.1.43'[39m[26m)
+2026-09-24 22:05:45,487	INFO scripts.py:1139 -- To terminate the Ray runtime, run
+2026-09-24 22:05:45,487	INFO scripts.py:1140 -- [1m  ray stop[22m
+2026-09-24 22:05:45,487	INFO scripts.py:1143 -- To view the status of the cluster, use
+2026-09-24 22:05:45,487	INFO scripts.py:1144 --   [1mray status[22m[26m

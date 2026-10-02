@@ -1,0 +1,129 @@
+
+Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".
+
+
+Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with "PrgEnv-gnu/8.7.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-libsci/26.03.0     2) cray-mpich/9.1.0
+
+name, driver_version
+NVIDIA A100-SXM4-40GB, 580.65.06
+  4) gcc-native/14           12) darshan/3.5.0
+  6) cray-mpich/9.1.0        14) cray-hdf5-parallel/1.14.3.9
+  7) cray-libsci/26.03.0     15) conda/2026-09-17
+=== 8 ranks / 2 nodes ===
+[rank 4 x3200c0s19b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 5 x3200c0s19b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 0 x3200c0s13b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 6 x3200c0s19b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 7 x3200c0s19b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 4 x3200c0s19b0n0] local_rank 0 PALS_LOCAL_RANKID= 0
+[rank 4 x3200c0s19b0n0] CVD= 0
+[rank 5 x3200c0s19b0n0] local_rank 1 PALS_LOCAL_RANKID= 1
+[rank 5 x3200c0s19b0n0] CVD= 1
+[rank 6 x3200c0s19b0n0] local_rank 2 PALS_LOCAL_RANKID= 2
+[rank 6 x3200c0s19b0n0] CVD= 2
+[rank 7 x3200c0s19b0n0] local_rank 3 PALS_LOCAL_RANKID= 3
+[rank 7 x3200c0s19b0n0] CVD= 3
+[rank 1 x3200c0s13b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 1 x3200c0s13b1n0] local_rank 1 PALS_LOCAL_RANKID= 1
+[rank 1 x3200c0s13b1n0] CVD= 1
+[rank 2 x3200c0s13b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 2 x3200c0s13b1n0] local_rank 2 PALS_LOCAL_RANKID= 2
+[rank 2 x3200c0s13b1n0] CVD= 2
+[rank 3 x3200c0s13b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 3 x3200c0s13b1n0] local_rank 3 PALS_LOCAL_RANKID= 3
+[rank 3 x3200c0s13b1n0] CVD= 3
+[rank 0 x3200c0s13b1n0] local_rank 0 PALS_LOCAL_RANKID= 0
+[rank 0 x3200c0s13b1n0] CVD= 0
+[rank 1 x3200c0s13b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=8869.4
+[rank 2 x3200c0s13b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=-7158.1
+[rank 3 x3200c0s13b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=-6436.7
+[rank 0 x3200c0s13b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=43869.6
+[rank 4 x3200c0s19b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=19908.8
+[rank 6 x3200c0s19b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=11163.9
+[rank 5 x3200c0s19b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=5723.0
+[rank 7 x3200c0s19b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=-1160.3
+[rank 4 x3200c0s19b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 0 x3200c0s13b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 5 x3200c0s19b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 6 x3200c0s19b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 7 x3200c0s19b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 1 x3200c0s13b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 2 x3200c0s13b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 3 x3200c0s13b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 7 x3200c0s19b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 3 x3200c0s13b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 4 x3200c0s19b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 6 x3200c0s19b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 2 x3200c0s13b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 5 x3200c0s19b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 0 x3200c0s13b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 1 x3200c0s13b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[W922 20:46:20.239830697 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W922 20:46:20.076209903 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W922 20:46:20.267050544 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W922 20:46:20.267132157 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W922 20:46:20.097939733 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W922 20:46:20.280457992 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+NCCL version 2.30.7+cuda13.3
+[W922 20:46:20.106458860 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W922 20:46:20.109677626 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[rank 0 x3200c0s13b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 4 x3200c0s19b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 1 x3200c0s13b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 5 x3200c0s19b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 6 x3200c0s19b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 7 x3200c0s19b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 2 x3200c0s13b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 3 x3200c0s13b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1790109984.792451  718363 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+I0000 00:00:1790110005.448655  718363 gpu_device.cc:2043] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 38235 MB memory:  -> device: 0, name: NVIDIA A100-SXM4-40GB, pci bus id: 0000:07:00.0, compute capability: 8.0
+[rank 0 x3200c0s13b1n0] tensorflow GPU OK tf 2.21.0 gpus=1 r=134217728.0
+[rank 0 x3200c0s13b1n0] jax GPU OK jax 0.11.1 devices=[CudaDevice(id=0)] r=65536.0
+[rank 0 x3200c0s13b1n0] flash_attn OK flash_attn 2.8.3.post1 out (1, 128, 8, 64)
+W0922 20:46:57.293000 718363 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0922 20:46:57.294000 718363 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0922 20:46:57.294000 718363 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+W0922 20:46:57.297000 718363 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0922 20:46:57.297000 718363 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0922 20:46:57.297000 718363 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+W0922 20:46:57.301000 718363 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0922 20:46:57.301000 718363 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0922 20:46:57.301000 718363 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+W0922 20:46:57.304000 718363 site-packages/torch/_library/opaque_object.py:381] is_opaque_value_type is deprecated, use is_opaque_constant_type instead
+W0922 20:46:57.304000 718363 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0922 20:46:57.304000 718363 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/soft/applications/conda/2026-09-17/mconda3/lib/python3.13/site-packages/transformer_engine/jax/sharding.py:23: DeprecationWarning: jax.interpreters.pxla.thread_resources is deprecated as of JAX v0.8.2. Please switch to using `with jax.set_mesh(mesh)` instead of `with mesh:` and then use `jax.sharding.get_abstract_mesh()` to get the current mesh.
+  _PXLA_THREAD_RESOURCES = pxla.thread_resources
+[rank 0 x3200c0s13b1n0] transformer_engine OK TE linear (8, 64)
+[rank 0 x3200c0s13b1n0] deepspeed OK deepspeed 0.19.6+c7cc64a90 FusedAdam ok
+W0922 20:47:42.238000 718363 site-packages/torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W0922 20:47:42.238000 718363 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0922 20:47:42.238000 718363 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+[rank 0 x3200c0s13b1n0] vllm import OK 0.29.1.dev0+g98dff2a81.d20260917
+[rank 0 x3200c0s13b1n0] torch.compile (triton JIT) OK torch.compile/triton torch.Size([64])
+[rank 0 x3200c0s13b1n0] mpi4jax OK mpi4jax import ok
+[rank 4 x3200c0s19b0n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 5 x3200c0s19b0n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 6 x3200c0s19b0n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 1 x3200c0s13b1n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 7 x3200c0s19b0n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 2 x3200c0s13b1n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 3 x3200c0s13b1n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 0 x3200c0s13b1n0] h5py parallel MPI-IO OK h5py 3.14.0 hdf5 1.14.3 parallel write/read ok
+[rank 4 x3200c0s19b0n0] done
+[rank 0 x3200c0s13b1n0] done
+[rank 5 x3200c0s19b0n0] done
+[rank 6 x3200c0s19b0n0] done
+[rank 1 x3200c0s13b1n0] done
+[rank 7 x3200c0s19b0n0] done
+[rank 2 x3200c0s13b1n0] done
+[rank 3 x3200c0s13b1n0] done
+exit=0

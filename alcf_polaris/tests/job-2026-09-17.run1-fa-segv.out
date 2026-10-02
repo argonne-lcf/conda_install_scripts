@@ -1,0 +1,90 @@
+
+Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".
+
+
+Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with "PrgEnv-gnu/8.7.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-libsci/26.03.0     2) cray-mpich/9.1.0
+
+name, driver_version
+NVIDIA A100-SXM4-40GB, 580.65.06
+  4) gcc-native/14           12) darshan/3.5.0
+  6) cray-mpich/9.1.0        14) cray-hdf5-parallel/1.14.3.9
+  7) cray-libsci/26.03.0     15) conda/2026-09-17
+=== 8 ranks / 2 nodes ===
+[rank 4 x3200c0s19b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 5 x3200c0s19b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 6 x3200c0s19b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 7 x3200c0s19b1n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 0 x3200c0s13b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 1 x3200c0s13b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 2 x3200c0s13b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 3 x3200c0s13b0n0] MPI lib: MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1) size 8
+[rank 3 x3200c0s13b0n0] local_rank 3 PALS_LOCAL_RANKID= 3
+[rank 3 x3200c0s13b0n0] CVD= 3
+[rank 4 x3200c0s19b1n0] local_rank 0 PALS_LOCAL_RANKID= 0
+[rank 4 x3200c0s19b1n0] CVD= 0
+[rank 0 x3200c0s13b0n0] local_rank 0 PALS_LOCAL_RANKID= 0
+[rank 0 x3200c0s13b0n0] CVD= 0
+[rank 1 x3200c0s13b0n0] local_rank 1 PALS_LOCAL_RANKID= 1
+[rank 1 x3200c0s13b0n0] CVD= 1
+[rank 6 x3200c0s19b1n0] local_rank 2 PALS_LOCAL_RANKID= 2
+[rank 6 x3200c0s19b1n0] CVD= 2
+[rank 2 x3200c0s13b0n0] local_rank 2 PALS_LOCAL_RANKID= 2
+[rank 2 x3200c0s13b0n0] CVD= 2
+[rank 5 x3200c0s19b1n0] local_rank 1 PALS_LOCAL_RANKID= 1
+[rank 5 x3200c0s19b1n0] CVD= 1
+[rank 7 x3200c0s19b1n0] local_rank 3 PALS_LOCAL_RANKID= 3
+[rank 7 x3200c0s19b1n0] CVD= 3
+[rank 1 x3200c0s13b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=-16380.2
+[rank 2 x3200c0s13b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=10879.1
+[rank 0 x3200c0s13b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=22145.5
+[rank 3 x3200c0s13b0n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=16702.5
+[rank 4 x3200c0s19b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=-24267.5
+[rank 7 x3200c0s19b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=-75101.4
+[rank 5 x3200c0s19b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=5597.2
+[rank 6 x3200c0s19b1n0] torch.cuda OK torch 2.14.0 cuda 13.0 dev NVIDIA A100-SXM4-40GB sum=49524.0
+[rank 4 x3200c0s19b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 0 x3200c0s13b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 5 x3200c0s19b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 6 x3200c0s19b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 1 x3200c0s13b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 2 x3200c0s13b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 7 x3200c0s19b1n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 3 x3200c0s13b0n0] mpi4py CUDA-aware allreduce (cupy) OK cupy 14.2.0 GPU allreduce sum=8.0
+[rank 7 x3200c0s19b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 3 x3200c0s13b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 4 x3200c0s19b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 6 x3200c0s19b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 5 x3200c0s19b1n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 2 x3200c0s13b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 0 x3200c0s13b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[rank 1 x3200c0s13b0n0] torch.distributed NCCL OK nccl (2, 30, 7) allreduce over 8 ranks ok
+[W917 15:22:29.133349975 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W917 15:22:29.360967560 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W917 15:22:29.148630129 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W917 15:22:29.159581419 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W917 15:22:29.161051681 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W917 15:22:29.389849159 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+NCCL version 2.30.7+cuda13.3
+[W917 15:22:29.395393219 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[W917 15:22:29.406172538 ProcessGroupMPI.cpp:274] Warning: MPI was previously initialized. (function operator())
+[rank 0 x3200c0s13b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 4 x3200c0s19b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 1 x3200c0s13b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 5 x3200c0s19b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 2 x3200c0s13b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 6 x3200c0s19b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 3 x3200c0s13b0n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+[rank 7 x3200c0s19b1n0] torch.distributed MPI backend OK torch mpi backend GPU allreduce ok
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1789658554.225844 3460843 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+I0000 00:00:1789658577.711020 3460843 gpu_device.cc:2043] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 38235 MB memory:  -> device: 0, name: NVIDIA A100-SXM4-40GB, pci bus id: 0000:07:00.0, compute capability: 8.0
+[rank 0 x3200c0s13b0n0] tensorflow GPU OK tf 2.21.0 gpus=1 r=134217728.0
+[rank 0 x3200c0s13b0n0] jax GPU OK jax 0.11.1 devices=[CudaDevice(id=0)] r=65536.0
+x3200c0s13b0n0.hsn.cm.sirius.alcf.anl.gov: rank 0 died from signal 11 and dumped core
+x3200c0s13b0n0.hsn.cm.sirius.alcf.anl.gov: rank 3 died from signal 15
+exit=143

@@ -1,0 +1,9 @@
+__pycache__/
+# tokenizers 0.22 shim, only needed for the broken 2025-09-25 env
+_site/
+# scratch drivers/outputs/logs from the 2025-09-25 runs
+job.pbs
+job.out
+job6.pbs
+job6.out
+logs/7630*/

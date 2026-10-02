@@ -1,0 +1,22 @@
+#!/bin/bash -l
+#PBS -A datascience
+#PBS -q debug
+#PBS -l select=2:ncpus=64:ngpus=4,filesystems=home:grand,walltime=00:45:00
+#PBS -N conda-test-2026-10-01
+#PBS -j oe
+#PBS -o polaris-2026-10-01.out
+# Post-sync check of conda/2026-10-01 on Polaris: 2-node harness, then per-package isolation tests.
+cd $PBS_O_WORKDIR
+module use /soft/modulefiles
+module load conda/2026-10-01; conda activate
+export MPICH_GPU_SUPPORT_ENABLED=1 DARSHAN_DISABLE=1
+nvidia-smi --query-gpu=name,driver_version --format=csv | head -2
+module list 2>&1 | grep -E "conda|gcc|mpich|hdf5"
+echo "=== 8 ranks / 2 nodes ==="
+NCCL_DEBUG=WARN mpiexec -n 8 --ppn 4 ./gpu_wrap.sh python gpu_test.py
+echo "exit=$?"
+echo "=== isolation tests (1 GPU)"
+for t in fa fa_after_tf te ds apex vllm compile mpi4jax ort xgb mamba flashinfer gce numpyro; do
+  echo "=== $t"; CUDA_VISIBLE_DEVICES=0 python -X faulthandler isolate_2026-09-17.py $t 2>&1 | grep -vE '^(I0000|WARNING: All log|To enable the following)' | tail -25; echo "--- rc=${PIPESTATUS[0]}"
+done
+echo "=== all done"

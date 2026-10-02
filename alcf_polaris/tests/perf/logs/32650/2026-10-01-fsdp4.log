@@ -1,0 +1,1 @@
+RESULT fsdp2 gpt params=1.42B gpus=4 bs/gpu=4 seq=1024 step_ms=225 tok/s/gpu=18184 tok/s_total=72736 TFLOPS/gpu=166 peak_mem_GB=13.1 loss=0.03

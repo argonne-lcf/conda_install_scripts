@@ -1,0 +1,222 @@
+[2026-09-23 20:06:03,375 W 1561368 1561368] network_util.cc:330: Failed to determine local IP via external connectivity to: 8.8.8.8:53, [2001:4860:4860::8888]:53, falling back to hostname resolution
+2026-09-23 20:06:03,294	INFO scripts.py:1231 -- [37mLocal node IP[39m: [1m10.201.1.51[22m
+2026-09-23 20:06:09,768	SUCC scripts.py:1247 -- [32m--------------------[39m
+2026-09-23 20:06:09,768	SUCC scripts.py:1248 -- [32mRay runtime started.[39m
+2026-09-23 20:06:09,768	SUCC scripts.py:1249 -- [32m--------------------[39m
+2026-09-23 20:06:09,768	INFO scripts.py:1251 -- To terminate the Ray runtime, run
+2026-09-23 20:06:09,768	INFO scripts.py:1252 -- [1m  ray stop[22m
+2026-09-23 20:06:09,768	INFO scripts.py:1262 -- [36m[1m--block[22m[39m
+2026-09-23 20:06:09,768	INFO scripts.py:1263 -- This command will now block forever until terminated by a signal.
+2026-09-23 20:06:09,768	INFO scripts.py:1266 -- Running subprocesses are monitored and a message will be printed if any of them terminate unexpectedly. Subprocesses exit with SIGTERM will be treated as graceful, thus NOT reported.
+2026-09-23 20:06:09,768	INFO scripts.py:1271 -- Process exit logs will be saved to: [1m/tmp/ray_felker/session_2026-09-23_20-05-47_572301_362588/logs/ray_process_exit.log[22m[26m
+2026-09-23 20:12:57,862	ERR scripts.py:1304 -- [31mSome Ray subprocesses exited unexpectedly:[39m
+2026-09-23 20:12:57,862	ERR scripts.py:86 -- [31m[1mraylet[22m[26m[39m[0m[2m [exit code=1][22m[0m
+2026-09-23 20:12:57,863	ERR scripts.py:114 -- [31m----- BEGIN raylet.err tail (exit code(s)=1) -----[39m
+2026-09-23 20:12:57,863	ERR scripts.py:121 -- [31m[2026-09-23 20:12:57,824 E 1561430 1561430] (raylet) rpc_client.h:204: Failed to connect to GCS within 60 seconds. GCS may have been killed. It's either GCS is terminated by `ray stop` or is killed unexpectedly. If it is killed unexpectedly, see the log file gcs_server.out. https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#logging-directory-structure. The program will terminate.
+[39m
+2026-09-23 20:12:57,863	ERR scripts.py:127 -- [31m----- END raylet.err tail (exit code(s)=1) -----[39m
+2026-09-23 20:12:57,863	ERR scripts.py:114 -- [31m----- BEGIN raylet.out tail (exit code(s)=1) -----[39m
+2026-09-23 20:12:57,863	ERR scripts.py:121 -- [31m[state-dump] OwnershipBasedObjectDirectory:
+[state-dump] - num listeners: 0
+[state-dump] - cumulative location updates: 0
+[state-dump] - num location updates per second: 0.000
+[state-dump] - num location lookups per second: 0.000
+[state-dump] - num locations added per second: 0.000
+[state-dump] - num locations removed per second: 0.000
+[state-dump] BufferPool:
+[state-dump] - create buffer state map size: 0
+[state-dump] PullManager:
+[state-dump] - num bytes available for pulled objects: 156644473651
+[state-dump] - num bytes being pulled (all): 0
+[state-dump] - num bytes being pulled / pinned: 0
+[state-dump] - get request bundles: BundlePullRequestQueue{0 total, 0 active, 0 inactive, 0 unpullable}
+[state-dump] - wait request bundles: BundlePullRequestQueue{0 total, 0 active, 0 inactive, 0 unpullable}
+[state-dump] - task request bundles: BundlePullRequestQueue{0 total, 0 active, 0 inactive, 0 unpullable}
+[state-dump] - first get request bundle: N/A
+[state-dump] - first wait request bundle: N/A
+[state-dump] - first task request bundle: N/A
+[state-dump] - num objects queued: 0
+[state-dump] - num objects actively pulled (all): 0
+[state-dump] - num objects actively pulled / pinned: 0
+[state-dump] - num bundles being pulled: 0
+[state-dump] - num pull retries: 0
+[state-dump] - max timeout seconds: 0
+[state-dump] - max timeout request is already processed. No entry.
+[state-dump] 
+[state-dump] WorkerPool:
+[state-dump] - registered jobs: 0
+[state-dump] - process_failed_job_config_missing: 0
+[state-dump] - process_failed_rate_limited: 0
+[state-dump] - process_failed_pending_registration: 0
+[state-dump] - process_failed_runtime_env_setup_failed: 0
+[state-dump] - num PYTHON workers: 0
+[state-dump] - num PYTHON drivers: 0
+[state-dump] - num PYTHON pending start requests: 0
+[state-dump] - num PYTHON pending registration requests: 0
+[state-dump] - num object spill callbacks queued: 0
+[state-dump] - num object restore queued: 0
+[state-dump] - num util functions queued: 0
+[state-dump] - num idle workers: 0
+[state-dump] LeaseDependencyManager:
+[state-dump] - lease deps map size: 0
+[state-dump] - get req map size: 0
+[state-dump] - wait req map size: 0
+[state-dump] - local objects map size: 0
+[state-dump] WaitManager:
+[state-dump] - num active wait requests: 0
+[state-dump] Subscriber:
+[state-dump] Channel WORKER_REF_REMOVED_CHANNEL
+[state-dump] - cumulative subscribe requests: 0
+[state-dump] - cumulative unsubscribe requests: 0
+[state-dump] - active subscribed publishers: 0
+[state-dump] - cumulative published messages: 0
+[state-dump] - cumulative processed messages: 0
+[state-dump] Channel WORKER_OBJECT_LOCATIONS_CHANNEL
+[state-dump] - cumulative subscribe requests: 0
+[state-dump] - cumulative unsubscribe requests: 0
+[state-dump] - active subscribed publishers: 0
+[state-dump] - cumulative published messages: 0
+[state-dump] - cumulative processed messages: 0
+[state-dump] num async plasma notifications: 0
+[state-dump] Event stats:
+[state-dump] Global stats: 15485 total (13 active)
+[state-dump] Queueing time: mean = 71.36ms, max = 195131.57ms, min = -0.01ms, total = 1105080.02ms
+[state-dump] Execution time:  mean = 26.29ms, total = 407140.04ms
+[state-dump] Event stats:
+[state-dump] 	ObjectManager.UpdateAvailableMemory - 3589 total (0 active), Execution time: mean = 0.00ms, total = 3.80ms, Queueing time: mean = 0.04ms, max = 18.41ms, min = 0.00ms, total = 146.58ms
+[state-dump] 	NodeManager.CheckGC - 3589 total (1 active), Execution time: mean = 0.00ms, total = 3.77ms, Queueing time: mean = 0.31ms, max = 189.50ms, min = 0.00ms, total = 1108.72ms
+[state-dump] 	RaySyncer.BroadcastMessageIfNewVersion - 3589 total (1 active), Execution time: mean = 0.00ms, total = 12.65ms, Queueing time: mean = 0.31ms, max = 189.50ms, min = -0.00ms, total = 1100.86ms
+[state-dump] 	RayletWorkerPool.deadline_timer.kill_idle_workers - 1797 total (1 active), Execution time: mean = 0.00ms, total = 6.30ms, Queueing time: mean = 0.39ms, max = 189.51ms, min = -0.01ms, total = 697.60ms
+[state-dump] 	NodeManager.ScheduleAndGrantLeases - 360 total (1 active), Execution time: mean = 0.01ms, total = 2.04ms, Queueing time: mean = 0.58ms, max = 148.87ms, min = 0.00ms, total = 208.04ms
+[state-dump] 	NodeManager.deadline_timer.spill_objects_when_over_threshold - 360 total (1 active), Execution time: mean = 0.00ms, total = 0.44ms, Queueing time: mean = 0.58ms, max = 148.88ms, min = 0.00ms, total = 207.82ms
+[state-dump] 	NodeManager.deadline_timer.flush_free_objects - 360 total (1 active), Execution time: mean = 0.00ms, total = 0.38ms, Queueing time: mean = 0.58ms, max = 148.88ms, min = 0.00ms, total = 207.87ms
+[state-dump] 	NodeManager.CheckForUnexpectedWorkerDisconnects - 360 total (1 active), Execution time: mean = 0.01ms, total = 2.52ms, Queueing time: mean = 0.58ms, max = 148.87ms, min = 0.00ms, total = 207.38ms
+[state-dump] 	NodeManagerService.grpc_server.GetResourceLoad - 347 total (0 active), Execution time: mean = 0.31ms, total = 106.84ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	NodeManagerService.grpc_server.GetResourceLoad.HandleRequestImpl - 347 total (0 active), Execution time: mean = 0.05ms, total = 16.25ms, Queueing time: mean = 0.16ms, max = 43.76ms, min = 0.01ms, total = 57.23ms
+[state-dump] 	ClusterResourceManager.ResetRemoteNodeView - 120 total (1 active), Execution time: mean = 0.00ms, total = 0.39ms, Queueing time: mean = 1.55ms, max = 161.62ms, min = 0.01ms, total = 185.76ms
+[state-dump] 	NodeManager.deadline_timer.record_metrics - 72 total (1 active), Execution time: mean = 0.12ms, total = 9.00ms, Queueing time: mean = 0.19ms, max = 10.19ms, min = 0.01ms, total = 13.82ms
+[state-dump] 	NodeManagerService.grpc_server.GetWorkerPIDs.HandleRequestImpl - 70 total (0 active), Execution time: mean = 0.02ms, total = 1.61ms, Queueing time: mean = 0.02ms, max = 0.22ms, min = 0.01ms, total = 1.67ms
+[state-dump] 	NodeManagerService.grpc_server.GetAgentPIDs.HandleRequestImpl - 70 total (0 active), Execution time: mean = 0.01ms, total = 0.61ms, Queueing time: mean = 0.02ms, max = 0.23ms, min = 0.01ms, total = 1.61ms
+[state-dump] 	NodeManagerService.grpc_server.GetWorkerPIDs - 70 total (0 active), Execution time: mean = 0.23ms, total = 15.97ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	NodeManagerService.grpc_server.GetAgentPIDs - 70 total (0 active), Execution time: mean = 0.21ms, total = 14.35ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	 - 42 total (0 active), Execution time: mean = 0.02ms, total = 0.94ms, Queueing time: mean = 1.26ms, max = 18.85ms, min = 0.00ms, total = 53.12ms
+[state-dump] 	event_loop_lag_probe - 38 total (0 active), Execution time: mean = 0.01ms, total = 0.24ms, Queueing time: mean = 142.50ms, max = 5360.87ms, min = 0.00ms, total = 5414.86ms
+[state-dump] 	NodeManager.deadline_timer.debug_state_dump - 36 total (1 active), Execution time: mean = 0.32ms, total = 11.56ms, Queueing time: mean = 0.31ms, max = 10.15ms, min = 0.01ms, total = 11.15ms
+[state-dump] 	ClientConnection.async_read.ProcessMessageHeader - 20 total (0 active), Execution time: mean = 0.00ms, total = 0.04ms, Queueing time: mean = 53962.90ms, max = 195131.57ms, min = 0.01ms, total = 1079257.95ms
+[state-dump] 	ClientConnection.async_read.ProcessMessage - 20 total (0 active), Execution time: mean = 0.06ms, total = 1.27ms, Queueing time: mean = 0.02ms, max = 0.19ms, min = 0.00ms, total = 0.46ms
+[state-dump] 	RaySyncer.BroadcastMessage - 15 total (0 active), Execution time: mean = 0.05ms, total = 0.80ms, Queueing time: mean = 0.00ms, max = 0.00ms, min = 0.00ms, total = 0.00ms
+[state-dump] 	PeriodicalRunner.RunFnPeriodically - 13 total (0 active), Execution time: mean = 0.10ms, total = 1.29ms, Queueing time: mean = 1232.97ms, max = 5335.60ms, min = 0.03ms, total = 16028.63ms
+[state-dump] 	ray::rpc::ControlPlanePubSubGcsService.grpc_client.GcsSubscriberPoll.OnReplyReceived - 10 total (0 active), Execution time: mean = 0.06ms, total = 0.61ms, Queueing time: mean = 5.30ms, max = 38.09ms, min = 0.01ms, total = 53.00ms
+[state-dump] 	ray::rpc::ControlPlanePubSubGcsService.grpc_client.GcsSubscriberPoll - 10 total (0 active), Execution time: mean = 34756.26ms, total = 347562.58ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	Subscriber.HandlePublishedMessage_GCS_WORKER_DELTA_CHANNEL - 9 total (0 active), Execution time: mean = 0.00ms, total = 0.02ms, Queueing time: mean = 0.12ms, max = 0.37ms, min = 0.07ms, total = 1.11ms
+[state-dump] 	ray::rpc::NodeInfoGcsService.grpc_client.CheckAlive - 6 total (0 active), Execution time: mean = 1.37ms, total = 8.25ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ray::rpc::NodeInfoGcsService.grpc_client.CheckAlive.OnReplyReceived - 6 total (0 active), Execution time: mean = 0.01ms, total = 0.06ms, Queueing time: mean = 0.12ms, max = 0.71ms, min = 0.01ms, total = 0.75ms
+[state-dump] 	NodeManager.deadline_timer.print_event_loop_stats - 6 total (1 active, 1 running), Execution time: mean = 0.54ms, total = 3.25ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.06ms
+[state-dump] 	NodeManager.GcsCheckAlive - 6 total (1 active), Execution time: mean = 0.08ms, total = 0.48ms, Queueing time: mean = 0.48ms, max = 0.72ms, min = 0.51ms, total = 2.88ms
+[state-dump] 	NodeManagerService.grpc_server.GetSystemConfig - 4 total (0 active), Execution time: mean = 0.12ms, total = 0.46ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	CoreWorkerService.grpc_client.KillActor.OnReplyReceived - 4 total (0 active), Execution time: mean = 0.08ms, total = 0.31ms, Queueing time: mean = 0.01ms, max = 0.02ms, min = 0.01ms, total = 0.05ms
+[state-dump] 	ray::rpc::WorkerInfoGcsService.grpc_client.ReportWorkerFailure - 4 total (0 active), Execution time: mean = 3.74ms, total = 14.95ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	NodeManagerService.grpc_server.RequestWorkerLease.HandleRequestImpl - 4 total (0 active), Execution time: mean = 0.11ms, total = 0.46ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.03ms
+[state-dump] 	ObjectManager.ObjectAdded - 4 total (0 active), Execution time: mean = 0.01ms, total = 0.02ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.05ms
+[state-dump] 	CoreWorkerService.grpc_client.KillActor - 4 total (0 active), Execution time: mean = 690.85ms, total = 2763.40ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ObjectManager.ObjectDeleted - 4 total (0 active), Execution time: mean = 0.00ms, total = 0.02ms, Queueing time: mean = 0.03ms, max = 0.07ms, min = 0.02ms, total = 0.13ms
+[state-dump] 	NodeManagerService.grpc_server.KillLocalActor - 4 total (0 active), Execution time: mean = 704.48ms, total = 2817.91ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	NodeManagerService.grpc_server.GetSystemConfig.HandleRequestImpl - 4 total (0 active), Execution time: mean = 0.01ms, total = 0.05ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.03ms
+[state-dump] 	NodeManagerService.grpc_server.RequestWorkerLease - 4 total (0 active), Execution time: mean = 12068.41ms, total = 48273.65ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	NodeManagerService.grpc_server.KillLocalActor.HandleRequestImpl - 4 total (0 active), Execution time: mean = 10.98ms, total = 43.93ms, Queueing time: mean = 13.44ms, max = 18.05ms, min = 0.01ms, total = 53.75ms
+[state-dump] 	ray::rpc::WorkerInfoGcsService.grpc_client.ReportWorkerFailure.OnReplyReceived - 4 total (0 active), Execution time: mean = 0.00ms, total = 0.02ms, Queueing time: mean = 11.11ms, max = 14.81ms, min = 0.02ms, total = 44.45ms
+[state-dump] 	ClientConnection.async_write.DoAsyncWrites - 4 total (0 active), Execution time: mean = 0.00ms, total = 0.00ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.03ms
+[state-dump] 	RaySyncerRegister - 2 total (0 active), Execution time: mean = 0.00ms, total = 0.00ms, Queueing time: mean = 0.00ms, max = 0.00ms, min = 0.00ms, total = 0.00ms
+[state-dump] 	Subscriber.HandlePublishedMessage_GCS_JOB_CHANNEL - 2 total (0 active), Execution time: mean = 0.01ms, total = 0.02ms, Queueing time: mean = 0.09ms, max = 0.13ms, min = 0.05ms, total = 0.18ms
+[state-dump] 	ray::rpc::ControlPlanePubSubGcsService.grpc_client.GcsSubscriberCommandBatch.OnReplyReceived - 2 total (0 active), Execution time: mean = 0.07ms, total = 0.14ms, Queueing time: mean = 0.43ms, max = 0.74ms, min = 0.12ms, total = 0.85ms
+[state-dump] 	ray::rpc::ControlPlanePubSubGcsService.grpc_client.GcsSubscriberCommandBatch - 2 total (0 active), Execution time: mean = 1.73ms, total = 3.45ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	Subscriber.HandlePublishedMessage_GCS_NODE_ADDRESS_AND_LIVENESS_CHANNEL - 1 total (0 active), Execution time: mean = 0.02ms, total = 0.02ms, Queueing time: mean = 0.07ms, max = 0.07ms, min = 0.07ms, total = 0.07ms
+[state-dump] 	ray::rpc::NodeInfoGcsService.grpc_client.GetAllNodeAddressAndLiveness - 1 total (0 active), Execution time: mean = 2.02ms, total = 2.02ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ray::rpc::NodeInfoGcsService.grpc_client.RegisterNode.OnReplyReceived - 1 total (0 active), Execution time: mean = 0.18ms, total = 0.18ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.01ms
+[state-dump] 	NodeManagerService.grpc_server.CommitBundleResources - 1 total (0 active), Execution time: mean = 0.34ms, total = 0.34ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ray::rpc::InternalKVGcsService.grpc_client.GetInternalConfig.OnReplyReceived - 1 total (0 active), Execution time: mean = 5360.82ms, total = 5360.82ms, Queueing time: mean = 2.47ms, max = 2.47ms, min = 2.47ms, total = 2.47ms
+[state-dump] 	ray::rpc::NodeInfoGcsService.grpc_client.RegisterNode - 1 total (0 active), Execution time: mean = 0.81ms, total = 0.81ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ReporterService.grpc_client.HealthCheck.OnReplyReceived - 1 total (0 active), Execution time: mean = 0.13ms, total = 0.13ms, Queueing time: mean = 0.09ms, max = 0.09ms, min = 0.09ms, total = 0.09ms
+[state-dump] 	NodeManagerService.grpc_server.CommitBundleResources.HandleRequestImpl - 1 total (0 active), Execution time: mean = 0.25ms, total = 0.25ms, Queueing time: mean = 0.02ms, max = 0.02ms, min = 0.02ms, total = 0.02ms
+[state-dump] 	NodeManager.GCTaskFailureReason - 1 total (1 active), Execution time: mean = 0.00ms, total = 0.00ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	NodeManagerService.grpc_server.RemovePlacementGroupBundles.HandleRequestImpl - 1 total (0 active), Execution time: mean = 0.31ms, total = 0.31ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.01ms
+[state-dump] 	NodeManagerService.grpc_server.PrepareBundleResources - 1 total (0 active), Execution time: mean = 0.52ms, total = 0.52ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ray::rpc::JobInfoGcsService.grpc_client.GetAllJobInfo.OnReplyReceived - 1 total (0 active), Execution time: mean = 0.01ms, total = 0.01ms, Queueing time: mean = 8.86ms, max = 8.86ms, min = 8.86ms, total = 8.86ms
+[state-dump] 	ray::rpc::NodeInfoGcsService.grpc_client.GetAllNodeAddressAndLiveness.OnReplyReceived - 1 total (0 active), Execution time: mean = 0.11ms, total = 0.11ms, Queueing time: mean = 0.01ms, max = 0.01ms, min = 0.01ms, total = 0.01ms
+[state-dump] 	NodeManagerService.grpc_server.PrepareBundleResources.HandleRequestImpl - 1 total (0 active), Execution time: mean = 0.37ms, total = 0.37ms, Queueing time: mean = 0.02ms, max = 0.02ms, min = 0.02ms, total = 0.02ms
+[state-dump] 	ray::rpc::InternalKVGcsService.grpc_client.GetInternalConfig - 1 total (0 active), Execution time: mean = 0.58ms, total = 0.58ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ray::rpc::JobInfoGcsService.grpc_client.GetAllJobInfo - 1 total (0 active), Execution time: mean = 0.34ms, total = 0.34ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	NodeManagerService.grpc_server.RemovePlacementGroupBundles - 1 total (0 active), Execution time: mean = 0.45ms, total = 0.45ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] 	ReporterService.grpc_client.HealthCheck - 1 total (0 active), Execution time: mean = 65.69ms, total = 65.69ms, Queueing time: mean = 0.00ms, max = -0.00ms, min = 9223372036854.78ms, total = 0.00ms
+[state-dump] DebugString() time ms: 0
+[state-dump] 
+[state-dump] 
+[2026-09-23 20:12:09,286 W 1561430 1564842] (raylet) open_telemetry_metric_recorder.cc:67: Failed to export metrics to the metrics agent. Result: 1
+[2026-09-23 20:12:09,465 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:10,823 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:10,823 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:12,823 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:12,823 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:14,467 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:14,824 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:14,824 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:16,824 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:16,824 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:18,824 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:18,824 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:19,287 W 1561430 1564843] (raylet) open_telemetry_metric_recorder.cc:67: Failed to export metrics to the metrics agent. Result: 1
+[2026-09-23 20:12:19,471 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:20,824 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:20,824 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:22,824 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:22,825 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:24,473 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:24,825 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:24,825 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:26,825 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:26,825 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:28,825 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:28,825 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:29,288 W 1561430 1564844] (raylet) open_telemetry_metric_recorder.cc:67: Failed to export metrics to the metrics agent. Result: 1
+[2026-09-23 20:12:29,476 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:30,826 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:30,826 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:32,826 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:32,826 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:34,479 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:34,826 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:34,826 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:36,826 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:36,827 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:38,827 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:38,827 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:39,287 W 1561430 1564845] (raylet) open_telemetry_metric_recorder.cc:67: Failed to export metrics to the metrics agent. Result: 1
+[2026-09-23 20:12:39,482 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:40,827 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:40,827 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:42,828 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:42,828 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:44,485 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:44,828 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:44,828 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:46,828 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:46,828 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:48,829 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:48,829 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:49,289 W 1561430 1564905] (raylet) open_telemetry_metric_recorder.cc:67: Failed to export metrics to the metrics agent. Result: 1
+[2026-09-23 20:12:49,488 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:50,829 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:50,829 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:52,829 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:52,829 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:54,491 W 1561430 1561499] (raylet) memory_monitor_utils.cc:240: Got negative used memory for cgroup -1, setting it to zero
+[2026-09-23 20:12:54,829 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:54,829 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:56,830 I 1561430 1561430] (raylet) ray_syncer.cc:108: Connection to the node was broken, reconnecting. node_id=00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:56,830 I 1561430 1561430] (raylet) ray_syncer_bidi_reactor_base.h:243: Failed to read a message from node: 00000000000000000000000000000000000000000000000000000000
+[2026-09-23 20:12:57,824 W 1561430 1561430] (raylet) retryable_grpc_client.cc:85: GCS has been unavailable for more than 60 seconds
+[2026-09-23 20:12:57,824 E 1561430 1561430] (raylet) rpc_client.h:204: Failed to connect to GCS within 60 seconds. GCS may have been killed. It's either GCS is terminated by `ray stop` or is killed unexpectedly. If it is killed unexpectedly, see the log file gcs_server.out. https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#logging-directory-structure. The program will terminate.
+[39m
+2026-09-23 20:12:57,863	ERR scripts.py:127 -- [31m----- END raylet.out tail (exit code(s)=1) -----[39m
+2026-09-23 20:12:57,863	ERR scripts.py:1312 -- [31mRemaining processes will be killed.[39m
+x3001c0s19b1n0.hsn.cm.polaris.alcf.anl.gov: rank 0 exited with code 1

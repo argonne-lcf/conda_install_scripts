@@ -1,0 +1,51 @@
+=== Wed Sep 23 07:56:18 PM UTC 2026 nodes: x3001c0s19b0n0.hsn.cm.polaris.alcf.anl.gov x3001c0s19b1n0.hsn.cm.polaris.alcf.anl.gov  logs: logs/7646687
+
+Lmod is automatically replacing "nvidia/25.9" with "gcc-native/14".
+
+
+Lmod is automatically replacing "PrgEnv-nvidia/8.7.0" with "PrgEnv-gnu/8.7.0".
+
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-libsci/26.03.0     2) cray-mpich/9.1.0
+
+W0923 19:56:29.901000 356564 site-packages/torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W0923 19:56:29.902000 356564 site-packages/torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W0923 19:56:29.902000 356564 site-packages/torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+torch 2.14.0 nccl (2, 30, 7) vllm 0.29.1.dev0+g98dff2a81.d20260917 ray 2.58.0 transformers 5.10.4
+##### A. default module (no NCCL net plugin -> cross-node over TCP sockets) #####
+=== DDP ResNet-50: 1, 4, 8 GPUs ===
+RESULT ddp resnet50 bf16 gpus=1 bs/gpu=128 step_ms=68.1 img/s/gpu=1880 img/s_total=1880 peak_mem_GB=5.6
+x3001c0s19b0n0:357046:35704RESULT ddp resnet50 bf16 gpus=4 bs/gpu=128 step_ms=71.5 img/s/gpu=1790 img/s_total=7159 peak_mem_GB=5.8
+x3001c0s19b0n0:357047:357047 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:357048:357048 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:357049:357049 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1557908:1557908 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1557909:1557909 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1557909:1558058 [0] RESULT ddp resnet50 bf16 gpus=8 bs/gpu=128 step_ms=181.8 img/s/gpu=704 img/s_total=5633 peak_mem_GB=5.8
+x3001c0s19b1n0:1557910:1557910 [0] NCCL INFO Using network Socket
+=== FSDP2 GPT-1.4B: 4, 8, 8 HSDP ===
+x3001c0s19b0n0:357746:35774RESULT fsdp2 gpt params=1.42B gpus=4 bs/gpu=4 seq=1024 step_ms=224 tok/s/gpu=18277 tok/s_total=73110 TFLOPS/gpu=166 peak_mem_GB=13.1 loss=0.03
+x3001c0s19b0n0:357747:357747 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:357748:357748 [0] NCCL INFO Using network Socket
+x3001c0s19b0n0:357749:357749 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1558439:1558439 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1558439:1558587 [0] NRESULT fsdp2 gpt params=1.42B gpus=8 bs/gpu=4 seq=1024 step_ms=6405 tok/s/gpu=640 tok/s_total=5116 TFLOPS/gpu=6 peak_mem_GB=11.1 loss=0.03
+x3001c0s19b1n0:1558440:1558440 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1558441:1558441 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1559350:1559350 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1559351:1559351 [0] NCCL INFO Using network Socket
+x3001c0s19b1n0:1559352:1559352 [0] NCCL INFO Using network Socket
+xRESULT hsdp gpt params=1.42B gpus=8 bs/gpu=4 seq=1024 step_ms=2817 tok/s/gpu=1454 tok/s_total=11631 TFLOPS/gpu=13 peak_mem_GB=13.1 loss=0.03
+=== vLLM 1 node TP=4 (mp) ===
+engine init 104s
+RESULT vllm Qwen/Qwen2.5-7B-Instruct backend=mp tp=4 pp=1 reqs=512 time_s=5.7 gen_tok/s=22857 total_tok/s=30862 req/s=89.29
+sample: To determine how much Janet makes every day at the farmers' market, we need to follow these steps:  1. Calculate the total number of eggs laid by the ducks per day. 2. Subtract the number of eggs Jane
+##### C. multinode vLLM over Ray (default module) #####
+=== Ray cluster ===
+ 0.0/8.0 GPU
+=== vLLM 2 nodes TP=4 PP=2 (ray) ===
+engine init 251s
+RESULT vllm Qwen/Qwen2.5-7B-Instruct backend=ray tp=4 pp=2 reqs=512 time_s=26.1 gen_tok/s=5031 total_tok/s=6792 req/s=19.65
+sample: To determine how much Janet makes every day at the farmers' market, we need to follow these steps:  1. Calculate the total number of eggs laid by the ducks each day. 2. Subtract the number of eggs Jan
+=== done Wed Sep 23 08:13:02 PM UTC 2026
